@@ -1,4 +1,5 @@
-﻿namespace Bau.Libraries.LibReporting.Application;
+﻿
+namespace Bau.Libraries.LibReporting.Application;
 
 /// <summary>
 ///		Manager para reporting

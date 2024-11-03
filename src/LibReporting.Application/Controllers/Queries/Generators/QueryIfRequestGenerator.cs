@@ -1,6 +1,6 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
-using Bau.Libraries.LibReporting.Requests.Models;
+using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -37,7 +37,7 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 	///		Obtiene la SQL de una lista de expresiones
 	/// </summary>
 	//TODO: la comprobación de expresiones solicitadas debería ir a la Request
-	private string GetSql(List<ParserIfRequestExpressionSectionModel> expressions, ReportRequestModel request)
+	private string GetSql(List<ParserIfRequestExpressionSectionModel> expressions, RequestModel request)
 	{
 		string sql = string.Empty;
 
@@ -60,11 +60,11 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Comprueba si se ha solicitado alguna de las expresiones asociadas
 	/// </summary>
-	private bool IsRequested(ParserIfRequestExpressionSectionModel expression, ReportRequestModel request)
+	private bool IsRequested(ParserIfRequestExpressionSectionModel expression, RequestModel request)
 	{
 		// Comprueba si se ha solicitado alguna de las expresiones
 		foreach (string key in expression.ExpressionKeys)
-			if (request.IsRequestedExpression(key))
+			if (request.IsExpressionRequested(key))
 				return true;
 		// Si ha llegado hasta aquí es porque no ha solicitado nada
 		return false;

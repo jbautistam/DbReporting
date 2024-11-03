@@ -15,14 +15,14 @@ public class ReportRequestModel
 											ReportId = ReportId
 										};
 
-			// Clona las solicitudes de dimensions
+			// Clona las solicitudes de dimensiones
 			foreach (DimensionRequestModel dimensionRequest in Dimensions)
 				cloned.Dimensions.Add(dimensionRequest.Clone());
 			// Clona las solicitudes de orígenes de datos
 			foreach (DataSourceRequestModel dataSourceRequest in DataSources)
 				cloned.DataSources.Add(dataSourceRequest.Clone());
 			// Clona las solicitudes de expresiones
-			foreach (ExpressionRequestModel expressionRequest in Expressions)
+			foreach (ExpressionColumnRequestModel expressionRequest in Expressions)
 				cloned.Expressions.Add(expressionRequest.Clone());
 			// Clona la paginación
 			cloned.Pagination.Clone(Pagination);
@@ -76,10 +76,9 @@ public class ReportRequestModel
 		// Comprueba si se ha solicitado alguna de las expresiones
 		if (expressionKeys is not null)
 			foreach (string key in expressionKeys)
-				foreach (ExpressionRequestModel request in Expressions)
-					foreach (ExpressionColumnRequestModel column in request.Columns)
-						if (column.ColumnId.Equals(key, StringComparison.CurrentCultureIgnoreCase))
-							return true;
+				foreach (ExpressionColumnRequestModel expression in Expressions)
+					if (expression.ColumnId.Equals(key, StringComparison.CurrentCultureIgnoreCase))
+						return true;
 		// Si se ha llegado hasta aquí es porque no se ha encontrado ninguna de las expresiones
 		return false;
 	}
@@ -126,10 +125,9 @@ public class ReportRequestModel
 	public ExpressionColumnRequestModel? GetExpressionRequest(string expression)
 	{
 		// Busca la expresión entre las solicitudes
-		foreach (ExpressionRequestModel expressionRequest in Expressions)
-			foreach (ExpressionColumnRequestModel columnRequest in expressionRequest.Columns)
-				if (columnRequest.ColumnId.Equals(expression, StringComparison.CurrentCultureIgnoreCase))
-					return columnRequest;
+		foreach (ExpressionColumnRequestModel columnRequest in Expressions)
+			if (columnRequest.ColumnId.Equals(expression, StringComparison.CurrentCultureIgnoreCase))
+				return columnRequest;
 		// Si ha llegado hasta aquí es porque no ha encontrado nada
 		return null;
 	}
@@ -162,7 +160,7 @@ public class ReportRequestModel
 	/// <summary>
 	///		Expresiones solicitadas
 	/// </summary>
-	public List<ExpressionRequestModel> Expressions { get; } = [];
+	public List<ExpressionColumnRequestModel> Expressions { get; } = [];
 
 	/// <summary>
 	///		Paginación

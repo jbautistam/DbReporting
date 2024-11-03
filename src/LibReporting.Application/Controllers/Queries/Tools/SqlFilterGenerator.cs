@@ -14,6 +14,11 @@ internal class SqlFilterGenerator
 	}
 
 	/// <summary>
+	///		Obtiene la SQL de los filtros
+	/// </summary>
+	internal string GetSql(string table, string column, string aggregation) => GetSqlWithFilter(table, column, aggregation, null);
+
+	/// <summary>
 	///		Obtiene la SQL de los filtros para un <see cref="List{RequestFilterModel}"/>
 	/// </summary>
 	internal string GetSql(string table, string column, List<RequestFilterModel> filters) => GetSql(table, column, string.Empty, filters);
@@ -27,7 +32,7 @@ internal class SqlFilterGenerator
 
 			// Genera la SQL de los filtros
 			foreach (RequestFilterModel filter in filters)
-				sql = sql.AddWithSeparator(GetSql(table, column, aggregation, filter), "AND");
+				sql = sql.AddWithSeparator(GetSqlWithFilter(table, column, aggregation, filter), "AND");
 			// Devuelve la cadena SQL
 			return sql;
 	}
@@ -35,14 +40,20 @@ internal class SqlFilterGenerator
 	/// <summary>
 	///		Obtiene la cadena SQL para un <see cref="RequestFilterModel"/>
 	/// </summary>
-	internal string GetSql(string table, string column, RequestFilterModel filter) => GetSql(table, column, string.Empty, filter);
+	internal string GetSql(string table, string column, RequestFilterModel filter) => GetSqlWithFilter(table, column, string.Empty, filter);
 
 	/// <summary>
 	///		Obtiene la cadena SQL de un <see cref="RequestFilterModel"/>
 	/// </summary>
-	internal string GetSql(string table, string column, string aggregation, RequestFilterModel filter)
+	internal string GetSqlWithFilter(string table, string column, string aggregation, RequestFilterModel? filter)
 	{
-		return $"{GetFieldNameWithAggregation(table, column, aggregation)} {GetCondition(filter.Condition)} {GetValues(filter.Condition, filter.Values)}";
+		string sql = GetFieldNameWithAggregation(table, column, aggregation);
+		
+			// Añade el filtro
+			if (filter is not null)
+				sql = sql.AddWithSeparator(GetCondition(filter.Condition) + " " + GetValues(filter.Condition, filter.Values), " ");
+			// Devuelve el filtro
+			return sql;
 	}
 
 	/// <summary>

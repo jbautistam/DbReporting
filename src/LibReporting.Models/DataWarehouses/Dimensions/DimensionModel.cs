@@ -79,5 +79,5 @@ public class DimensionModel : BaseDimensionModel
 	/// <summary>
 	///		Relaciones de esta dimensión con su dimensión hijo
 	/// </summary>
-	public List<DimensionRelationModel> Relations { get; } = new();
+	public List<DimensionRelationModel> Relations { get; } = [];
 }

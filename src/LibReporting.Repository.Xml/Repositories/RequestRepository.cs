@@ -70,7 +70,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 										request.DataSources.Add(LoadDataSource(nodeML));
 									break;
 								case TagExpression:
-										request.Expressions.Add(LoadExpressions(nodeML));
+										request.Expressions.AddRange(LoadExpressions(nodeML));
 									break;
 							}
 					}
@@ -110,8 +110,6 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 						column.ColumnId = nodeML.Attributes[TagId].Value.TrimIgnoreNull();
 						// Asigna las propiedades básicas
 						LoadBaseColumnData(column, nodeML);
-						// Carga las columnas básicas
-						column.Childs.AddRange(LoadDimensionColumns(nodeML));
 						// Añade la columna
 						columns.Add(column);
 				}
@@ -159,26 +157,11 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	}
 
 	/// <summary>
-	///		Carga los datos de una expresión
-	/// </summary>
-	private ExpressionRequestModel LoadExpressions(MLNode rootML)
-	{
-		ExpressionRequestModel expression = new();
-
-			// Asigna los datos de la expresión
-			expression.ReportDataSourceId = rootML.Attributes[TagId].Value.TrimIgnoreNull();
-			// Añade las columnas
-			expression.Columns.AddRange(LoadExpressionColumns(rootML));
-			// Devuelve los datos
-			return expression;
-	}
-
-	/// <summary>
 	///		Carga las columnas de una expresión
 	/// </summary>
-	private List<ExpressionColumnRequestModel> LoadExpressionColumns(MLNode rootML)
+	private List<ExpressionColumnRequestModel> LoadExpressions(MLNode rootML)
 	{
-		List<ExpressionColumnRequestModel> columns = new();
+		List<ExpressionColumnRequestModel> columns = [];
 
 			// Carga las columnas
 			foreach (MLNode nodeML in rootML.Nodes)
@@ -188,9 +171,6 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 
 						// Carga las propiedades
 						column.ColumnId = nodeML.Attributes[TagId].Value.TrimIgnoreNull();
-						column.AggregatedBy = nodeML.Attributes[TagAggregatedBy].Value.TrimIgnoreNull().GetEnum(ExpressionColumnRequestModel.AggregationType.Sum);
-						// Carga los datos básicos
-						LoadBaseColumnData(column, nodeML);
 						// Añade la columna a la colección
 						columns.Add(column);
 				}
@@ -387,8 +367,6 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 					nodeML.Attributes.Add(TagId, column.ColumnId);
 					// Añade los atributos básicos de la columna
 					GetBaseColumnAttributes(column, nodeML);
-					// Añade las solicitudes de columnas hija
-					nodeML.Nodes.AddRange(GetNodesDimensionColumns(column.Childs));
 					// Añade el nodo a la colección
 					nodesML.Add(nodeML);
 			}
@@ -430,30 +408,17 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// <summary>
 	///		Obtiene los nodos de las expresiones
 	/// </summary>
-	private MLNodesCollection GetNodesExpressions(List<ExpressionRequestModel> expressions)
+	private MLNodesCollection GetNodesExpressions(List<ExpressionColumnRequestModel> expressions)
 	{
 		MLNodesCollection nodesML = [];
 
-			// Añade los nodos de expresión
-			foreach (ExpressionRequestModel expression in expressions)
+			// Añade las columnas
+			foreach (ExpressionColumnRequestModel column in expressions)
 			{
-				MLNode nodeML = new(TagExpression);
+				MLNode columnML = nodesML.Add(TagColumn);
 
-					// Añade los atributos
-					nodeML.Attributes.Add(TagId, expression.ReportDataSourceId);
-					// Añade las columnas
-					foreach (ExpressionColumnRequestModel column in expression.Columns)
-					{
-						MLNode columnML = nodeML.Nodes.Add(TagColumn);
-
-							// Añade los valores
-							columnML.Attributes.Add(TagId, column.ColumnId);
-							columnML.Attributes.Add(TagAggregatedBy, column.AggregatedBy.ToString());
-							// Añade los atributos base de la columna
-							GetBaseColumnAttributes(column, columnML);
-					}
-					// Añade los datos del nodo a la colección
-					nodesML.Add(nodeML);
+					// Añade los valores
+					columnML.Attributes.Add(TagId, column.ColumnId);
 			}
 			// Devuelve los nodos
 			return nodesML;

@@ -78,7 +78,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// </summary>
 	private List<(string dimensionTable, string dimensionAlias, string join)> GetSqlJoins(ParserJoinSectionModel section)
 	{
-		List<(string dimensionTable, string dimensionAlias, string sql)> sqlJoins = new();
+		List<(string dimensionTable, string dimensionAlias, string sql)> sqlJoins = [];
 
 			// Crea las SQL de las dimensiones
 			foreach ((QueryTableModelNew tableSource, QueryTableModelNew tableDimension, bool checkIfNull) in GetRelatedTables(section))
@@ -98,11 +98,11 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// </summary>
 	private List<(QueryTableModelNew tableSource, QueryTableModelNew tableDimension, bool checkIfNull)> GetRelatedTables(ParserJoinSectionModel join)
 	{
-		List<(QueryTableModelNew tableSource, QueryTableModelNew tableDimension, bool checkIfNull)> tables = new();
+		List<(QueryTableModelNew tableSource, QueryTableModelNew tableDimension, bool checkIfNull)> tables = [];
 
 			// Añade las tablas de las relaciones
 			foreach (ParserJoinDimensionSectionModel joinDimension in join.JoinDimensions)
-				if (Manager.RequestController.CheckIfDimensionRequest(joinDimension.DimensionKey))
+				if (Manager.Request.IsDimensionRequested(joinDimension.DimensionKey))
 				{
 					(QueryTableModelNew? tableSource, QueryTableModelNew? tableDimension) = GetTablesForJoin(join, joinDimension);
 				
@@ -117,7 +117,8 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene las tablas para las que se hace un JOIN
 	/// </summary>
-	private (QueryTableModelNew? tableSource, QueryTableModelNew? tableDimension) GetTablesForJoin(ParserJoinSectionModel join, ParserJoinDimensionSectionModel relationDimension)
+	private (QueryTableModelNew? tableSource, QueryTableModelNew? tableDimension) GetTablesForJoin(ParserJoinSectionModel join, 
+																								   ParserJoinDimensionSectionModel relationDimension)
 	{
 		QueryTableModelNew? tableDimension = null, tableSource = null;
 
@@ -125,8 +126,8 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 			if (relationDimension.WithRequestedFields)
 			{
 				// Obtiene una tabla con todos los campos solicitados para una dimensión
-				tableDimension = Manager.RequestController.GetRequestedTable(relationDimension.Table, relationDimension.TableAlias, relationDimension.DimensionKey, 
-																			 false, true);
+				tableDimension = Manager.Request.GetRequestedTable(relationDimension.Table, relationDimension.TableAlias, relationDimension.DimensionKey, 
+																   false, true);
 				// Si tenemos una tabla de dimensión, creamos una tabla origen con los mismos campos
 				if (tableDimension is not null)
 					tableSource = tableDimension.Clone(join.Table, join.TableAlias);

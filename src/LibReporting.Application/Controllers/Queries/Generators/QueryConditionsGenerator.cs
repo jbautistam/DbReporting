@@ -1,7 +1,7 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
+using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
-using Bau.Libraries.LibReporting.Requests.Models;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -84,16 +84,11 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 				BaseDataSourceModel? dataSource = Manager.Request.Report.DataWarehouse.DataSources[parserDataSource.DataSourceKey];
 
 					if (dataSource is not null)
-					{
-						DataSourceRequestModel? request = Manager.Request.GetDataSourceRequest(dataSource.Id);
-
-							if (request is not null)
-								foreach (DataSourceColumnRequestModel column in request.Columns)
-									if (column.FiltersWhere.Count > 0)
-										sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserDataSource.Table, column.ColumnId, 
-																											  column.FiltersWhere), 
-																   " AND ");
-					}
+						foreach (RequestDataSourceColumnModel requestColumn in Manager.Request.GetRequestedColumns(dataSource))
+							if (requestColumn.FiltersWhere.Count > 0)
+								sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserDataSource.Table, requestColumn.Column.Id, 
+																										requestColumn.FiltersWhere), 
+															" AND ");
 			}
 			// Devuelve la cadena SQL
 			return sql;
@@ -109,11 +104,13 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 			// Obtiene las comparaciones de los campos
 			foreach (ParserExpressionModel parserExpression in expressions)
 			{
-				ExpressionColumnRequestModel? column = Manager.Request.GetExpressionRequest(parserExpression.Expression);
+				RequestExpressionColumnModel? column = Manager.Request.GetRequestedExpression(parserExpression.Expression);
 
 					// Añade las condiciones del HAVING
-					if (column is not null && column.FiltersHaving.Count > 0)
-						sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserExpression.Table, column.ColumnId, parserExpression.Aggregation, column.FiltersHaving), " AND ");
+					if (column is not null)
+						sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserExpression.Table, column.ExpressionId, 
+																							  parserExpression.Aggregation), 
+												   " AND ");
 			}
 			// Devuelve la cadena SQL
 			return sql;

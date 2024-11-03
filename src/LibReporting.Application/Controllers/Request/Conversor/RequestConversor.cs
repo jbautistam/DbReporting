@@ -87,7 +87,7 @@ internal class RequestConversor
 									throw new Exceptions.ReportingParserException($"Can't find the column {requestColumn.ColumnId} at data source {dataSource.GetTableAlias()}");
 								else
 								{
-									RequestDataSourceColumnModel requestDataSourceColumn = new(column);
+									RequestDataSourceColumnModel requestDataSourceColumn = new(column, Convert(requestColumn.AggregatedBy));
 
 										// Asigna los datos de la solicitud de la columna
 										AssignColumnRequestData(requestColumn, requestDataSourceColumn);
@@ -98,56 +98,34 @@ internal class RequestConversor
 			}
 			// Devuelve los datos convertidos
 			return converted;
+
+		// Convierte el tipo de agregación
+		RequestDataSourceColumnModel.AggregationType Convert(DataSourceColumnRequestModel.AggregationType type)
+		{
+			return type switch
+					{
+						DataSourceColumnRequestModel.AggregationType.Sum => RequestDataSourceColumnModel.AggregationType.Sum,
+						DataSourceColumnRequestModel.AggregationType.Max => RequestDataSourceColumnModel.AggregationType.Max,
+						DataSourceColumnRequestModel.AggregationType.Min => RequestDataSourceColumnModel.AggregationType.Min,
+						DataSourceColumnRequestModel.AggregationType.Average => RequestDataSourceColumnModel.AggregationType.Average,
+						DataSourceColumnRequestModel.AggregationType.StandardDeviation => RequestDataSourceColumnModel.AggregationType.StandardDeviation,
+						_ => RequestDataSourceColumnModel.AggregationType.NoAggregated
+					};
+		}
 	}
 
 	/// <summary>
 	///		Convierte las expresiones
 	/// </summary>
-	private List<RequestExpressionColumnModel> Convert(List<ExpressionRequestModel> expressions)
+	private List<RequestExpressionColumnModel> Convert(List<ExpressionColumnRequestModel> expressions)
 	{
 		List<RequestExpressionColumnModel> converted = [];
 
 			// Convierte los orígenes de datos
-			foreach (ExpressionRequestModel requestExpression in expressions)
-			{
-				BaseDataSourceModel? dataSource = Manager.Schema.DataWarehouses.GetDataSource(requestExpression.ReportDataSourceId);
-
-					if (dataSource is null)
-						throw new Exceptions.ReportingParserException($"Can't find the data source {requestExpression.ReportDataSourceId}");
-					else
-						foreach (ExpressionColumnRequestModel requestColumn in requestExpression.Columns)
-						{
-							DataSourceColumnModel? column = dataSource.Columns[requestColumn.ColumnId];
-
-								if (column is null)
-									throw new Exceptions.ReportingParserException($"Can't find the column {requestColumn.ColumnId} at data source {dataSource.GetTableAlias()}");
-								else
-								{
-									RequestExpressionColumnModel requestExpressionColumn = new(column, Convert(requestColumn.AggregatedBy));
-
-										// Asigna los datos adicionales a la columne
-										AssignColumnRequestData(requestColumn, requestExpressionColumn);
-										// Añade la expresión solicitada
-										converted.Add(requestExpressionColumn);
-								}
-						}	
-			}
+			foreach (ExpressionColumnRequestModel requestExpression in expressions)
+				converted.Add(new RequestExpressionColumnModel(requestExpression.ColumnId));
 			// Devuelve los datos convertidos
 			return converted;
-
-		// Convierte el tipo de agregación
-		RequestExpressionColumnModel.AggregationType Convert(ExpressionColumnRequestModel.AggregationType type)
-		{
-			return type switch
-					{
-						ExpressionColumnRequestModel.AggregationType.Sum => RequestExpressionColumnModel.AggregationType.Sum,
-						ExpressionColumnRequestModel.AggregationType.Max => RequestExpressionColumnModel.AggregationType.Max,
-						ExpressionColumnRequestModel.AggregationType.Min => RequestExpressionColumnModel.AggregationType.Min,
-						ExpressionColumnRequestModel.AggregationType.Average => RequestExpressionColumnModel.AggregationType.Average,
-						ExpressionColumnRequestModel.AggregationType.StandardDeviation => RequestExpressionColumnModel.AggregationType.StandardDeviation,
-						_ => RequestExpressionColumnModel.AggregationType.NoAggregated
-					};
-		}
 	}
 
 	/// <summary>

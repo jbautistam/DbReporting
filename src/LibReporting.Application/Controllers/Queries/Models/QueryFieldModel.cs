@@ -12,7 +12,7 @@ internal class QueryFieldModel
 
 	internal QueryFieldModel(QueryModel query, bool primaryKey, string table, string field, string alias, 
 							 RequestColumnBaseModel.SortOrder orderBy, 
-							 RequestExpressionColumnModel.AggregationType aggregation, bool visible)
+							 RequestDataSourceColumnModel.AggregationType aggregation, bool visible)
 	{
 		Query = query;
 		IsPrimaryKey = primaryKey;
@@ -34,11 +34,11 @@ internal class QueryFieldModel
 
 			return Aggregation switch
 						{
-							RequestExpressionColumnModel.AggregationType.Average => $"AVG({computed})",
-							RequestExpressionColumnModel.AggregationType.Max => $"MAX({computed})",
-							RequestExpressionColumnModel.AggregationType.Min => $"MIN({computed})",
-							RequestExpressionColumnModel.AggregationType.StandardDeviation => $"STDDEV({computed})",
-							RequestExpressionColumnModel.AggregationType.Sum => $"SUM({computed})",
+							RequestDataSourceColumnModel.AggregationType.Average => $"AVG({computed})",
+							RequestDataSourceColumnModel.AggregationType.Max => $"MAX({computed})",
+							RequestDataSourceColumnModel.AggregationType.Min => $"MIN({computed})",
+							RequestDataSourceColumnModel.AggregationType.StandardDeviation => $"STDDEV({computed})",
+							RequestDataSourceColumnModel.AggregationType.Sum => $"SUM({computed})",
 							_ => computed
 						};
 	}
@@ -80,19 +80,19 @@ internal class QueryFieldModel
 					// Añade la agregación si es necesario
 					switch (Aggregation)
 					{
-						case RequestExpressionColumnModel.AggregationType.Average:
+						case RequestDataSourceColumnModel.AggregationType.Average:
 								alias += "_AVG";
 							break;
-						case RequestExpressionColumnModel.AggregationType.Max:
+						case RequestDataSourceColumnModel.AggregationType.Max:
 								alias += "_MAX";
 							break;
-						case RequestExpressionColumnModel.AggregationType.Min:
+						case RequestDataSourceColumnModel.AggregationType.Min:
 								alias += "_MIN";
 							break;
-						case RequestExpressionColumnModel.AggregationType.StandardDeviation:
+						case RequestDataSourceColumnModel.AggregationType.StandardDeviation:
 								alias += "_STD";
 							break;
-						case RequestExpressionColumnModel.AggregationType.Sum:
+						case RequestDataSourceColumnModel.AggregationType.Sum:
 								alias += "_SUM";
 							break;
 					}
@@ -106,7 +106,7 @@ internal class QueryFieldModel
 	/// <summary>
 	///		Agregación
 	/// </summary>
-	internal RequestExpressionColumnModel.AggregationType Aggregation { get; }
+	internal RequestDataSourceColumnModel.AggregationType Aggregation { get; }
 
 	/// <summary>
 	///		Ordenación

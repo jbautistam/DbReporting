@@ -3,27 +3,8 @@
 /// <summary>
 ///		Clase con los datos de una columna solicitada para un listado
 /// </summary>
-public class ExpressionColumnRequestModel : BaseColumnRequestModel
+public class ExpressionColumnRequestModel
 {
-	/// <summary>
-	///		Modo de agregación por esta columna
-	/// </summary>
-	public enum AggregationType
-	{
-		/// <summary>Sin agregación</summary>
-		NoAggregated,
-		/// <summary>Suma</summary>
-		Sum,
-		/// <summary>Valor máximo</summary>
-		Max,
-		/// <summary>Valor mínimo</summary>
-		Min,
-		/// <summary>Media</summary>
-		Average,
-		/// <summary>Desviación estándar</summary>
-		StandardDeviation
-	}
-
 	/// <summary>
 	///		Clona los datos
 	/// </summary>
@@ -32,11 +13,8 @@ public class ExpressionColumnRequestModel : BaseColumnRequestModel
 		ExpressionColumnRequestModel cloned = new()
 												{
 													ColumnId = ColumnId,
-													AggregatedBy = AggregatedBy
 												};
 
-			// Clona los datos base
-			CopyBase(cloned);
 			// Devuelve el objeto clonado
 			return cloned;
 	}
@@ -45,9 +23,4 @@ public class ExpressionColumnRequestModel : BaseColumnRequestModel
 	///		Código de columna solicitada
 	/// </summary>
 	public string ColumnId { get; set; } = string.Empty;
-
-	/// <summary>
-	///		Modo de agregación
-	/// </summary>
-	public AggregationType AggregatedBy { get; set; }
 }

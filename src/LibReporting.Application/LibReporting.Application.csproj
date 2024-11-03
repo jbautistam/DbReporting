@@ -20,6 +20,7 @@
 		<Compile Remove="Controllers\Queries\ReportQueryAdvancedGenerator.cs" />
 		<Compile Remove="Controllers\Queries\ReportQueryGenerator_Old.cs" />
 		<Compile Remove="Controllers\ReportController.cs" />
+		<Compile Remove="Controllers\Request\Models\ReportRequestModel.cs" />
 		<Compile Remove="Controllers\Request\Models\RequestColumnModel.cs" />
 		<Compile Remove="Controllers\Request\ReportRequestController.cs" />
 	</ItemGroup>

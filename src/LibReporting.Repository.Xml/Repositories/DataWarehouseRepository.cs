@@ -85,9 +85,6 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 								case TagDimension:
 										dataWarehouse.Dimensions.Add(LoadBaseDimension(nodeML, dataWarehouse));
 									break;
-								//case TagReport:
-								//		dataWarehouse.Reports.Add(LoadReport(nodeML, dataWarehouse));
-								//	break;
 							}
 						// Carga los informes avanzados
 						AddAdvancedReports(dataWarehouse, Path.GetDirectoryName(id));

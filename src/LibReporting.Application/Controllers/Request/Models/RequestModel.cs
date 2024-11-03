@@ -56,10 +56,9 @@ internal class RequestModel
 	{
 		RequestDimensionModel? requestDimension = GetRequestedDimension(dimensionKey);
 
-			if (requestDimension is null)
-				throw new Exceptions.ReportingParserException($"Can't find the dimension {dimensionKey}");
-			else if (required || 
-					 (IsDimensionRequested(relatedDimensions) && !IsDimensionRequested(notRequestedDimensions)))
+			if (requestDimension is not null && 
+					(required || 
+					 (IsDimensionRequested(relatedDimensions) && !IsDimensionRequested(notRequestedDimensions))))
 				return requestDimension.Dimension;
 			else
 				return null;
@@ -150,7 +149,7 @@ internal class RequestModel
 	/// <summary>
 	///		Obtiene la expresión solicitada
 	/// </summary>
-	internal RequestExpressionColumnModel? GetRequestedExpression(string id) => Expressions.FirstOrDefault(item => item.Column.Id.Equals(id, StringComparison.CurrentCultureIgnoreCase));
+	internal RequestExpressionColumnModel? GetRequestedExpression(string id) => Expressions.FirstOrDefault(item => item.ExpressionId.Equals(id, StringComparison.CurrentCultureIgnoreCase));
 
 	/// <summary>
 	///		Añade una dimensión y columna a la lista
@@ -213,6 +212,26 @@ internal class RequestModel
 			// Devuelve la lista encontrada
 			return requestDimensions;
 	}
+
+	/// <summary>
+	///		Obtiene las columnas solicitadas para un origen de datos
+	/// </summary>
+	internal List<RequestDataSourceColumnModel> GetRequestedColumns(BaseDataSourceModel dataSource)
+	{
+		List<RequestDataSourceColumnModel> columns = [];
+
+			// Obtiene las columnas solicitadas
+			foreach (RequestDataSourceColumnModel column in DataSourceColumns)
+				if (column.Column.DataSource.Id.Equals(dataSource.Id, StringComparison.CurrentCultureIgnoreCase))
+					columns.Add(column);
+			// Devuelve las columnas solicitadas
+			return columns;
+	}
+
+	/// <summary>
+	///		Indica si se han solicitado totales (estamos en la primera página)
+	/// </summary>
+	public bool IsRequestedTotals() => Pagination.IsFirstPage;
 
 	/// <summary>
 	///		Manager principal

@@ -50,7 +50,7 @@ internal class QueryModel
 	internal void AddPrimaryKey(RequestColumnBaseModel? requestColumn, string columnId, string columnAlias, bool visible)
 	{
 		QueryFieldModel field = new(this, true, FromAlias, columnId, columnAlias, RequestColumnBaseModel.SortOrder.Undefined, 
-									RequestExpressionColumnModel.AggregationType.NoAggregated, visible);
+									RequestDataSourceColumnModel.AggregationType.NoAggregated, visible);
 
 			// Añade los filtros
 			if (requestColumn is not null)
@@ -64,13 +64,13 @@ internal class QueryModel
 	/// </summary>
 	internal void AddColumn(string columnId, string columnAlias, RequestColumnBaseModel requestColumn)
 	{
-		AddColumn(columnId, columnAlias, RequestExpressionColumnModel.AggregationType.NoAggregated, requestColumn);
+		AddColumn(columnId, columnAlias, RequestDataSourceColumnModel.AggregationType.NoAggregated, requestColumn);
 	}
 
 	/// <summary>
 	///		Añade un campo a la consulta
 	/// </summary>
-	internal void AddColumn(string columnId, string columnAlias, RequestExpressionColumnModel.AggregationType aggregatedBy, 
+	internal void AddColumn(string columnId, string columnAlias, RequestDataSourceColumnModel.AggregationType aggregatedBy, 
 							RequestColumnBaseModel requestColumn)
 	{
 		QueryFieldModel field = GetQueryField(columnId, columnAlias, aggregatedBy, requestColumn);
@@ -85,7 +85,7 @@ internal class QueryModel
 	/// <summary>
 	///		Obtiene el campo de la consulta
 	/// </summary>
-	private QueryFieldModel GetQueryField(string columnId, string columnAlias, RequestExpressionColumnModel.AggregationType aggregatedBy, 
+	private QueryFieldModel GetQueryField(string columnId, string columnAlias, RequestDataSourceColumnModel.AggregationType aggregatedBy, 
 										  RequestColumnBaseModel requestColumn)
 	{
 		QueryFieldModel? field = Fields.FirstOrDefault(item => item.Field.Equals(columnId, StringComparison.CurrentCultureIgnoreCase));
@@ -179,16 +179,16 @@ internal class QueryModel
 					sqlFields = sqlFields.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos
 			foreach (QueryFieldModel field in Fields)
-				if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestExpressionColumnModel.AggregationType.NoAggregated)
+				if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
 					sqlFields = sqlFields.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos (no clave) de los JOIN hijo (dimensiones hija) que no estén agregados
 			foreach (QueryJoinModel join in Joins)
 				foreach (QueryFieldModel field in join.Query.Fields)
-					if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestExpressionColumnModel.AggregationType.NoAggregated)
+					if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
 						sqlFields = sqlFields.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos agrupados
 			foreach (QueryFieldModel field in Fields)
-				if (field.Aggregation != RequestExpressionColumnModel.AggregationType.NoAggregated)
+				if (field.Aggregation != RequestDataSourceColumnModel.AggregationType.NoAggregated)
 					sqlFields = sqlFields.AddWithSeparator($"{field.GetAggregation(FromAlias)} AS {Generator.SqlTools.GetFieldName(field.Alias)}", ",");
 			// Devuelve los campos
 			return sqlFields;
@@ -312,7 +312,7 @@ internal class QueryModel
 			{
 				// Añade los campos de agrupación
 				foreach (QueryFieldModel field in Fields)
-					if (field.Aggregation == RequestExpressionColumnModel.AggregationType.NoAggregated && field.Visible)
+					if (field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated && field.Visible)
 						sqlFields = sqlFields.AddWithSeparator(Generator.SqlTools.GetFieldName(field.Table, field.Field), ",");
 				// Si hay algún campo de agrupación, le añade la cláusula
 				if (!string.IsNullOrWhiteSpace(sqlFields))
@@ -329,7 +329,7 @@ internal class QueryModel
 	{
 		// Recorre los campos buscando si hay algún agregado
 		foreach (QueryFieldModel field in Fields)
-			if (field.Aggregation != RequestExpressionColumnModel.AggregationType.NoAggregated)
+			if (field.Aggregation != RequestDataSourceColumnModel.AggregationType.NoAggregated)
 				return true;
 		// Si ha llegado hasta aquí es porque no hay ningún campo agregado
 		return false;

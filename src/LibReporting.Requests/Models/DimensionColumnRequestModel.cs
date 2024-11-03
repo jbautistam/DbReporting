@@ -18,9 +18,6 @@ public class DimensionColumnRequestModel : BaseColumnRequestModel
 
 			// Clona los datos base
 			CopyBase(cloned);
-			// Clona los elementos hijo
-			foreach (DimensionColumnRequestModel child in Childs)
-				cloned.Childs.Add(child.Clone());
 			// Devuelve los datos clonados
 			return cloned;
 	}
@@ -34,9 +31,4 @@ public class DimensionColumnRequestModel : BaseColumnRequestModel
 	///		Código de columna
 	/// </summary>
 	public string ColumnId { get; set; } = string.Empty;
-
-	/// <summary>
-	///		Solicitudes de dimensiones hija
-	/// </summary>
-	public List<DimensionColumnRequestModel> Childs { get; } = [];
 }

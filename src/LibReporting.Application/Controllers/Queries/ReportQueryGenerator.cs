@@ -32,6 +32,8 @@ internal class ReportQueryGenerator
 			throw new ReportingParserException($"Unknown report {Request.Report.Id}. {Request.Report.GetType().ToString()}");
 		else
 		{
+			// Inicializa el almacén de datos
+			Request.Manager.Schema.Initialize();
 			// Normaliza la solicitud
 			NormalizeRequest(Request, reportAdvanced);
 			// Devuelve la SQL generada
@@ -109,7 +111,7 @@ internal class ReportQueryGenerator
 	/// </summary>
 	private List<QuerySqlModel> GetQueries(List<BaseBlockModel> blocks)
 	{
-		List<QuerySqlModel> queries = new();
+		List<QuerySqlModel> queries = [];
 
 			// Genera el SQL de los bloques
 			foreach (BaseBlockModel blockBase in blocks)
@@ -336,7 +338,7 @@ internal class ReportQueryGenerator
 	/// </summary>
 	private List<(string table, string field)> GetListFields(QueryModel query, string tableAlias, bool includePrimaryKey)
 	{
-		List<(string table, string field)> fields = new();
+		List<(string table, string field)> fields = [];
 
 			// Añade los campos de la consulta
 			foreach (QueryFieldModel field in query.Fields)
@@ -416,7 +418,7 @@ internal class ReportQueryGenerator
 	/// </summary>
 	private List<(string tableDimension, string fieldDimension)> GetFieldsRequest(ParserDimensionModel parserDimension, bool includeRequestFields, bool includePrimaryKey)
 	{
-		List<(string tableDimension, string fieldDimension)> fields = new();
+		List<(string tableDimension, string fieldDimension)> fields = [];
 		BaseDimensionModel? dimension = Request.GetDimensionIfRequest(parserDimension);
 
 			// Si se ha solicitado algo de esta dimensión, se obtienen los datos
@@ -473,7 +475,7 @@ internal class ReportQueryGenerator
 					if (!query.ExistsField(table, field.Alias))
 						query.Fields.Add(new QueryFieldModel(query, true, dimension.GetTableAlias(), field.Field, field.Alias, 
 															 RequestColumnBaseModel.SortOrder.Undefined,
-															 RequestExpressionColumnModel.AggregationType.NoAggregated, true));
+															 RequestDataSourceColumnModel.AggregationType.NoAggregated, true));
 			}
 			// Devuelve la cadena SQL de esta dimensión
 			return query.Build();
