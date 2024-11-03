@@ -1,0 +1,46 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<ReportRequest Id = "Transfers" >
+	<Expression Id = "" >
+		<Column Id = "TransferType"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "ActualStockOriginStore"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "IdealStockOriginStore"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "ActualStockDestinationStore"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "IdealStockDestinationStore"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "CostPVM"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "TotalTransfersOut"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "DaysInStore"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "Sales"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "Margin"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+
+	<Expression Id = "" >
+		<Column Id = "MarginPercentage"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+	</Expression>
+</ReportRequest>

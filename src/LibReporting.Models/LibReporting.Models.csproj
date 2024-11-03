@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Bau.Libraries.$(MSBuildProjectName)</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataBases\**" />
+    <Compile Remove="Metadata\**" />
+    <EmbeddedResource Remove="DataBases\**" />
+    <EmbeddedResource Remove="Metadata\**" />
+    <None Remove="DataBases\**" />
+    <None Remove="Metadata\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataWarehouses\DataSets\SqlSelectModel.cs" />
+    <Compile Remove="DataWarehouses\Dimensions\DimensionRelationColumnModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\Blocks\ClauseJoinModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportAdvancedModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportAdvancedRequestDimension.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportAdvancedRequestDimensionField.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportBaseModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportDataSourceExpressionModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportDataSourceRelationColumnModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportDataSourceRelationModel.cs" />
+    <Compile Remove="DataWarehouses\Reports\ReportModel_Old.cs" />
+  </ItemGroup>
+
+</Project>

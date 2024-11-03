@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibReporting.Models", "src\LibReporting.Models\LibReporting.Models.csproj", "{518C3F2D-A424-48D2-930E-0B7AAFFA6894}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibReporting.Requests", "src\LibReporting.Requests\LibReporting.Requests.csproj", "{A53F0A55-5736-4D06-9FDD-454EF865B4E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibReporting.Application", "src\LibReporting.Application\LibReporting.Application.csproj", "{E3817915-69A3-4291-B5B5-61BE0DE70408}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{0B01069E-554B-425E-AD8A-B17359408E74}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repositories", "Repositories", "{6CDE719D-730A-4B1A-A48F-5F6580B5F9E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibReporting.Repository.Xml", "src\LibReporting.Repository.Xml\LibReporting.Repository.Xml.csproj", "{C1229F99-800C-447B-B735-17CA6022762D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibReporting.Tests", "tests\LibReporting.Tests\LibReporting.Tests.csproj", "{D6641D30-DF66-4AB2-91EE-F18D1DDBDF48}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{518C3F2D-A424-48D2-930E-0B7AAFFA6894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{518C3F2D-A424-48D2-930E-0B7AAFFA6894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{518C3F2D-A424-48D2-930E-0B7AAFFA6894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{518C3F2D-A424-48D2-930E-0B7AAFFA6894}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A53F0A55-5736-4D06-9FDD-454EF865B4E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A53F0A55-5736-4D06-9FDD-454EF865B4E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A53F0A55-5736-4D06-9FDD-454EF865B4E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A53F0A55-5736-4D06-9FDD-454EF865B4E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3817915-69A3-4291-B5B5-61BE0DE70408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3817915-69A3-4291-B5B5-61BE0DE70408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3817915-69A3-4291-B5B5-61BE0DE70408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3817915-69A3-4291-B5B5-61BE0DE70408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1229F99-800C-447B-B735-17CA6022762D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1229F99-800C-447B-B735-17CA6022762D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1229F99-800C-447B-B735-17CA6022762D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1229F99-800C-447B-B735-17CA6022762D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6641D30-DF66-4AB2-91EE-F18D1DDBDF48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6641D30-DF66-4AB2-91EE-F18D1DDBDF48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6641D30-DF66-4AB2-91EE-F18D1DDBDF48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6641D30-DF66-4AB2-91EE-F18D1DDBDF48}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C1229F99-800C-447B-B735-17CA6022762D} = {6CDE719D-730A-4B1A-A48F-5F6580B5F9E9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3466A10A-B830-46D9-9F7A-9DEAA48EE3D3}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>Bau.Libraries.$(MSBuildProjectName)</RootNamespace>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Controllers\Queries\Parsers\Models\ParserJoinRelationSectionModel.cs" />
+		<Compile Remove="Controllers\Queries\Parsers\Models\ParserWhereConditionSectionModel.cs" />
+		<Compile Remove="Controllers\Queries\Parsers\ParserParametersSection.cs" />
+		<Compile Remove="Controllers\Queries\Models\QueryGroupFieldModel.cs" />
+		<Compile Remove="Controllers\Queries\QueryBaseGenerator.cs" />
+		<Compile Remove="Controllers\Queries\QueryDimensionGenerator.cs" />
+		<Compile Remove="Controllers\Queries\QueryDimensionGeneratorOld.cs" />
+		<Compile Remove="Controllers\Queries\QueryExpressionsGenerator.cs" />
+		<Compile Remove="Controllers\Queries\ReportBaseQueryGenerator.cs" />
+		<Compile Remove="Controllers\Queries\ReportQueryAdvancedGenerator.cs" />
+		<Compile Remove="Controllers\Queries\ReportQueryGenerator_Old.cs" />
+		<Compile Remove="Controllers\ReportController.cs" />
+		<Compile Remove="Controllers\Request\Models\RequestColumnModel.cs" />
+		<Compile Remove="Controllers\Request\ReportRequestController.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\Common\LibHelper\src\LibHelper.csproj" />
+	  <ProjectReference Include="..\LibReporting.Models\LibReporting.Models.csproj" />
+	  <ProjectReference Include="..\LibReporting.Requests\LibReporting.Requests.csproj" />
+	</ItemGroup>
+
+</Project>
