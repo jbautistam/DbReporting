@@ -96,9 +96,6 @@ internal class RequestModel
 				foreach (RequestDimensionColumnModel columnRequest in dimensionRequest.Columns)
 					if (!columnRequest.Column.IsPrimaryKey)
 						columns.Add(columnRequest.Column);
-			//// Añade las columnas solicitadas para las dimensiones hija
-			//foreach (DimensionRequestModel childs in dimensionRequest.Childs)
-			//	columns.AddRange(GetRequestedFields(childs, includePrimaryKeys, includeRequestFields));
 			// Devuelve las columnas
 			return columns;
 	}
@@ -111,7 +108,7 @@ internal class RequestModel
 		// Comprueba que se hayan solicitado todas las dimensiones
 		if (ids is not null)
 			foreach (string id in ids)
-				if (!IsDimensionRequested(id) || IsRelatedDimensionRequested(id))
+				if (!IsDimensionRequested(id) && !IsRelatedDimensionRequested(id))
 					return false;
 		// Si ha llegado hasta aquí es porque todos las dimensiones existen
 		return true;
@@ -133,7 +130,17 @@ internal class RequestModel
 	private bool IsRelatedDimensionRequested(string dimensionId)
 	{
 		bool isRelated = false;
+		BaseDimensionModel? dimension = Report.DataWarehouse.Dimensions[dimensionId];
 
+			// Obtiene la dimensión
+			if (dimension is null)
+				throw new Exceptions.ReportingParserException($"Can't find the dimension {dimensionId}");
+			else if (IsDimensionRequested(dimensionId))
+				isRelated = true;
+			else
+				foreach (DimensionRelationModel relation in dimension.GetRelations())
+					if (!isRelated && relation.Dimension is not null)
+						isRelated = IsRelatedDimensionRequested(relation.Dimension.Id);
 			// Devuelve el valor que indica si alguna de las dimensiones relacionadas se ha solicitado
 			return isRelated;
 	}

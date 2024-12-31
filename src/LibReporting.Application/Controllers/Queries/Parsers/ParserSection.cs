@@ -58,7 +58,7 @@ internal class ParserSection
 	/// </summary>
 	internal List<(string marker, ParserBaseSectionModel section)> Parse()
 	{
-		List<(string marker, ParserBaseSectionModel section)> sections = new();
+		List<(string marker, ParserBaseSectionModel section)> sections = [];
 		List<string> placeholders = Sql.Extract("{{", "}}", false);
 
 			// Interpreta las secciones
@@ -83,7 +83,7 @@ internal class ParserSection
 	/// </summary>
 	private List<ParserBaseSectionModel> Parse(string content)
 	{ 
-		List<ParserBaseSectionModel> sections = new();
+		List<ParserBaseSectionModel> sections = [];
 		BlockInfoCollection blocks = new();
 
 			// Interpreta los bloques
@@ -229,20 +229,20 @@ internal class ParserSection
 			return dimension;
 	}
 
-	/// <summary>
-	///		Interpreta las dimensiones de un bloque
-	/// </summary>
-	private List<ParserDimensionModel> ParseDimensions(BlockInfo block)
-	{ 
-		List<ParserDimensionModel> dimensions = new();
+	///// <summary>
+	/////		Interpreta las dimensiones de un bloque
+	///// </summary>
+	//private List<ParserDimensionModel> ParseDimensions(BlockInfo block)
+	//{ 
+	//	List<ParserDimensionModel> dimensions = new();
 
-			// Interpreta las dimensiones
-			foreach (BlockInfo child in block.Blocks)
-				if (child.HasHeader(HeaderDimension))
-					dimensions.Add(ParseDimension(child));
-			// Devuelve las dimensiones
-			return dimensions;
-	}
+	//		// Interpreta las dimensiones
+	//		foreach (BlockInfo child in block.Blocks)
+	//			if (child.HasHeader(HeaderDimension))
+	//				dimensions.Add(ParseDimension(child));
+	//		// Devuelve las dimensiones
+	//		return dimensions;
+	//}
 
 	/// <summary>
 	///		Interpreta una dimensión

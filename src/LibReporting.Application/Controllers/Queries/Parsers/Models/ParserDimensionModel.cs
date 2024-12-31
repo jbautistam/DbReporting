@@ -74,10 +74,10 @@ internal class ParserDimensionModel : ParserBaseSectionModel
     /// <summary>
     ///		Dimensiones relacionadas (obliga a hacer un join por esta dimensión aunque no se haya solicitado directamente)
     /// </summary>
-    internal List<string> RelatedDimensions { get; } = new();
+    internal List<string> RelatedDimensions { get; } = [];
 
     /// <summary>
     ///		Dimensiones que se deben comprobar que no se han solicitado
     /// </summary>
-    internal List<string> IfNotRequestDimensions { get; } = new();
+    internal List<string> IfNotRequestDimensions { get; } = [];
 }
