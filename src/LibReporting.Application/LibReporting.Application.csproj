@@ -26,7 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\Common\LibHelper\src\LibHelper.csproj" />
+	  <PackageReference Include="Bau.Libraries.LibHelper" Version="1.1.33" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\LibReporting.Models\LibReporting.Models.csproj" />
 	  <ProjectReference Include="..\LibReporting.Requests\LibReporting.Requests.csproj" />
 	</ItemGroup>

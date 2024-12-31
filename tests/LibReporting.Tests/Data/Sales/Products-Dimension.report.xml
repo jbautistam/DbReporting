@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report>
+	<Name>Products - Dimension</Name>
+
+	<Dimension Name = "Products" />
+
+	<Blocks>
+		<With Name = "Main">
+			<IfRequest Dimension = "Products">
+				<Cte Name = "ProductsCte" Dimension = "Products" />
+			</IfRequest>
+
+			<Query>
+				<![CDATA[
+					SELECT {{
+								Fields
+									-Dimension: Products 
+										--Table: ProductsCte
+	                		}}
+	                	FROM ProductsCte
+				]]>
+			</Query>
+		</With>
+	</Blocks>
+</Report>

@@ -1,0 +1,20 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<ReportRequest Id = "Sales report" >
+	<Parameter Key = "StartDate"  Type = "Date"  Value = "" />
+	<Parameter Key = "EndDate"  Type = "Date"  Value = "" />
+	<Dimension Id = "Products" >
+		<Column Id = "Code"  Visible = "yes"  OrderIndex = "-1"  OrderBy = "Undefined" />
+</Dimension>
+	<Expression Id = "" >
+		<Column Id = "Quantity"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+</Expression>
+	<Expression Id = "" >
+		<Column Id = "SellingPrice"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+</Expression>
+	<Expression Id = "" >
+		<Column Id = "PurchasePrice"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+</Expression>
+	<Expression Id = "" >
+		<Column Id = "Taxes"  AggregatedBy = "NoAggregated"  Visible = "yes"  OrderIndex = "0"  OrderBy = "Undefined" />
+</Expression>
+</ReportRequest>

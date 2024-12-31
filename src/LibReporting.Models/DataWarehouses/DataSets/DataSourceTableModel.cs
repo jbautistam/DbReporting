@@ -81,12 +81,12 @@ public class DataSourceTableModel : BaseDataSourceModel
 	/// <summary>
 	///		Esquema origen
 	/// </summary>
-	public string Schema { get; set; } = string.Empty;
+	public string Schema { get; set; } = default!;
 
 	/// <summary>
 	///		Tabla origen
 	/// </summary>
-	public string Table { get; set; } = string.Empty;
+	public string Table { get; set; } = default!;
 
 	/// <summary>
 	///		Nombre completo

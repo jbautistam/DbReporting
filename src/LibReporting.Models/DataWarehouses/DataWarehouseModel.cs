@@ -51,12 +51,12 @@ public class DataWarehouseModel : Base.BaseReportingModel
 	/// <summary>
 	///		Nombre del elemento
 	/// </summary>
-	public string Name { get; set; } = string.Empty;
+	public string Name { get; set; } = default!;
 
 	/// <summary>
 	///		Descripción del elemento
 	/// </summary>
-	public string Description { get; set; } = string.Empty;
+	public string Description { get; set; } = default!;
 
 	/// <summary>
 	///		Orígenes de datos

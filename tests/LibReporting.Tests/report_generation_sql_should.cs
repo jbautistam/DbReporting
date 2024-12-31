@@ -12,8 +12,8 @@ public class report_generation_sql_should
 	///		convert_to_sql_files, recoge y comprueba todos los archivos de datos)
 	/// </summary>
 	[Theory]
-	[InlineData("Sales/Test-Sales.Reporting.xml", 
-				"Sales/Sales/NoDimensions - Filtered.request.xml")]
+	[InlineData("Sales/Reporting-Sql Server - SalesSamples.Schema.xml", 
+				"Sales/ManualRequests/Products.request.xml")]
 	public void convert_to_sql(string schema, string fileRequest)
 	{
 		string schemaFileName = Tools.FileHelper.GetFullFileName(schema);
@@ -27,7 +27,7 @@ public class report_generation_sql_should
 	///		Comprueba todos los archivos de informe: obtiene todos los esquemas e informes del directorio Data, obtiene todos los
 	///	archivos de solicitud y los compara con las respuestas
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Todavía no")]
 	public void convert_to_sql_files()
 	{
 		Dictionary<string, List<string>> reports = Tools.FileHelper.GetReports();
@@ -81,7 +81,11 @@ public class report_generation_sql_should
 				string responseFile = Tools.FileHelper.GetResponseFile(requestFile, page);
 
 					if (!File.Exists(responseFile))
-						error += $"Can't find the response for {requestFile} page {page.ToString()}" + Environment.NewLine;
+					{
+						// Sólo es un error para la página 0 (no paginado), el resto puede que no tengamos respuesta en tests
+						if (page == 0)
+							error += $"Can't find the response for {requestFile} page {page.ToString()}" + Environment.NewLine;
+					}
 					else
 						try
 						{

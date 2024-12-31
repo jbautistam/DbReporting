@@ -24,5 +24,5 @@ public class ReportParameterModel : Base.BaseReportingModel
 	/// <summary>
 	///		Valor predeterminado
 	/// </summary>
-	public string DefaultValue { get; set; } = string.Empty;
+	public string DefaultValue { get; set; } = default!;
 }

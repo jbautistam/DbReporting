@@ -1,0 +1,181 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<Schema>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Calendar" >
+		<Field Name = "CalendarId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Date"  Type = "Date"  DbType = "date"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Year"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "Month"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+		<Field Name = "Day"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "5"  Identity = "no" />
+		<Field Name = "Week"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "6"  Identity = "no" />
+		<Field Name = "YearWeek"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "7"  Identity = "no" />
+		<Field Name = "YearMonth"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "8"  Identity = "no" />
+		<Field Name = "WeekDay"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "9"  Identity = "no" />
+		<Field Name = "NaturalYear"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "10"  Identity = "no" />
+		<Field Name = "NaturalWeek"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "11"  Identity = "no" />
+		<Field Name = "LastWeekDay"  Type = "Boolean"  DbType = "bit"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "12"  Identity = "no" />
+		<Field Name = "LastMonthDay"  Type = "Boolean"  DbType = "bit"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "13"  Identity = "no" />
+		<Field Name = "YearWeekIndex"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "14"  Identity = "no" />
+		<Field Name = "YearMonthIndex"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "15"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Calendar"  Table = "Calendar"  Field = "CalendarId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Cities" >
+		<Field Name = "CityId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "StateId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "3"  Identity = "no" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "ClassificationTypes" >
+		<Field Name = "ClassificationTypeId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_ClassificationTypes"  Table = "ClassificationTypes"  Field = "ClassificationTypeId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Countries" >
+		<Field Name = "CountryId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Countries"  Table = "Countries"  Field = "CountryId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Customers" >
+		<Field Name = "CustomerId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "FirstName"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "LastName"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "EmailAddress"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "no"  Position = "4"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Customers"  Table = "Customers"  Field = "CustomerId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Departments" >
+		<Field Name = "DepartmentId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Departments"  Table = "Departments"  Field = "DepartmentId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Employees" >
+		<Field Name = "EmployeeId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Surname"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "DepartmentId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+		<Field Name = "PositionId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "5"  Identity = "no" />
+		<Field Name = "CityId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "6"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Employees"  Table = "Employees"  Field = "EmployeeId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Fact"  Catalog = "SalesSample"  Name = "EmployeeSalaries" >
+		<Field Name = "CalendarId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "EmployeeId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "SalaryTypeId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "Salary"  Type = "Decimal"  DbType = "money"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Entities" >
+		<Field Name = "EntityId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Entities"  Table = "Entities"  Field = "EntityId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "EntityTagValues" >
+		<Field Name = "TagValueId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "EntityId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "EntityValueId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_EntityTagValue"  Table = "EntityTagValues"  Field = "TagValueId"  Type = "PrimaryKey"  Position = "1" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_EntityTagValue"  Table = "EntityTagValues"  Field = "EntityId"  Type = "PrimaryKey"  Position = "2" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_EntityTagValue"  Table = "EntityTagValues"  Field = "EntityValueId"  Type = "PrimaryKey"  Position = "3" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "PositionTypes" >
+		<Field Name = "PositionId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_PositionTypes"  Table = "PositionTypes"  Field = "PositionId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "ProductRoots" >
+		<Field Name = "ProductRootId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Code"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "ClassificationTypeId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_ProductRoots"  Table = "ProductRoots"  Field = "ProductRootId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Products" >
+		<Field Name = "ProductId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "ProductRootId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "Code"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "4"  Identity = "no" />
+		<Field Name = "SizeId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "5"  Identity = "no" />
+		<Field Name = "Price"  Type = "Decimal"  DbType = "float"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "6"  Identity = "no" >
+			<Default>((0))</Default>
+</Field>
+		<Field Name = "Cost"  Type = "Decimal"  DbType = "float"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "7"  Identity = "no" >
+			<Default>((0))</Default>
+</Field>
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Products"  Table = "Products"  Field = "ProductId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "ProductSizes" >
+		<Field Name = "ProductSizeId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_ProductSizes"  Table = "ProductSizes"  Field = "ProductSizeId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Fact"  Catalog = "SalesSample"  Name = "PurchaseOrders" >
+		<Field Name = "RequestCalendarId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "DeliveryCalendarId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "no"  Position = "2"  Identity = "no" />
+		<Field Name = "ShopId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "SupplierId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+		<Field Name = "ProductId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "5"  Identity = "no" />
+		<Field Name = "PurchaseOrderStatusId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "6"  Identity = "no" />
+		<Field Name = "Quantity"  Type = "Decimal"  DbType = "float"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "7"  Identity = "no" />
+		<Field Name = "PurchasePrice"  Type = "Decimal"  DbType = "money"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "8"  Identity = "no" />
+		<Field Name = "TransportPrice"  Type = "Decimal"  DbType = "money"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "9"  Identity = "no" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "PurchaseOrderStatus" >
+		<Field Name = "PurchaseOrderStatusId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_PurchaseOrderStatus"  Table = "PurchaseOrderStatus"  Field = "PurchaseOrderStatusId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "SalaryTypes" >
+		<Field Name = "SalaryTypeId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_SalaryTypes"  Table = "SalaryTypes"  Field = "SalaryTypeId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Fact"  Catalog = "SalesSample"  Name = "Sales" >
+		<Field Name = "CalendarId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "EmployeeId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "ShopId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "CustomerId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "no"  Position = "4"  Identity = "no" />
+		<Field Name = "ProductId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "5"  Identity = "no" />
+		<Field Name = "Quantity"  Type = "Decimal"  DbType = "float"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "6"  Identity = "no" />
+		<Field Name = "PurchasePrice"  Type = "Decimal"  DbType = "money"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "7"  Identity = "no" />
+		<Field Name = "SellingPrice"  Type = "Decimal"  DbType = "money"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "8"  Identity = "no" />
+		<Field Name = "Taxes"  Type = "Decimal"  DbType = "money"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "9"  Identity = "no" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Shops" >
+		<Field Name = "ShopId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "128"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "ShopTypeId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "ErpCode"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "64"  Required = "no"  Position = "4"  Identity = "no" />
+		<Field Name = "CityId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "no"  Position = "5"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Shops"  Table = "Shops"  Field = "ShopId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Fact"  Catalog = "SalesSample"  Name = "ShopStocks" >
+		<Field Name = "CalendarId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "ShopId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "ProductId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "Quantity"  Type = "Decimal"  DbType = "float"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "ShopTypes" >
+		<Field Name = "ShopTypeId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_ShopTypes"  Table = "ShopTypes"  Field = "ShopTypeId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "States" >
+		<Field Name = "StateId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "CountryId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "3"  Identity = "no" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Suppliers" >
+		<Field Name = "SupplierId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "CityId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Suppliers"  Table = "Suppliers"  Field = "SupplierId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Tags" >
+		<Field Name = "TagId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "EntityId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Tags"  Table = "Tags"  Field = "TagId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "TagValues" >
+		<Field Name = "TagValueId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "TagId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "50"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_TagValues"  Table = "TagValues"  Field = "TagValueId"  Type = "PrimaryKey"  Position = "1" />
+</Table>
+</Schema>

@@ -22,5 +22,5 @@ public class ExpressionColumnRequestModel
 	/// <summary>
 	///		Código de columna solicitada
 	/// </summary>
-	public string ColumnId { get; set; } = string.Empty;
+	public string ColumnId { get; set; } = default!;
 }

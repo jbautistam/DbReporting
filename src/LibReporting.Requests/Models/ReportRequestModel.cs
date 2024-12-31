@@ -140,7 +140,7 @@ public class ReportRequestModel
 	/// <summary>
 	///		Código de informe solicitado
 	/// </summary>
-	public string ReportId { get; set; } =  string.Empty;
+	public string ReportId { get; set; } =  default!;
 
 	/// <summary>
 	///		Parámetros

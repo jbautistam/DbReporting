@@ -8,5 +8,5 @@ public class ReportRequestDimensionField
 	/// <summary>
 	///		Campo que se debe solicitar
 	/// </summary>
-	public string Field { get; set; } = string.Empty;
+	public string Field { get; set; } = default!;
 }

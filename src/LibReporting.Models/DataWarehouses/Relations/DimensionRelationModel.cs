@@ -45,5 +45,5 @@ public class DimensionRelationModel
 	/// <summary>
 	///		Campos de la relación
 	/// </summary>
-	public List<RelationForeignKey> ForeignKeys { get; } = new();
+	public List<RelationForeignKey> ForeignKeys { get; } = [];
 }

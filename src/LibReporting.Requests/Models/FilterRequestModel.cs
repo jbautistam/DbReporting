@@ -55,5 +55,5 @@ public class FilterRequestModel
 	/// <summary>
 	///		Valores del filtro
 	/// </summary>
-	public List<object?> Values { get; } = new();
+	public List<object?> Values { get; } = [];
 }

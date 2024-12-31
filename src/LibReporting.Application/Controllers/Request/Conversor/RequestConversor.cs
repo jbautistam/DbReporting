@@ -1,6 +1,5 @@
 ﻿using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 using Bau.Libraries.LibReporting.Requests.Models;
 

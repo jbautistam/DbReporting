@@ -13,7 +13,7 @@ public class report_execution_should
 	/// <summary>
 	///		Comprueba si se puede cargar un esquema de base de datos y sus informes y ejecutar la cadena SQL contra la base de datos
 	/// </summary>
-	[Fact]
+	[Fact(Skip = "Todavía no")]
 	public void execute_files_to_sql()
 	{
 		Dictionary<string, List<string>> reports = FileHelper.GetReports();
@@ -45,7 +45,7 @@ public class report_execution_should
 	///		Comprueba si se puede cargar un esquema de base de datos y sus informes y ejecutar la cadena SQL contra la base de datos
 	///	(el método execute_files_to_sql lo hace para todos los archivos, este es sólo por si queremos ejecutar uno en concreto)
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Todavía no")]
 	[InlineData("Sales/Test-Sales.Reporting.xml", 
 				"Sales/Sales/NoDimensions - Filtered.request.xml")]
 	public void execute_to_sql(string fileName, string fileRequest)

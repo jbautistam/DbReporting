@@ -38,7 +38,7 @@ public class DimensionRequestModel
 	/// <summary>
 	///		Código de dimensión
 	/// </summary>
-	public string DimensionId { get; set; } = string.Empty;
+	public string DimensionId { get; set; } = default!;
 
 	/// <summary>
 	///		Columnas

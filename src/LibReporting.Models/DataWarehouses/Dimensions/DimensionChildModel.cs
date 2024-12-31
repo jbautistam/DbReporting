@@ -103,7 +103,7 @@ public class DimensionChildModel : BaseDimensionModel
 	{
 		DimensionModel dimension = GetSourceDimension();
 		List<DimensionRelationModel> sourceRelations = dimension.GetRelations();
-		List<DimensionRelationModel> targetRelations = new();
+		List<DimensionRelationModel> targetRelations = [];
 
 			// Crea las relaciones cambiando los alias
 			foreach (DimensionRelationModel relation in sourceRelations)

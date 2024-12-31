@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Report>
-	<Name>AnalysisByDate</Name>
-	<Description>
-		Informe de análisis por fechas
-	</Description>
-
+	<Name>Sales report</Name>
+	
 	<Parameter Name = "StartDate" Type = "Date" />
 	<Parameter Name = "EndDate" Type = "Date" />
 
-	<Dimension Name = "PointsOfSale" />
+	<Dimension Name = "Shops" />
 	<Dimension Name = "Products" />
+	<Dimension Name = "Calendar" />
 
 	<Requests>
-		<Dimension Name = "PointsOfSale">
-			<Field Name = "Name;ErpCode;ImageUrl" />
+		<Dimension Name = "Shops">
+			<Field Name = "Name;ErpCode" />
 		</Dimension>
 		<Dimension Name = "Products">
-			<Field Name = "ProductCode;Description;UrlImage" />
+			<Field Name = "ProductCode" />
+		</Dimension>
+		<Dimension Name = "Calendar" Required="true">
 		</Dimension>
 	</Requests>
 
-	<Expression Name = "StockBreakage;StockBreakageAmount;Sales;SalesPrice;SalesTaxesIncluded;SalesTaxesExcluded;SalesOutlier;SalesOutlierTaxesIncluded;SalesOutlierTaxesExcluded" />
-	<Expression Name = "SalesMarginTaxesIncluded;SalesMarginTaxesExcluded;SalesMarginPercentageTaxesIncluded;SalesMarginPercentageTaxesExcluded" />
-	<Expression Name = "DesignVariationsWithSales;Markup;AveragePrice;AverageCost;SalesAtCost;SalesParticipation;DesignVariationsWithStock;Stock;StockCost" />
+	<Expression Name = "Quantity;SellingPrice;PurchasePrice;Taxes" />
 
 	<Blocks>
 		<With Name = "Main">
@@ -30,851 +28,76 @@
 				<Cte Name = "ProductsCte" Dimension = "Products" />
 			</IfRequest>
 
-			<IfRequest Dimension = "PointsOfSale">
-				<Cte Name = "PointsOfSaleCte" Dimension = "PointsOfSale" />
+			<IfRequest Dimension = "Shops">
+				<Cte Name = "ShopsCte" Dimension = "Shops" />
 			</IfRequest>
 
-			<Cte Name = "StockIntervalsCte">
-				<![CDATA[
-					SELECT 
-						   {{
-								Fields
-									-Dimension: PointsOfSale 
-										--Table: PointsOfSaleCte
-									-Dimension: Products 
-										--Table: ProductsCte
-									-WithComma
-	                	   }}
-						   DailyStocksIntervals.ProductId, DailyStocksIntervals.PointOfSaleId,
-						   DailyStocksIntervals.StartDate, DailyStocksIntervals.EndDate, 
-						   DailyStocksIntervals.Quantity
-						FROM Fact.DailyStocksIntervals
-						{{
-	                		InnerJoin 
-	                			-Dimension: PointsOfSale 
-	                				--Table: PointsOfSaleCte
-									--On: PointOfSaleId-PointOfSaleId
-								-Table: DailyStocksIntervals
-						}}
-		            	{{
-		            		InnerJoin 
-		            			-Dimension: Products 
-		            				--Table: ProductsCte
-									--On: ProductId-ProductId
-								-Table: DailyStocksIntervals
-		            	}}
-						INNER JOIN Dim.Products
-							ON DailyStocksIntervals.ProductId = Products.Id
-						WHERE DailyStocksIntervals.StartDate <= @EndDate 
-							AND DailyStocksIntervals.EndDate >= @StartDate
-				]]>
-			</Cte>
-
-			<!-- Esto sólo se debería hacer cuando se solicite la expresión y los totales -->
-			<IfRequest Expressions="DesignVariationsWithStock" WhenTotals="true">
-				<Cte Name = "DvStockCountCte">
+			<Cte Name = "CalendarCte" Dimension = "Calendar">
+				<Filter>
 					<![CDATA[
-						SELECT COUNT(RootProductCode) AS DvStock
-							FROM (SELECT DISTINCT Products.RootProductCode
-									FROM StockIntervalsCte INNER JOIN Dim.Products
-										ON StockIntervalsCte.ProductId = Products.Id
-								) AS ProductsRoot
-					]]>
-				</Cte>
-			</IfRequest>
-
-			<Cte Name = "StockCte">
-				<![CDATA[
-					SELECT CalendarIso.[Date], 
-						   {{
-								Fields
-									-Dimension: PointsOfSale 
-										--Table: PointsOfSaleCte
-									-Dimension: Products 
-										--Table: ProductsCte
-									-WithComma
-	                	   }}
-						   SUM(StockIntervalsCte.Quantity) AS Stock,
-						   SUM(StockIntervalsCte.Quantity * ProductCostAndPriceByPointOfSaleIntervals.Cost) AS StockCost
-						FROM StockIntervalsCte
-						{{
-	                		InnerJoin 
-	                			-Dimension: PointsOfSale 
-	                				--Table: PointsOfSaleCte
-								-Table: StockIntervalsCte
-								-On: PointOfSaleId-PointOfSaleId
-						}}
-		            	{{
-		            		InnerJoin 
-		            			-Dimension: Products 
-		            				--Table: ProductsCte
-								-Table: StockIntervalsCte
-								-On: ProductId-ProductId
-		            	}}
-						INNER JOIN Dim.CalendarIso
-							ON CalendarIso.[Date] BETWEEN StockIntervalsCte.StartDate AND StockIntervalsCte.EndDate
-								AND CalendarIso.Date BETWEEN @StartDate AND @EndDate
-						INNER JOIN Fact.ProductCostAndPriceByPointOfSaleIntervals
-							ON StockIntervalsCte.ProductId = ProductCostAndPriceByPointOfSaleIntervals.ProductId
-								AND StockIntervalsCte.PointOfSaleId = ProductCostAndPriceByPointOfSaleIntervals.PointOfSaleId
-								AND CalendarIso.[Date] BETWEEN ProductCostAndPriceByPointOfSaleIntervals.[StartDate] 
-														AND ProductCostAndPriceByPointOfSaleIntervals.[EndDate]
-						{{
-	                		GroupBy
-	                			-Dimension: PointsOfSale 
-	                				--Table: PointsOfSaleCte
-		            			-Dimension: Products 
-		            				--Table: ProductsCte
-								-Sql
-									--CalendarIso.[Date]
-		            	}}	
-				]]>
-			</Cte>
-
-			<!-- Esto sólo se debería hacer cuando se solicite la expresión (sea o no de totales) -->
-			<IfRequest Expressions="DesignVariationsWithStock" >
-				<Cte Name = "StockDvCte">
-					<![CDATA[
-						SELECT CalendarIso.Date,
-								{{
-									Fields
-										-Dimension: Products
-											--Table: ProductsCte
-										-Dimension: PointsOfSale
-											--Table: PointsOfSaleCte
-										-WithComma
-	                		   }}
-							   COUNT(DISTINCT Products.RootProductCode) AS DesignVariationsWithStock				
-						  FROM StockIntervalsCte INNER JOIN Dim.Products
-							ON StockIntervalsCte.ProductId = Products.Id
-						  INNER JOIN Dim.CalendarIso
-							ON CalendarIso.[Date] BETWEEN StockIntervalsCte.StartDate AND StockIntervalsCte.EndDate
-								AND CalendarIso.Date BETWEEN @StartDate AND @EndDate
-						{{
-							InnerJoin
-								-Dimension: Products
-									--Table: ProductsCte
-									--On: ProductId
-								-Table: StockIntervalsCte
-						}}
-						{{
-							InnerJoin
-								-Dimension: PointsOfSale
-									--Table: PointsOfSaleCte
-									--On: PointOfSaleId
-								-Table: StockIntervalsCte
-						}}
-						{{
-	                		GroupBy
-								-Dimension: Products
-									--Table: ProductsCte
-								-Dimension: PointsOfSale
-									--Table: PointsOfSaleCte
-								-Sql
-									--CalendarIso.Date
-		            	}}
-					]]>
-				</Cte>
-			</IfRequest>
-
-			<Cte Name = "AnalysisFilteredCte">
-				<![CDATA[
-					SELECT {{
-								Fields
-									-Dimension: PointsOfSale 
-										--Table: PointsOfSaleCte
-									-Dimension: Products 
-										--Table: ProductsCte
-									-WithComma
-	                	   }}
-						   Analysis.ProductId, Analysis.PointOfSaleId,
-						   Products.RootProductCode AS AnalysisRootProductCode,
-						   Analysis.Date, Analysis.StockBreakage, Analysis.StockBreakageAmount,
-						   Analysis.Sales, Analysis.SalesTaxesIncluded, Analysis.SalesTaxesExcluded,
-						   Analysis.SalesOutlier, Analysis.SalesOutlierTaxesIncluded,
-						   Analysis.SalesOutlierTaxesExcluded
-						FROM Fact.Analysis
-						{{
-	                		InnerJoin 
-	                			-Dimension: PointsOfSale 
-	                				--Table: PointsOfSaleCte
-									--On: PointOfSaleId-PointOfSaleId
-								-Table: Analysis
-						}}
-		            	{{
-		            		InnerJoin 
-		            			-Dimension: Products 
-		            				--Table: ProductsCte
-									--On: ProductId-ProductId
-								-Table: Analysis
-		            	}}
-						INNER JOIN Dim.Products
-							ON Analysis.ProductId = Products.Id
-						WHERE Analysis.Date BETWEEN @StartDate AND @EndDate
-				]]>
-			</Cte>
-
-			<!-- Esto sólo se debería hacer cuando se solicite la expresión y los totales -->
-			<IfRequest Expressions="DesignVariationsWithSales" WhenTotals="true">
-				<Cte Name = "DvSalesCountCte">
-					<![CDATA[
-						SELECT COUNT(*) DvSales
-							FROM (SELECT AnalysisRootProductCode
-									FROM AnalysisFilteredCte
-									GROUP BY AnalysisRootProductCode
-									HAVING SUM(Sales) > 0
-								) AS RootProducts
-					]]>
-				</Cte>
-			</IfRequest>
-
-			<!-- Esto sólo se debería hacer cuando se solicite la expresión (haya o no totales) -->
-			<IfRequest Expressions="DesignVariationsWithSales">
-				<Then>
-					<Cte Name = "AnalysisDvSalesCte">
-						<![CDATA[
-							SELECT {{
-										Fields
-											-Dimension: PointsOfSale
-											-Dimension: Products
-											-WithComma
-	                			   }}
-								   Date, COUNT(1) AS DesignVariationsWithSales
-								FROM AnalysisFilteredCte
-								{{
-	                				GroupBy
-	                					-Dimension: PointsOfSale
-		            					-Dimension: Products
-										-Sql
-											--AnalysisRootProductCode, Date 
-		            			}}
-								HAVING SUM(Sales) > 0
-						]]>
-					</Cte>
-				</Then>
-				<Else>
-					<Cte Name = "AnalysisDvSalesCte">
-						<![CDATA[
-							SELECT CAST('1970-01-01' AS Date) AS Date, 0 AS DesignVariationsWithSales
-						]]>
-					</Cte>
-				</Else>
-			</IfRequest>
-
-			<Cte Name = "AnalysisCte">
-				<![CDATA[
-					SELECT AnalysisFilteredCte.Date,
-						   {{
-								Fields
-									-Dimension: PointsOfSale 
-										--Table: AnalysisFilteredCte
-									-Dimension: Products 
-										--Table: AnalysisFilteredCte
-									-WithComma
-	                	   }}
-						   {{
-								IfRequest
-									-Expression: StockBreakage
-										--SUM(AnalysisFilteredCte.StockBreakage) AS StockBreakage
-									-Expression: StockBreakageAmount
-										--SUM(AnalysisFilteredCte.StockBreakageAmount) AS StockBreakageAmount
-									-Expression: Sales
-										--SUM(AnalysisFilteredCte.Sales) AS Sales
-									-Expression: SalesPrice
-										--SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost) AS SalesPrice
-									-Expression: SalesTaxesIncluded
-										--SUM(AnalysisFilteredCte.SalesTaxesIncluded) AS SalesTaxesIncluded
-									-Expression: SalesTaxesExcluded
-										--SUM(AnalysisFilteredCte.SalesTaxesExcluded) AS SalesTaxesExcluded
-									-Expression: SalesOutlier
-										--SUM(AnalysisFilteredCte.SalesOutlier) AS SalesOutlier
-									-Expression: SalesOutlierTaxesIncluded
-										--SUM(AnalysisFilteredCte.SalesOutlierTaxesIncluded) AS SalesOutlierTaxesIncluded
-									-Expression: SalesOutlierTaxesExcluded
-										--SUM(AnalysisFilteredCte.SalesOutlierTaxesExcluded) AS SalesOutlierTaxesExcluded
-									-Expression: SalesMarginTaxesIncluded
-										--SUM((AnalysisFilteredCte.SalesTaxesIncluded - AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) AS SalesMarginTaxesIncluded
-									-Expression: SalesMarginTaxesExcluded
-										--SUM((AnalysisFilteredCte.SalesTaxesExcluded - AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) AS SalesMarginTaxesExcluded
-									-Expression: SalesMarginPercentageTaxesIncluded
-										--(SUM(AnalysisFilteredCte.SalesTaxesIncluded) - SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) 
-										--		/ NULLIF(SUM(AnalysisFilteredCte.SalesTaxesIncluded), 0) * 100 AS SalesMarginPercentageTaxesIncluded
-									-Expression: SalesMarginPercentageTaxesExcluded
-										--(SUM(AnalysisFilteredCte.SalesTaxesExcluded) - SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost))
-										--		/ NULLIF(SUM(AnalysisFilteredCte.SalesTaxesExcluded), 0) * 100 AS SalesMarginPercentageTaxesExcluded
-									-Expression: DesignVariationsWithSales
-										--MAX(AnalysisDvSalesCte.DesignVariationsWithSales) AS DesignVariationsWithSales
-									-Expression: Markup
-										--SUM(AnalysisFilteredCte.SalesTaxesIncluded) / NULLIF(SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost), 0) AS Markup
-									-Expression: AveragePrice
-										--SUM(AnalysisFilteredCte.SalesTaxesIncluded) / NULLIF(SUM(AnalysisFilteredCte.Sales), 0) AS AveragePrice
-									-Expression: AverageCost
-										--SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost) / NULLIF(SUM(AnalysisFilteredCte.Sales), 0) AS AverageCost
-									-Expression: SalesAtCost
-										--SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost) AS SalesAtCost
-							}}						
-					FROM AnalysisFilteredCte
-					INNER JOIN Fact.ProductCostAndPriceByPointOfSaleIntervals
-						ON AnalysisFilteredCte.ProductId = ProductCostAndPriceByPointOfSaleIntervals.ProductId
-							AND AnalysisFilteredCte.PointOfSaleId = ProductCostAndPriceByPointOfSaleIntervals.PointOfSaleId
-							AND AnalysisFilteredCte.Date BETWEEN ProductCostAndPriceByPointOfSaleIntervals.[StartDate] 
-															AND ProductCostAndPriceByPointOfSaleIntervals.[EndDate]
-		            {{
-		            	LeftJoin
-		            		-Dimension: Products 
-		            			--Table: AnalysisDvSalesCte
-								--OnRequestFields
-		            		-Dimension: PointsOfSale 
-		            			--Table: AnalysisDvSalesCte
-								--OnRequestFields
-							-Table: AnalysisFilteredCte
-							-Sql
-								-- AnalysisFilteredCte.Date = AnalysisDvSalesCte.Date
-							-SqlNoDimension
-								-- AnalysisDvSalesCte ON AnalysisFilteredCte.Date = AnalysisDvSalesCte.Date
-		            }}
-					{{
-	                	GroupBy
-	                		-Dimension: PointsOfSale
-								--Table: AnalysisFilteredCte
-		            		-Dimension: Products
-								--Table: AnalysisFilteredCte
-							-Sql
-								--AnalysisFilteredCte.Date
-		            }}	
-				]]>
-			</Cte>
-
-			<!-- Ojo con las plantillas: Template: tiene los datos de dos tablas diferentes -->
-			<Cte Name = "ReportCte">
-				<![CDATA[
-					SELECT {{
-								Fields
-									-Dimension: PointsOfSale 
-										--Table: AnalysisCte
-										--AdditionalTable: StockCte
-									-Dimension: Products 
-										--Table: AnalysisCte
-										--AdditionalTable: StockCte
-									-WithComma
-	                	   }}
-						   IsNull(AnalysisCte.[Date], StockCte.[Date]) AS [Date],
-						   {{
-								IfRequest
-									-Expression: StockBreakage
-										--AnalysisCte.StockBreakage
-									-Expression: StockBreakageAmount
-										--AnalysisCte.StockBreakageAmount
-									-Expression: Sales
-										--AnalysisCte.Sales
-									-Expression: SalesPrice
-										--AnalysisCte.SalesPrice
-									-Expression: SalesTaxesIncluded
-										--AnalysisCte.SalesTaxesIncluded
-									-Expression: SalesTaxesExcluded
-										--AnalysisCte.SalesTaxesExcluded
-									-Expression: SalesOutlier
-										--AnalysisCte.SalesOutlier
-									-Expression: SalesOutlierTaxesIncluded
-										--AnalysisCte.SalesOutlierTaxesIncluded
-									-Expression: SalesOutlierTaxesExcluded
-										--AnalysisCte.SalesOutlierTaxesExcluded
-									-Expression: SalesMarginTaxesIncluded
-										--AnalysisCte.SalesMarginTaxesIncluded
-									-Expression: SalesMarginTaxesExcluded
-										--AnalysisCte.SalesMarginTaxesExcluded
-									-Expression: SalesMarginPercentageTaxesIncluded
-										--AnalysisCte.SalesMarginPercentageTaxesIncluded
-									-Expression: SalesMarginPercentageTaxesExcluded
-										--AnalysisCte.SalesMarginPercentageTaxesExcluded
-									-Expression: DesignVariationsWithSales
-										--AnalysisCte.DesignVariationsWithSales
-									-Expression: Markup
-										--AnalysisCte.Markup
-									-Expression: AveragePrice
-										--AnalysisCte.AveragePrice
-									-Expression: AverageCost
-										--AnalysisCte.AverageCost
-									-Expression: SalesAtCost
-										--AnalysisCte.SalesAtCost
-									-Expression: SalesParticipation
-										--(CAST(AnalysisCte.Sales AS decimal) / (NULLIF(SUM(AnalysisCte.Sales) OVER(), 0))) * 100 AS SalesParticipation
-									-Expression: DesignVariationsWithStock
-										--StockDvCte.DesignVariationsWithStock
-									-Expression: Stock
-										--StockCte.Stock
-									-Expression: StockCost
-										--StockCte.StockCost
-							}}						
-						FROM StockCte
-						{{
-		            		FullJoin
-		            			-Dimension: Products 
-		            				--Table: StockDvCte
-									--OnRequestFields
-									--CheckIfNull
-		            			-Dimension: PointsOfSale
-		            				--Table: StockDvCte
-									--OnRequestFields
-									--CheckIfNull
-								-Table: StockCte
-								-Sql
-									--StockCte.[Date] = StockDvCte.[Date]
-								-SqlNoDimension
-									--StockDvcte ON StockCte.[Date] = StockDvCte.[Date]
-						}}
-						{{
-		            		FullJoin 
-		            			-Dimension: Products 
-		            				--Table: AnalysisCte
-									--OnRequestFields
-									--CheckIfNull
-		            			-Dimension: PointsOfSale
-		            				--Table: AnalysisCte
-									--OnRequestFields
-									--CheckIfNull
-								-Table: StockCte
-								-NoDimensionTable: StockDvCte
-								-Sql
-									--StockCte.[Date] = AnalysisCte.[Date]
-								-SqlNoDimension
-									--AnalysisCte ON StockCte.[Date] = AnalysisCte.[Date]
-						}}
-				]]>
+	 					[Date] BETWEEN @StartDate AND @EndDate
+	 				]]>
+				</Filter>
 			</Cte>
 
 			<Query>
 				<![CDATA[
 					SELECT {{
 								Fields
-									-Dimension: PointsOfSale 
-										--Table: ReportCte
+									-Dimension: Shops 
+										--Table: ShopsCte
 									-Dimension: Products 
-										--Table: ReportCte
+										--Table: ProductsCte
+									-Dimension: Calendar 
+										--Table: CalendarCte
 									-WithComma
 	                		}}
-							ReportCte.Date,
-						   {{
-								IfRequest
-									-Expression: StockBreakage
-										--ReportCte.StockBreakage
-									-Expression: StockBreakageAmount
-										--ReportCte.StockBreakageAmount
-									-Expression: Sales
-										--ReportCte.Sales
-									-Expression: SalesPrice
-										--ReportCte.SalesPrice
-									-Expression: SalesTaxesIncluded
-										--ReportCte.SalesTaxesIncluded
-									-Expression: SalesTaxesExcluded
-										--ReportCte.SalesTaxesExcluded
-									-Expression: SalesOutlier
-										--ReportCte.SalesOutlier
-									-Expression: SalesOutlierTaxesIncluded
-										--ReportCte.SalesOutlierTaxesIncluded
-									-Expression: SalesOutlierTaxesExcluded
-										--ReportCte.SalesOutlierTaxesExcluded
-									-Expression: SalesMarginTaxesIncluded
-										--ReportCte.SalesMarginTaxesIncluded
-									-Expression: SalesMarginTaxesExcluded
-										--ReportCte.SalesMarginTaxesExcluded
-									-Expression: SalesMarginPercentageTaxesIncluded
-										--ReportCte.SalesMarginPercentageTaxesIncluded
-									-Expression: SalesMarginPercentageTaxesExcluded
-										--ReportCte.SalesMarginPercentageTaxesExcluded
-									-Expression: DesignVariationsWithSales
-										--ReportCte.DesignVariationsWithSales
-									-Expression: Markup
-										--ReportCte.Markup
-									-Expression: AveragePrice
-										--ReportCte.AveragePrice
-									-Expression: AverageCost
-										--ReportCte.AverageCost
-									-Expression: SalesAtCost
-										--ReportCte.SalesAtCost
-									-Expression: SalesParticipation
-										--ReportCte.SalesParticipation
-									-Expression: DesignVariationsWithStock
-										--ReportCte.DesignVariationsWithStock
-									-Expression: Stock
-										--ReportCte.Stock
-									-Expression: StockCost
-										--ReportCte.StockCost
-									-WhenRequestTotals
-										--Default
-											---COUNT(*) OVER () AS TotalCount
-										--Expression: StockBreakage
-											---SUM(ReportCte.StockBreakage) OVER () AS TotalStockBreakage
-										--Expression: StockBreakageAmount
-											---SUM(ReportCte.StockBreakageAmount) OVER () AS TotalStockBreakageAmount
-										--Expression: Sales
-											---SUM(ReportCte.Sales) OVER () AS TotalSales
-										--Expression: SalesPrice
-											---
-										--Expression: SalesTaxesIncluded
-											---SUM(ReportCte.SalesTaxesIncluded) OVER () AS TotalSalesTaxesIncluded
-										--Expression: SalesTaxesExcluded
-											---SUM(ReportCte.SalesTaxesExcluded) OVER () AS TotalSalesTaxesExcluded
-										--Expression: SalesOutlier
-											---SUM(ReportCte.SalesOutlier) OVER () AS TotalSalesOutlier
-										--Expression: SalesOutlierTaxesIncluded
-											---SUM(ReportCte.SalesOutlierTaxesIncluded) OVER () AS TotalSalesOutlierTaxesIncluded
-										--Expression: SalesOutlierTaxesExcluded
-											---SUM(ReportCte.SalesOutlierTaxesExcluded) OVER () AS TotalSalesOutlierTaxesExcluded
-										--Expression: SalesMarginTaxesIncluded
-											---SUM(ReportCte.SalesMarginTaxesIncluded) OVER() AS TotalSalesMarginTaxesIncluded
-										--Expression: SalesMarginTaxesExcluded
-											---SUM(ReportCte.SalesMarginTaxesExcluded) OVER() AS TotalSalesMarginTaxesExcluded
-										--Expression: SalesMarginPercentageTaxesIncluded
-											---SUM(ReportCte.SalesTaxesIncluded - ReportCte.SalesPrice) OVER() / NULLIF(SUM(ReportCte.SalesTaxesIncluded) OVER(), 0) * 100 AS TotalSalesMarginPercentageTaxesIncluded
-										--Expression: SalesMarginPercentageTaxesExcluded
-											---SUM(ReportCte.SalesTaxesExcluded - ReportCte.SalesPrice) OVER() / NULLIF(SUM(ReportCte.SalesTaxesExcluded) OVER(), 0) * 100 AS TotalSalesMarginPercentageTaxesExcluded
-										--Expression: DesignVariationsWithSales
-											---DvSalesCountCte.DvSales AS TotalDesignVariationsWithSales
-										--Expression: Markup
-											---SUM(ReportCte.SalesTaxesIncluded) OVER() / NULLIF(SUM(ReportCte.SalesPrice) OVER(), 0) AS TotalMarkup
-										--Expression: AveragePrice
-											---SUM(ReportCte.SalesTaxesIncluded) OVER() / NULLIF(SUM(ReportCte.Sales) OVER(), 0) AS TotalAveragePrice
-										--Expression: AverageCost
-											---SUM(ReportCte.SalesPrice) OVER() / NULLIF(SUM(ReportCte.Sales) OVER(), 0) AS TotalAverageCost
-										--Expression: SalesAtCost
-											---SUM(ReportCte.SalesAtCost) OVER() AS TotalSalesAtCost
-										--Expression: SalesParticipation
-											---100 AS TotalSalesParticipation
-										--Expression: DesignVariationsWithStock
-											---DvStockCountCte.DvStock AS TotalDesignVariationsWithStock
-										--Expression: Stock
-											---SUM(ReportCte.Stock) OVER () AS TotalStock
-										--Expression: StockCost
-											---SUM(ReportCte.StockCost) OVER () AS TotalStockCost
-								}}
-					FROM ReportCte
-					{{
-						IfRequest
-							-WhenRequestTotals
-								--Expression: DesignVariationsWithSales
-									---WithoutComma
-									---Sql
-										----CROSS JOIN DvSalesCountCte
-							-WhenRequestTotals
-								--Expression: DesignVariationsWithStock
-									---WithoutComma
-									---Sql
-										----CROSS JOIN DvStockCountCte
-					}}
-					WHERE ReportCte.Sales IS NOT NULL 
-						OR ReportCte.SalesTaxesIncluded IS NOT NULL 
-						OR ReportCte.SalesTaxesExcluded IS NOT NULL 
-						OR ReportCte.SalesParticipation IS NOT NULL 
-						OR ReportCte.SalesAtCost IS NOT NULL 
-						OR ReportCte.SalesOutlier IS NOT NULL 
-						OR ReportCte.SalesOutlierTaxesIncluded IS NOT NULL 
-						OR ReportCte.SalesOutlierTaxesExcluded IS NOT NULL 
-						OR ReportCte.StockBreakage IS NOT NULL 
-						OR ReportCte.StockBreakageAmount IS NOT NULL 
-						OR ReportCte.SalesMarginTaxesExcluded IS NOT NULL 
-						OR ReportCte.SalesMarginTaxesIncluded IS NOT NULL 
-						OR ReportCte.SalesMarginPercentageTaxesExcluded IS NOT NULL 
-						OR ReportCte.SalesMarginPercentageTaxesIncluded IS NOT NULL 
-						OR ReportCte.Stock IS NOT NULL 
-						OR ReportCte.StockCost IS NOT NULL 
-						OR ReportCte.DesignVariationsWithSales IS NOT NULL 
-						OR ReportCte.DesignVariationsWithStock IS NOT NULL 
-						OR ReportCte.Markup IS NOT NULL 
-						OR ReportCte.AveragePrice IS NOT NULL 
-						OR ReportCte.AverageCost IS NOT NULL
-					{{
-						OrderBy
-							-Dimension: PointsOfSale
-								--Table: ReportCte
-							-Dimension: Products
-								--Table: ReportCte
-							-Sql
-								--ReportCte.Date
-							-Required
-					}}
-					{{Pagination}}
+	                		SUM(Sales.Quantity) AS Quantity, SUM(Sales.SellingPrice) AS SellingPrice, 
+	                		SUM(Sales.PurchasePrice) AS PurchasePrice, SUM(Sales.Taxes) AS Taxes
+	                	FROM Fact.Sales
+	                	{{
+	                		InnerJoin 
+	                			-Dimension: Shops 
+	                				--Table: ShopsCte
+								-Table: Sales
+								-On: ShopId-ShopId
+	                	}}
+	                	{{
+	                		InnerJoin 
+	                			-Dimension: Products 
+	                				--Table: ProductsCte
+								-Table: Sales
+								-On: ProductId-ProductId
+	                	}}
+	                	{{
+	                		InnerJoin 
+	                			-Dimension: Calendar 
+	                				--Table: CalendarCte
+								-Table: Sales
+								-On: CalendarId-CalendarId
+								-Required
+	                	}}
+						{{
+	                		GroupBy
+	                			-Dimension: Shops
+									--Table: ShopsCte
+		            			-Dimension: Products
+									--Table: ProductsCte
+								-Dimension: Calendar
+									--Table: CalendarCte
+		            	}}
+						{{
+	                		OrderBy
+	                			-Dimension: Shops
+									--Table: ShopsCte
+		            			-Dimension: Products
+									--Table: ProductsCte
+								-Dimension: Calendar
+									--Table: CalendarCte									
+		            	}}
+						{{Pagination}}
 				]]>
 			</Query>
 		</With>
 	</Blocks>
-<!--
-DECLARE @StartDate date = '2023-06-01';
-DECLARE @EndDate date = '2023-07-01';
-            
-WITH 
-    ProductsCte AS
-		(SELECT P.Id AS ProductId, P.Description AS Description, P.UrlImage AS ProductImageURL,
-				P.RootProductCode AS RootProductCode, P.ProductCode, P.EanCode, P.BuyingPrice,
-				P.Size, T.Id AS TypologyId, T.[Name] AS Typology
-		FROM Dim.Products P 
-            INNER JOIN Dim.Typologies T ON P.TypologyId = T.ID  
-	),
-    PointsOfSaleCte AS
-		(SELECT PS.Id AS PointOfSaleId, PS.Name AS PointOfSale, PS.ImageUrl AS PointOfSaleImageUrl,
-				PS.ErpCode, PS.City, PS.State, PS.Country
-			FROM Dim.PointsOfSale PS
-		),
-	StockIntervalsCte AS 
-		(SELECT ProductsCte.ProductId, PointsOfSaleCte.PointOfSaleId,
-				DailyStocksIntervals.StartDate, DailyStocksIntervals.EndDate, DailyStocksIntervals.Quantity
-			FROM Fact.DailyStocksIntervals
-			INNER JOIN ProductsCte
-				ON DailyStocksIntervals.ProductId = ProductsCte.ProductId
-			INNER JOIN PointsOfSaleCte
-				ON DailyStocksIntervals.PointOfSaleId = PointsOfSaleCte.PointOfSaleId
-			INNER JOIN Dim.Products
-				ON DailyStocksIntervals.ProductId = Products.Id
-			WHERE DailyStocksIntervals.StartDate <= @EndDate 
-				AND DailyStocksIntervals.EndDate >= @StartDate					
-		),
-	DvStockCountCte AS 
-		(SELECT COUNT(RootProductCode) AS DvStock
-			FROM (SELECT DISTINCT Products.RootProductCode
-					FROM StockIntervalsCte INNER JOIN Dim.Products
-						ON StockIntervalsCte.ProductId = Products.Id
-				 ) AS ProductsRoot
-		),
-	StockCte AS
-		(SELECT CalendarIso.[Date], 
-				ProductsCte.Typology, ProductsCte.ProductCode, 
-				ProductsCte.ProductImageUrl, ProductsCte.Description,
-				PointsOfSaleCte.PointOfSale, PointsOfSaleCte.PointOfSaleImageUrl, PointsOfSaleCte.ErpCode,
-				SUM(StockIntervalsCte.Quantity) AS Stock,
-				SUM(StockIntervalsCte.Quantity * ProductCostAndPriceByPointOfSaleIntervals.Cost) AS StockCost
-			FROM StockIntervalsCte
-			INNER JOIN ProductsCte
-				ON StockIntervalsCte.ProductId = ProductsCte.ProductId
-			INNER JOIN PointsOfSaleCte
-				ON StockIntervalsCte.PointOfSaleId = PointsOfSaleCte.PointOfSaleId
-            INNER JOIN Dim.CalendarIso
-                ON CalendarIso.[Date] BETWEEN StockIntervalsCte.StartDate AND StockIntervalsCte.EndDate
-					AND CalendarIso.Date BETWEEN @StartDate AND @EndDate
-            INNER JOIN Fact.ProductCostAndPriceByPointOfSaleIntervals
-				ON StockIntervalsCte.ProductId = ProductCostAndPriceByPointOfSaleIntervals.ProductId
-					AND StockIntervalsCte.PointOfSaleId = ProductCostAndPriceByPointOfSaleIntervals.PointOfSaleId
-					AND CalendarIso.[Date] BETWEEN ProductCostAndPriceByPointOfSaleIntervals.[StartDate] 
-											AND ProductCostAndPriceByPointOfSaleIntervals.[EndDate]
-			GROUP BY CalendarIso.[Date], 
-					 ProductsCte.Typology, ProductsCte.ProductCode, 
-					 ProductsCte.ProductImageUrl, ProductsCte.Description,
-					 PointsOfSaleCte.PointOfSale, PointsOfSaleCte.PointOfSaleImageUrl, PointsOfSaleCte.ErpCode										 								
-		),
-	StockDvCte AS
-		(SELECT CalendarIso.Date, ProductsCte.Typology, ProductsCte.ProductCode, 
-				ProductsCte.ProductImageUrl, ProductsCte.Description, 
-				PointsOfSaleCte.PointOfSale, PointsOfSaleCte.PointOfSaleImageUrl, PointsOfSaleCte.ErpCode, 
-                COUNT(DISTINCT Products.RootProductCode) AS DesignVariationsWithStock
-			FROM StockIntervalsCte INNER JOIN Dim.Products
-				ON StockIntervalsCte.ProductId = Products.Id
-			INNER JOIN ProductsCte
-				ON StockIntervalsCte.ProductId = ProductsCte.ProductId
-			INNER JOIN PointsOfSaleCte
-				ON StockIntervalsCte.PointOfSaleId = PointsOfSaleCte.PointOfSaleId
-            INNER JOIN Dim.CalendarIso
-                ON CalendarIso.[Date] BETWEEN StockIntervalsCte.StartDate AND StockIntervalsCte.EndDate
-					AND CalendarIso.Date BETWEEN @StartDate AND @EndDate
-			GROUP BY CalendarIso.Date, ProductsCte.Typology, ProductsCte.ProductCode, ProductsCte.ProductImageUrl, 
-					 ProductsCte.Description, PointsOfSaleCte.PointOfSale, 
-					 PointsOfSaleCte.PointOfSaleImageUrl, PointsOfSaleCte.ErpCode
-		),
-	AnalysisFilteredCte AS
-		(SELECT ProductsCte.ProductId, PointsOfSaleCte.PointOfSaleId,
-				Products.RootProductCode AS AnalysisRootProductCode, 
-				ProductsCte.Typology, ProductsCte.ProductCode, ProductsCte.ProductImageUrl, 
-				ProductsCte.Description, ProductsCte.RootProductCode,
-				PointsOfSaleCte.PointOfSale, PointsOfSaleCte.PointOfSaleImageUrl, PointsOfSaleCte.ErpCode,
-				Analysis.Date, Analysis.StockBreakage, Analysis.StockBreakageAmount, 
-				Analysis.Sales, Analysis.SalesTaxesIncluded, Analysis.SalesTaxesExcluded, 
-				Analysis.SalesOutlier, Analysis.SalesOutlierTaxesIncluded, 
-				Analysis.SalesOutlierTaxesExcluded
-			FROM Fact.Analysis
-            INNER JOIN ProductsCte
-			    ON Analysis.ProductId = ProductsCte.ProductId
-		    INNER JOIN PointsOfSaleCte
-			    ON Analysis.PointOfSaleId = PointsOfSaleCte.PointOfSaleId
-			INNER JOIN Dim.Products
-				ON Analysis.ProductId = Products.Id
-			WHERE Analysis.Date BETWEEN @StartDate AND @EndDate
-		),
-	DvSalesCountCte AS 
-		(SELECT COUNT(*) DvSales
-			FROM (SELECT AnalysisRootProductCode
-					FROM AnalysisFilteredCte
-					GROUP BY AnalysisRootProductCode
-					HAVING SUM(Sales) > 0
-				) AS RootProducts
-		),
-	AnalysisDvSalesCte AS
-		(SELECT Typology, ProductCode, ProductImageUrl, 
-				Description, RootProductCode,
-				PointOfSale, PointOfSaleImageUrl, ErpCode,
-				Date, COUNT(1) AS DesignVariationsWithSales
-			FROM AnalysisFilteredCte
-			GROUP BY Typology, ProductCode, ProductImageUrl,
-					 Description, RootProductCode,
-					 PointOfSale, PointOfSaleImageUrl, ErpCode, 
-					 Date 
-			HAVING SUM(Sales) > 0
-		),
-	AnalysisCte AS
-		(SELECT AnalysisFilteredCte.Date,
-				AnalysisFilteredCte.Typology, AnalysisFilteredCte.ProductCode,
-				AnalysisFilteredCte.ProductImageUrl, AnalysisFilteredCte.Description,
-				AnalysisFilteredCte.PointOfSale, AnalysisFilteredCte.PointOfSaleImageUrl,
-				AnalysisFilteredCte.ErpCode,
-				SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost) AS SalesPrice,
-				SUM(AnalysisFilteredCte.StockBreakage) AS StockBreakage,
-				SUM(AnalysisFilteredCte.StockBreakageAmount) AS StockBreakageAmount,
-				SUM(AnalysisFilteredCte.Sales) AS Sales,
-				SUM(AnalysisFilteredCte.SalesTaxesIncluded) AS SalesTaxesIncluded,
-				SUM(AnalysisFilteredCte.SalesTaxesExcluded) AS SalesTaxesExcluded,
-				SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost) AS SalesAtCost,
-				SUM(AnalysisFilteredCte.SalesOutlier) AS SalesOutlier,
-				SUM(AnalysisFilteredCte.SalesOutlierTaxesIncluded) AS SalesOutlierTaxesIncluded,
-				SUM(AnalysisFilteredCte.SalesOutlierTaxesExcluded) AS SalesOutlierTaxesExcluded,
-				SUM((AnalysisFilteredCte.SalesTaxesIncluded - AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) AS SalesMarginTaxesIncluded,
-				SUM((AnalysisFilteredCte.SalesTaxesExcluded - AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) AS SalesMarginTaxesExcluded,
-				(SUM(AnalysisFilteredCte.SalesTaxesIncluded) - SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) 
-						/ NULLIF(SUM(AnalysisFilteredCte.SalesTaxesIncluded), 0) * 100 AS SalesMarginPercentageTaxesIncluded,
-				(SUM(AnalysisFilteredCte.SalesTaxesExcluded) - SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost)) 
-						/ NULLIF(SUM(AnalysisFilteredCte.SalesTaxesExcluded), 0) * 100 AS SalesMarginPercentageTaxesExcluded,
-				MAX(AnalysisDvSalesCte.DesignVariationsWithSales) AS DesignVariationsWithSales,
-				SUM(AnalysisFilteredCte.SalesTaxesIncluded) / NULLIF(SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost), 0) AS Markup,
-				SUM(AnalysisFilteredCte.SalesTaxesIncluded) / NULLIF(SUM(AnalysisFilteredCte.Sales), 0) AS AveragePrice,
-				SUM(AnalysisFilteredCte.Sales * ProductCostAndPriceByPointOfSaleIntervals.Cost) / NULLIF(SUM(AnalysisFilteredCte.Sales), 0) AS AverageCost
-			FROM AnalysisFilteredCte
-			INNER JOIN Fact.ProductCostAndPriceByPointOfSaleIntervals
-				ON AnalysisFilteredCte.ProductId = ProductCostAndPriceByPointOfSaleIntervals.ProductId
-					AND AnalysisFilteredCte.PointOfSaleId = ProductCostAndPriceByPointOfSaleIntervals.PointOfSaleId
-					AND AnalysisFilteredCte.Date BETWEEN ProductCostAndPriceByPointOfSaleIntervals.[StartDate] 
-													AND ProductCostAndPriceByPointOfSaleIntervals.[EndDate]
-			LEFT JOIN AnalysisDvSalesCte
-				ON AnalysisFilteredCte.Date = AnalysisDvSalesCte.Date
-					AND ISNULL(AnalysisFilteredCte.Typology, '') = ISNULL(AnalysisDvSalesCte.Typology, '')
-					AND ISNULL(AnalysisFilteredCte.ProductCode, '') = ISNULL(AnalysisDvSalesCte.ProductCode, '')
-					AND ISNULL(AnalysisFilteredCte.ProductImageUrl, '') = ISNULL(AnalysisDvSalesCte.ProductImageUrl, '')
-					AND ISNULL(AnalysisFilteredCte.Description, '') = ISNULL(AnalysisDvSalesCte.Description, '')
-					AND ISNULL(AnalysisFilteredCte.PointOfSale, '') = ISNULL(AnalysisDvSalesCte.PointOfSale, '')
-					AND ISNULL(AnalysisFilteredCte.PointOfSaleImageUrl, '') = ISNULL(AnalysisDvSalesCte.PointOfSaleImageUrl, '')
-					AND ISNULL(AnalysisFilteredCte.ErpCode, '') = ISNULL(AnalysisDvSalesCte.ErpCode, '')
-			GROUP BY AnalysisFilteredCte.Typology,
-					AnalysisFilteredCte.ProductCode,
-					AnalysisFilteredCte.ProductImageUrl,
-					AnalysisFilteredCte.Description,
-					AnalysisFilteredCte.PointOfSale,
-					AnalysisFilteredCte.PointOfSaleImageUrl,
-					AnalysisFilteredCte.ErpCode, 
-					AnalysisFilteredCte.Date 
-		),
-	ReportCte AS
-		(SELECT ISNULL(AnalysisCte.[Typology], StockCte.[Typology]) AS [Typology],
-				ISNULL(AnalysisCte.[ProductCode], StockCte.[ProductCode]) AS [ProductCode],
-				ISNULL(AnalysisCte.[ProductImageUrl], StockCte.[ProductImageUrl]) AS [ProductImageUrl],
-				ISNULL(AnalysisCte.[Description], StockCte.[Description]) AS [Description],
-				ISNULL(AnalysisCte.[PointOfSale], StockCte.[PointOfSale]) AS [PointOfSale],
-				ISNULL(AnalysisCte.[PointOfSaleImageUrl], StockCte.[PointOfSaleImageUrl]) AS [PointOfSaleImageUrl],
-				ISNULL(AnalysisCte.[ErpCode], StockCte.[ErpCode]) AS [ErpCode],
-				ISNULL(AnalysisCte.[Date], StockCte.[Date]) AS [Date],
-				AnalysisCte.StockBreakage,
-				AnalysisCte.StockBreakageAmount,
-				AnalysisCte.Sales,
-				AnalysisCte.SalesPrice,
-				AnalysisCte.SalesTaxesIncluded,
-				AnalysisCte.SalesTaxesExcluded,
-				AnalysisCte.SalesOutlier,
-				AnalysisCte.SalesOutlierTaxesIncluded,
-				AnalysisCte.SalesOutlierTaxesExcluded,
-				AnalysisCte.SalesMarginTaxesIncluded,
-				AnalysisCte.SalesMarginTaxesExcluded,
-				AnalysisCte.SalesMarginPercentageTaxesIncluded,
-				AnalysisCte.SalesMarginPercentageTaxesExcluded,
-				AnalysisCte.DesignVariationsWithSales,
-				AnalysisCte.Markup,
-				AnalysisCte.AveragePrice,
-				AnalysisCte.AverageCost,
-				AnalysisCte.SalesAtCost,
-				(CAST(AnalysisCte.Sales AS decimal) / (NULLIF(SUM(AnalysisCte.Sales) OVER(), 0))) * 100 AS SalesParticipation,
-				StockDvCte.DesignVariationsWithStock,
-				StockCte.Stock,
-				StockCte.StockCost
-			FROM StockCte 
-			FULL OUTER JOIN StockDvCte 
-				ON ISNULL(StockCte.[Typology], '') = ISNULL(StockDvCte.[Typology], '') 
-					AND ISNULL(StockCte.[ProductCode], '') = ISNULL(StockDvCte.[ProductCode], '') 
-					AND ISNULL(StockCte.[ProductImageUrl], '') = ISNULL(StockDvCte.[ProductImageUrl], '') 
-					AND ISNULL(StockCte.[Description], '') = ISNULL(StockDvCte.[Description], '') 
-					AND ISNULL(StockCte.[PointOfSale], '') = ISNULL(StockDvCte.[PointOfSale], '') 
-					AND ISNULL(StockCte.[PointOfSaleImageUrl], '') = ISNULL(StockDvCte.[PointOfSaleImageUrl], '') 
-					AND ISNULL(StockCte.[ErpCode], '') = ISNULL(StockDvCte.[ErpCode], '')
-					AND StockCte.[Date] = StockDvCte.[Date]
-			FULL OUTER JOIN AnalysisCte 
-				ON ISNULL(AnalysisCte.[Typology], '') = ISNULL(StockCte.[Typology], '') 
-					AND ISNULL(AnalysisCte.[ProductCode], '') = ISNULL(StockCte.[ProductCode], '') 
-					AND ISNULL(AnalysisCte.[ProductImageUrl], '') = ISNULL(StockCte.[ProductImageUrl], '') 
-					AND ISNULL(AnalysisCte.[Description], '') = ISNULL(StockCte.[Description], '') 
-					AND ISNULL(AnalysisCte.[PointOfSale], '') = ISNULL(StockCte.[PointOfSale], '') 
-					AND ISNULL(AnalysisCte.[PointOfSaleImageUrl], '') = ISNULL(StockCte.[PointOfSaleImageUrl], '') 
-					AND ISNULL(AnalysisCte.[ErpCode], '') = ISNULL(StockCte.[ErpCode], '') 
-					AND AnalysisCte.[Date] = StockCte.[Date]
-		)
-	SELECT ReportCte.Typology, ReportCte.ProductCode, ReportCte.ProductImageUrl, ReportCte.Description,
-			ReportCte.PointOfSale, ReportCte.PointOfSaleImageUrl, 
-			ReportCte.ErpCode, 
-			ReportCte.Date,
-			ReportCte.StockBreakage, ReportCte.StockBreakageAmount, ReportCte.Sales, ReportCte.SalesPrice,
-			ReportCte.SalesTaxesIncluded, ReportCte.SalesTaxesExcluded, ReportCte.SalesOutlier, ReportCte.SalesOutlierTaxesIncluded,
-			ReportCte.SalesOutlierTaxesExcluded, ReportCte.SalesMarginTaxesIncluded, ReportCte.SalesMarginTaxesExcluded,
-			ReportCte.SalesMarginPercentageTaxesIncluded, ReportCte.SalesMarginPercentageTaxesExcluded, ReportCte.DesignVariationsWithSales,
-			ReportCte.Markup, ReportCte.AveragePrice, ReportCte.AverageCost, ReportCte.SalesAtCost,
-			ReportCte.SalesParticipation, ReportCte.DesignVariationsWithStock, ReportCte.Stock, ReportCte.StockCost,
-			COUNT(*) OVER () AS TotalCount,
-			SUM(ReportCte.StockBreakage) OVER () AS TotalStockBreakage,
-			SUM(ReportCte.StockBreakageAmount) OVER () AS TotalStockBreakageAmount,
-			SUM(ReportCte.Sales) OVER () AS TotalSales,
-			SUM(ReportCte.SalesTaxesIncluded) OVER () AS TotalSalesTaxesIncluded,
-			SUM(ReportCte.SalesTaxesExcluded) OVER () AS TotalSalesTaxesExcluded,
-			SUM(ReportCte.SalesOutlier) OVER () AS TotalSalesOutlier,
-			SUM(ReportCte.SalesOutlierTaxesIncluded) OVER () AS TotalSalesOutlierTaxesIncluded,
-			SUM(ReportCte.SalesOutlierTaxesExcluded) OVER () AS TotalSalesOutlierTaxesExcluded,
-			DvSalesCountCte.DvSales AS TotalDesignVariationsWithSales,
-			SUM(ReportCte.SalesAtCost) OVER() AS TotalSalesAtCost,
-			SUM(ReportCte.SalesMarginTaxesIncluded) OVER() AS TotalSalesMarginTaxesIncluded,
-			SUM(ReportCte.SalesMarginTaxesExcluded) OVER() AS TotalSalesMarginTaxesExcluded,
-			SUM(ReportCte.SalesTaxesIncluded) OVER() / NULLIF(SUM(ReportCte.SalesPrice) OVER(), 0) AS TotalMarkup,
-			SUM(ReportCte.SalesTaxesIncluded) OVER() / NULLIF(SUM(ReportCte.Sales) OVER(), 0) AS TotalAveragePrice,
-			SUM(ReportCte.SalesPrice) OVER() / NULLIF(SUM(ReportCte.Sales) OVER(), 0) AS TotalAverageCost,
-			100 AS TotalSalesParticipation,
-			SUM(ReportCte.SalesTaxesIncluded - ReportCte.SalesPrice) OVER() / NULLIF(SUM(ReportCte.SalesTaxesIncluded) OVER(), 0) * 100 AS TotalSalesMarginPercentageTaxesIncluded,
-			SUM(ReportCte.SalesTaxesExcluded - ReportCte.SalesPrice) OVER() / NULLIF(SUM(ReportCte.SalesTaxesExcluded) OVER(), 0) * 100 AS TotalSalesMarginPercentageTaxesExcluded,
-			DvStockCountCte.DvStock AS TotalDesignVariationsWithStock,
-			SUM(ReportCte.Stock) OVER () AS TotalStock,
-			SUM(ReportCte.StockCost) OVER () AS TotalStockCost
-		FROM ReportCte
-		CROSS JOIN DvSalesCountCte
-		CROSS JOIN DvStockCountCte
-		WHERE ReportCte.Sales IS NOT NULL 
-			OR ReportCte.SalesTaxesIncluded IS NOT NULL 
-			OR ReportCte.SalesTaxesExcluded IS NOT NULL 
-			OR ReportCte.SalesParticipation IS NOT NULL 
-			OR ReportCte.SalesAtCost IS NOT NULL 
-			OR ReportCte.SalesOutlier IS NOT NULL 
-			OR ReportCte.SalesOutlierTaxesIncluded IS NOT NULL 
-			OR ReportCte.SalesOutlierTaxesExcluded IS NOT NULL 
-			OR ReportCte.StockBreakage IS NOT NULL 
-			OR ReportCte.StockBreakageAmount IS NOT NULL 
-			OR ReportCte.SalesMarginTaxesExcluded IS NOT NULL 
-			OR ReportCte.SalesMarginTaxesIncluded IS NOT NULL 
-			OR ReportCte.SalesMarginPercentageTaxesExcluded IS NOT NULL 
-			OR ReportCte.SalesMarginPercentageTaxesIncluded IS NOT NULL 
-			OR ReportCte.Stock IS NOT NULL 
-			OR ReportCte.StockCost IS NOT NULL 
-			OR ReportCte.DesignVariationsWithSales IS NOT NULL 
-			OR ReportCte.DesignVariationsWithStock IS NOT NULL 
-			OR ReportCte.Markup IS NOT NULL 
-			OR ReportCte.AveragePrice IS NOT NULL 
-			OR ReportCte.AverageCost IS NOT NULL
-		ORDER BY ReportCte.Date ASC 
-		OFFSET 0 ROWS FETCH NEXT 44 ROWS ONLY
--->
 </Report>

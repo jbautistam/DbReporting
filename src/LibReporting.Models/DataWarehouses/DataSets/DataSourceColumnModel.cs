@@ -42,7 +42,8 @@ public class DataSourceColumnModel : Base.BaseReportingModel
 							Alias = Alias,
 							Type = Type,
 							Visible = Visible,
-							Required = Required
+							Required = Required,
+							FormulaSql = FormulaSql
 						};
 	}
 
@@ -90,7 +91,7 @@ public class DataSourceColumnModel : Base.BaseReportingModel
 	/// <summary>
 	///		Fórmula SQL: el campo no es real, es una fórmula sobre otros campos
 	/// </summary>
-	public string FormulaSql { get; set; } = string.Empty;
+	public string? FormulaSql { get; set; }
 
 	/// <summary>
 	///		Indica si la columna es visible

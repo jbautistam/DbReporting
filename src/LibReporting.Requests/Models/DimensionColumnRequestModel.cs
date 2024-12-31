@@ -30,5 +30,5 @@ public class DimensionColumnRequestModel : BaseColumnRequestModel
 	/// <summary>
 	///		Código de columna
 	/// </summary>
-	public string ColumnId { get; set; } = string.Empty;
+	public string ColumnId { get; set; } = default!;
 }

@@ -32,7 +32,7 @@ public class ReportModel : Base.BaseReportingModel
 	/// <summary>
 	///		Descripción del <see cref="ReportModel"/>
 	/// </summary>
-	public string Description { get; set; } = string.Empty;
+	public string Description { get; set; } = default!;
 
 	/// <summary>
 	///		<see cref="DataWarehouseModel"/> al que se asocia este <see cref="ReportModel"/>
@@ -63,10 +63,10 @@ public class ReportModel : Base.BaseReportingModel
 	/// <summary>
 	///		Expresiones del informe
 	/// </summary>
-	public List<string> Expressions { get; } = new();
+	public List<string> Expressions { get; } = [];
 
 	/// <summary>
 	///		Bloques del informe
 	/// </summary>
-	public List<BaseBlockModel> Blocks { get; } = new();
+	public List<BaseBlockModel> Blocks { get; } = [];
 }

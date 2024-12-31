@@ -42,7 +42,7 @@ internal static class FileHelper
 	/// </summary>
 	public static Dictionary<string, List<string>> GetReports()
 	{
-		Dictionary<string, List<string>> reports = new();
+		Dictionary<string, List<string>> reports = [];
 
 			// Busca los directorios del directorio Data
 			foreach (string path in Directory.GetDirectories(GetDataPath()))

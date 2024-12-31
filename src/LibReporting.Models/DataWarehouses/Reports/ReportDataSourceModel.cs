@@ -24,5 +24,5 @@ public class ReportDataSourceModel
 	/// <summary>
 	///		Relaciones del origen de datos con las dimensiones
 	/// </summary>
-	public List<Relations.DimensionRelationModel> Relations { get; } = new();
+	public List<Relations.DimensionRelationModel> Relations { get; } = [];
 }

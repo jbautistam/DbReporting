@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Bau.Libraries.LibReporting.Application.Exceptions;
+﻿namespace Bau.Libraries.LibReporting.Application.Exceptions;
 
 /// <summary>
 ///		Excepción de interpretación de un informe
@@ -16,10 +14,6 @@ public class ReportingParserException : Exception
 	}
 
 	public ReportingParserException(string message, Exception innerException) : base(message, innerException)
-	{
-	}
-
-	protected ReportingParserException(SerializationInfo info, StreamingContext context) : base(info, context)
 	{
 	}
 }

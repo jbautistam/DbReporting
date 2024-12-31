@@ -20,10 +20,10 @@ public class RelationForeignKey
 	/// <summary>
 	///		Columna a relacionar
 	/// </summary>
-	public string ColumnId { get; set; } = string.Empty;
+	public string ColumnId { get; set; } = default!;
 
 	/// <summary>
 	///		Columna relacionada
 	/// </summary>
-	public string TargetColumnId { get; set; } = string.Empty;
+	public string TargetColumnId { get; set; } = default!;
 }

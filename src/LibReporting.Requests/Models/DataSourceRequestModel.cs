@@ -25,10 +25,10 @@ public class DataSourceRequestModel
 	/// <summary>
 	///		Clave del informe de origen de datos
 	/// </summary>
-	public string ReportDataSourceId { get; set; } = string.Empty;
+	public string ReportDataSourceId { get; set; } = default!;
 
 	/// <summary>
-	///		Columnas solicitada
+	///		Columnas solicitadas
 	/// </summary>
-	public List<DataSourceColumnRequestModel> Columns { get; } = new();
+	public List<DataSourceColumnRequestModel> Columns { get; } = [];
 }

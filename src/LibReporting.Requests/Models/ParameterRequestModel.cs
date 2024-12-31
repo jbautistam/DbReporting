@@ -38,7 +38,7 @@ public class ParameterRequestModel
 	/// <summary>
 	///		Clave del parámetro
 	/// </summary>
-	public string Key { get; set; } = string.Empty;
+	public string Key { get; set; } = default!;
 
 	/// <summary>
 	///		Tipo de parámetro

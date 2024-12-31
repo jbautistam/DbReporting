@@ -8,7 +8,7 @@ public class DataSourceSqlParameterModel
 	/// <summary>
 	///		Nombre del parámetro
 	/// </summary>
-	public string Name { get; set; } = string.Empty;
+	public string Name { get; set; } = default!;
 
 	/// <summary>
 	///		Tipo del parámetro
@@ -18,5 +18,5 @@ public class DataSourceSqlParameterModel
 	/// <summary>
 	///		Valor predeterminado
 	/// </summary>
-	public string DefaultValue { get; set; } = string.Empty;
+	public string? DefaultValue { get; set; }
 }

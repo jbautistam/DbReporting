@@ -31,10 +31,10 @@ public class DataSourceSqlModel : BaseDataSourceModel
 	/// <summary>
 	///		Comando SQL de consulta
 	/// </summary>
-	public string Sql { get; set; } = string.Empty;
+	public string Sql { get; set; } = default!;
 
 	/// <summary>
 	///		Parámetros asociados a la consulta
 	/// </summary>
-	public List<DataSourceSqlParameterModel> Parameters { get; } = new();
+	public List<DataSourceSqlParameterModel> Parameters { get; } = [];
 }

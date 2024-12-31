@@ -18,5 +18,5 @@ public class ReportRequestDimension
 	/// <summary>
 	///		Campos que se deben solicitar juntos
 	/// </summary>
-	public List<ReportRequestDimensionField> Fields { get; } = new();
+	public List<ReportRequestDimensionField> Fields { get; } = [];
 }
