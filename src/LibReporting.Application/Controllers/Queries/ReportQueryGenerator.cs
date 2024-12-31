@@ -488,6 +488,7 @@ internal class ReportQueryGenerator
 	{
 		QueryModel query = new(this, dimension.Id, dimension.Id);
 
+			aquí está el error
 			// Prepara la consulta
 			query.Prepare(dimension);
 			// Añade sólo los campos clave
