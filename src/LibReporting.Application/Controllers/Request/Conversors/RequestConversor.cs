@@ -3,7 +3,7 @@ using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 using Bau.Libraries.LibReporting.Requests.Models;
 
-namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Converson;
+namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Conversors;
 
 /// <summary>
 ///		Coversor de <see cref="ReportRequestModel"/> en <see cref="ReportRequestModel"/>
@@ -20,7 +20,7 @@ internal class RequestConversor
 	/// </summary>
 	internal RequestModel Convert(ReportRequestModel request)
 	{
-		RequestModel converted = new(Manager, GetReport(request.ReportId));
+		RequestModel converted = new(Manager, GetReport(request.DataWarehouseId, request.ReportId));
 
 			// Convierte los datos
 			ConvertDimensions(converted, request.Dimensions);
@@ -38,14 +38,21 @@ internal class RequestConversor
 	/// <summary>
 	///		Obtiene el informe solicitado
 	/// </summary>
-	private ReportModel GetReport(string id)
+	private ReportModel GetReport(string dataWarehouseId, string reportId)
 	{
-		ReportModel? report = Manager.Schema.DataWarehouses.GetReport(id);
+		LibReporting.Models.DataWarehouses.DataWarehouseModel? dataWarehouse = Manager.Schema.DataWarehouses[dataWarehouseId];
 
-			if (report is null)
-				throw new Exceptions.ReportingParserException($"Can't find the report {id}");
+			if (dataWarehouse is null)
+				throw new Exceptions.ReportingParserException($"Can't find the datawarehouse {dataWarehouseId} for report {reportId}");
 			else
-				return report;
+			{
+				ReportModel? report = Manager.Schema.DataWarehouses.GetReport(reportId);
+
+					if (report is null)
+						throw new Exceptions.ReportingParserException($"Can't find the report {reportId}");
+					else
+						return report;
+			}
 	}
 
 	/// <summary>

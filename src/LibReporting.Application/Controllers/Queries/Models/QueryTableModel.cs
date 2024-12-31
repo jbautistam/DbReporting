@@ -6,22 +6,22 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 /// <summary>
 ///		Modelo de una tabla para una consulta
 /// </summary>
-internal class QueryTableModelNew
+internal class QueryTableModel
 {
-	internal QueryTableModelNew(string table, string alias)
+	internal QueryTableModel(string table, string alias)
 	{
-		NameParts = new QueryTableNameModelNew(table, alias);
+		NameParts = new QueryTableNameModel(table, alias);
 	}
 
 	/// <summary>
 	///		Clona la tabla cambiándole los nombres
 	/// </summary>
-	internal QueryTableModelNew Clone(string table, string alias)
+	internal QueryTableModel Clone(string table, string alias)
 	{
-		QueryTableModelNew queryTable = new(table, alias);
+		QueryTableModel queryTable = new(table, alias);
 
 			// Añade los campos
-			foreach (QueryTableColumnModelNew column in Columns)
+			foreach (QueryTableColumnModel column in Columns)
 				queryTable.AddColumn(column.IsPrimaryKey, column.NameParts.Name, column.NameParts.Alias, column.Type);
 			// Devuelve la tabla generada
 			return queryTable;
@@ -32,13 +32,13 @@ internal class QueryTableModelNew
 	/// </summary>
 	internal void AddColumn(bool isPrimaryKey, string name, string alias, DataSourceColumnModel.FieldType type)
 	{
-		Columns.Add(new QueryTableColumnModelNew(this, isPrimaryKey, name, alias, type));
+		Columns.Add(new QueryTableColumnModel(this, isPrimaryKey, name, alias, type));
 	}
 
 	/// <summary>
 	///		Obtiene la SQL de un join con otra tabla
 	/// </summary>
-	internal string GetSqlJoinOn(QueryTableModelNew target, bool checkIfNull)
+	internal string GetSqlJoinOn(QueryTableModel target, bool checkIfNull)
 	{
 		string sql = string.Empty;
 
@@ -48,12 +48,12 @@ internal class QueryTableModelNew
 			else
 				for (int index = 0; index < Columns.Count; index++)
 					sql = sql.AddWithSeparator($"{ComposeField(Columns[index], checkIfNull)} = {ComposeField(target.Columns[index], checkIfNull)}",
-									Environment.NewLine + " AND ");
+											   Environment.NewLine + " AND ");
 			// Devuelve la cadena SQL
 			return sql;
 
 		// Rutina para componer el nombre del campo
-		string ComposeField(QueryTableColumnModelNew column, bool useIsNull)
+		string ComposeField(QueryTableColumnModel column, bool useIsNull)
 		{
 			string sql = column.GetFieldName();
 
@@ -69,10 +69,10 @@ internal class QueryTableModelNew
 	/// <summary>
 	///		Partes del nombre de tabla
 	/// </summary>
-	internal QueryTableNameModelNew NameParts { get; }
+	internal QueryTableNameModel NameParts { get; }
 
 	/// <summary>
 	///		Columnas
 	/// </summary>
-	internal List<QueryTableColumnModelNew> Columns { get; } = new();
+	internal List<QueryTableColumnModel> Columns { get; } = [];
 }

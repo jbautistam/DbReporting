@@ -22,7 +22,7 @@ internal class RequestModel
 	/// <summary>
 	///		Obtiene los campos solicitados para una dimensión
 	/// </summary>
-	internal QueryTableModelNew? GetRequestedTable(string table, string alias, string dimensionKey, bool includePrimaryKeys, bool includeRequestFields)
+	internal QueryTableModel? GetRequestedTable(string table, string alias, string dimensionKey, bool includePrimaryKeys, bool includeRequestFields)
 	{
 		List<DataSourceColumnModel>? columns = GetRequestedFields(dimensionKey, includePrimaryKeys, includeRequestFields);
 
@@ -30,7 +30,7 @@ internal class RequestModel
 				return null;
 			else
 			{
-				QueryTableModelNew queryTable = new(table, alias);
+				QueryTableModel queryTable = new(table, alias);
 
 					// Añade las columnas
 					foreach (DataSourceColumnModel column in columns)
@@ -111,7 +111,7 @@ internal class RequestModel
 		// Comprueba que se hayan solicitado todas las dimensiones
 		if (ids is not null)
 			foreach (string id in ids)
-				if (!IsDimensionRequested(id))
+				if (!IsDimensionRequested(id) || IsRelatedDimensionRequested(id))
 					return false;
 		// Si ha llegado hasta aquí es porque todos las dimensiones existen
 		return true;
@@ -126,6 +126,17 @@ internal class RequestModel
 	///		Obtiene la dimensión solicitada
 	/// </summary>
 	internal RequestDimensionModel? GetRequestedDimension(string id) => Dimensions.FirstOrDefault(item => item.Dimension.Id.Equals(id, StringComparison.CurrentCultureIgnoreCase));
+
+	/// <summary>
+	///		Comprueba si se ha seleccionado un campo de una dimensión relacionada
+	/// </summary>
+	private bool IsRelatedDimensionRequested(string dimensionId)
+	{
+		bool isRelated = false;
+
+			// Devuelve el valor que indica si alguna de las dimensiones relacionadas se ha solicitado
+			return isRelated;
+	}
 
 	/// <summary>
 	///		Comprueba si se ha solicitado una expresión
@@ -156,7 +167,7 @@ internal class RequestModel
 	/// </summary>
 	internal RequestDimensionColumnModel AddDimension(string dimensionId, string columnId, bool requestByUser)
 	{
-		BaseDimensionModel? dimension = Manager.Schema.DataWarehouses.GetDimension(dimensionId);
+		BaseDimensionModel? dimension = Report.DataWarehouse.Dimensions[dimensionId];
 
 			if (dimension is null)
 				throw new Exceptions.ReportingParserException($"Can't find the dimension {dimensionId}");

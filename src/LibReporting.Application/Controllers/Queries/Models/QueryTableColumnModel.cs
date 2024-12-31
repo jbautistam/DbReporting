@@ -5,13 +5,13 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 /// <summary>
 ///		Modelo de una columna para una consulta
 /// </summary>
-internal class QueryTableColumnModelNew
+internal class QueryTableColumnModel
 {
-	internal QueryTableColumnModelNew(QueryTableModelNew table, bool isPrimaryKey, string name, string alias, DataSourceColumnModel.FieldType type)
+	internal QueryTableColumnModel(QueryTableModel table, bool isPrimaryKey, string name, string alias, DataSourceColumnModel.FieldType type)
 	{
 		Table = table;
 		IsPrimaryKey = isPrimaryKey;
-		NameParts = new QueryTableNameModelNew(name, alias);
+		NameParts = new QueryTableNameModel(name, alias);
 		Type = type;
 	}
 
@@ -28,7 +28,7 @@ internal class QueryTableColumnModelNew
 	/// <summary>
 	///		Tabla a la que se asocia la columna
 	/// </summary>
-	internal QueryTableModelNew Table { get; }
+	internal QueryTableModel Table { get; }
 
 	/// <summary>
 	///		Indica si es una clave primaria
@@ -38,7 +38,7 @@ internal class QueryTableColumnModelNew
 	/// <summary>
 	///		Partes del nombre del campo
 	/// </summary>
-	internal QueryTableNameModelNew NameParts { get; }
+	internal QueryTableNameModel NameParts { get; }
 
 	/// <summary>
 	///		Tipo de la columna

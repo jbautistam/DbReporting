@@ -12,6 +12,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	// Constantes privadas
 	private const string TagRoot = "ReportRequest";
 	private const string TagId = "Id";
+	private const string TagDataWarehouseId = "DataWarehouseId";
 	private const string TagParameter = "Parameter";
 	private const string TagKey = "Key";
 	private const string TagType = "Type";
@@ -33,7 +34,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// <summary>
 	///		Carga los datos de un <see cref="ReportRequestModel"/>
 	/// </summary>
-	public async Task<ReportRequestModel> GetAsync(string id, CancellationToken cancellationToken)
+	public async Task<ReportRequestModel?> GetAsync(string id, CancellationToken cancellationToken)
 	{
 		// Evita las advertencias
 		await Task.Delay(1, cancellationToken);
@@ -44,9 +45,9 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// <summary>
 	///		Carga los datos de un <see cref="ReportRequestModel"/>
 	/// </summary>
-	public ReportRequestModel Get(string id)
+	public ReportRequestModel? Get(string id)
 	{
-		ReportRequestModel request = new();
+		ReportRequestModel? request = null;
 		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().Load(id);
 
 			// Carga los datos del archivo
@@ -54,8 +55,9 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 				foreach (MLNode rootML in fileML.Nodes)
 					if (rootML.Name == TagRoot)
 					{
-						// Asigna las propiedades
-						request.ReportId = rootML.Attributes[TagId].Value.TrimIgnoreNull();
+						// Crea el informe
+						request = new ReportRequestModel(rootML.Attributes[TagDataWarehouseId].Value.TrimIgnoreNull(),
+														 rootML.Attributes[TagId].Value.TrimIgnoreNull());
 						// Carga los parámetros
 						foreach (MLNode nodeML in rootML.Nodes)
 							switch (nodeML.Name)
@@ -271,6 +273,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 		MLNode rootML = fileML.Nodes.Add(TagRoot);
 
 			// Añade los atributos
+			rootML.Attributes.Add(TagDataWarehouseId, request.DataWarehouseId);
 			rootML.Attributes.Add(TagId, request.ReportId);
 			// Añade los datos de la solicitud
 			rootML.Nodes.AddRange(GetNodesParameters(request.Parameters));
@@ -333,7 +336,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// </summary>
 	private MLNodesCollection GetNodesDimensions(List<DimensionRequestModel> dimensions)
 	{
-		MLNodesCollection nodesML = new();
+		MLNodesCollection nodesML = [];
 
 			// Añade los nodos de dimensión
 			foreach (DimensionRequestModel dimension in dimensions)

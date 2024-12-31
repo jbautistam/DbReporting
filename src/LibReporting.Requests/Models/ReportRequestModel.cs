@@ -5,15 +5,18 @@
 /// </summary>
 public class ReportRequestModel
 {
+	public ReportRequestModel(string datawarehouseId, string reportId)
+	{
+		DataWarehouseId = datawarehouseId;
+		ReportId = reportId;
+	}
+
 	/// <summary>
 	///		Clona los datos del objeto
 	/// </summary>
 	public ReportRequestModel Clone()
 	{
-		ReportRequestModel cloned = new()
-										{
-											ReportId = ReportId
-										};
+		ReportRequestModel cloned = new(DataWarehouseId, ReportId);
 
 			// Clona las solicitudes de dimensiones
 			foreach (DimensionRequestModel dimensionRequest in Dimensions)
@@ -138,9 +141,14 @@ public class ReportRequestModel
 	public bool IsRequestedTotals() => Pagination.IsFirstPage;
 
 	/// <summary>
+	///		Código de almacén solicitado
+	/// </summary>
+	public string DataWarehouseId { get; }
+
+	/// <summary>
 	///		Código de informe solicitado
 	/// </summary>
-	public string ReportId { get; set; } =  default!;
+	public string ReportId { get; }
 
 	/// <summary>
 	///		Parámetros

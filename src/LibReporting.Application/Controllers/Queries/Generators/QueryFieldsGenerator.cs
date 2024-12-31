@@ -39,7 +39,7 @@ internal class QueryFieldsGenerator : QueryBaseGenerator
 			foreach (ParserFieldsDimensionSectionModel fieldDimension in dimensions)
 				if (Manager.Request.IsDimensionRequested(fieldDimension.DimensionKey))
 				{
-					QueryTableModelNew? table = Manager.Request.GetRequestedTable(fieldDimension.Table, fieldDimension.Table, fieldDimension.DimensionKey,
+					QueryTableModel? table = Manager.Request.GetRequestedTable(fieldDimension.Table, fieldDimension.Table, fieldDimension.DimensionKey,
 																				  fieldDimension.WithPrimaryKeys, fieldDimension.WithRequestedFields);
 
 						if (table is not null)
@@ -52,12 +52,12 @@ internal class QueryFieldsGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la SQL de los campos
 	/// </summary>
-	private string GetSqlFields(ParserFieldsDimensionSectionModel fielDimension, QueryTableModelNew table)
+	private string GetSqlFields(ParserFieldsDimensionSectionModel fielDimension, QueryTableModel table)
 	{
 		string sql = string.Empty;
 
 			// Genera la SQL para las columnas de la tabla
-			foreach (QueryTableColumnModelNew column in table.Columns)
+			foreach (QueryTableColumnModel column in table.Columns)
 				if (string.IsNullOrEmpty(fielDimension.AdditionalTable))
 					sql = sql.AddWithSeparator(column.GetFieldName(), ",");
 				else

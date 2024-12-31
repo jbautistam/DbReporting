@@ -8,12 +8,12 @@ public interface IRequestRepository
 	/// <summary>
 	///		Obtiene un <see cref="Requests.Models.ReportRequestModel"/>
 	/// </summary>
-	Requests.Models.ReportRequestModel Get(string id);
+	Requests.Models.ReportRequestModel? Get(string id);
 
 	/// <summary>
 	///		Obtiene un <see cref="Requests.Models.ReportRequestModel"/> (asíncrono)
 	/// </summary>
-	Task<Requests.Models.ReportRequestModel> GetAsync(string id, CancellationToken cancellationToken);
+	Task<Requests.Models.ReportRequestModel?> GetAsync(string id, CancellationToken cancellationToken);
 
 	/// <summary>
 	///		Graba un <see cref="Requests.Models.ReportRequestModel"/>

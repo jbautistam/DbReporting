@@ -16,9 +16,9 @@ internal abstract class QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la cadena SQL para los campos solicitados de las dimensiones
 	/// </summary>
-	protected List<Models.QueryTableModelNew> GetTablesForDimensions(List<ParserDimensionModel> dimensions, bool includePrimaryKeys, bool includeRequestFields)
+	protected List<Models.QueryTableModel> GetTablesForDimensions(List<ParserDimensionModel> dimensions, bool includePrimaryKeys, bool includeRequestFields)
 	{
-		List<Models.QueryTableModelNew> tables = new();
+		List<Models.QueryTableModel> tables = new();
 
 			// Obtiene las tablas
 			foreach (ParserDimensionModel dimension in dimensions)
@@ -27,7 +27,7 @@ internal abstract class QueryBaseGenerator
 
 					if (dimensionRequested is not null)
 					{
-						Models.QueryTableModelNew? table = Manager.Request.GetRequestedTable(dimension.Table, dimension.TableAlias, dimension.DimensionKey,
+						Models.QueryTableModel? table = Manager.Request.GetRequestedTable(dimension.Table, dimension.TableAlias, dimension.DimensionKey,
 																							 includePrimaryKeys, includeRequestFields);
 
 							if (table is not null)

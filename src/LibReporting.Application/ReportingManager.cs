@@ -27,7 +27,7 @@ public class ReportingManager
 	/// </summary>
 	public string GetSqlResponse(Requests.Models.ReportRequestModel request) 
 	{
-		Controllers.Request.Converson.RequestConversor conversor = new(this);
+		Controllers.Request.Conversors.RequestConversor conversor = new(this);
 
 			// Genera la consulta
 			return new Controllers.Queries.ReportQueryGenerator(conversor.Convert(request)).GetSql();

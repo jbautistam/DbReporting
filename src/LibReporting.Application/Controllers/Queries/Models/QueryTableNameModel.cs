@@ -5,12 +5,12 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 /// <summary>
 ///		Modelo de una tabla para una consulta
 /// </summary>
-internal class QueryTableNameModelNew
+internal class QueryTableNameModel
 {
 	// Variables privadas
 	private string _alias = string.Empty;
 
-	internal QueryTableNameModelNew(string name, string alias)
+	internal QueryTableNameModel(string name, string alias)
 	{
 		Name = name;
 		Alias = alias;
