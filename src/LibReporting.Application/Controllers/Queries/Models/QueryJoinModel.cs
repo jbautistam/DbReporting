@@ -20,7 +20,7 @@ internal class QueryJoinModel
 		Full
 	}
 
-	internal QueryJoinModel(JoinType type, QueryModel query, string alias)
+	internal QueryJoinModel(JoinType type, QueryDimensionModel query, string alias)
 	{
 		Type = type;
 		Query = query;
@@ -35,7 +35,7 @@ internal class QueryJoinModel
 	/// <summary>
 	///		Subconsulta
 	/// </summary>
-	internal QueryModel Query { get; }
+	internal QueryDimensionModel Query { get; }
 
 	/// <summary>
 	///		Alias de la subconsulta
@@ -45,5 +45,5 @@ internal class QueryJoinModel
 	/// <summary>
 	///		Campos de relación
 	/// </summary>
-	internal List<QueryRelationModel> Relations { get; } = new();
+	internal List<QueryRelationModel> Relations { get; } = [];
 }

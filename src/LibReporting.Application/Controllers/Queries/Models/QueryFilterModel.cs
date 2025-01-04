@@ -7,7 +7,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 /// </summary>
 internal class QueryFilterModel
 {
-	internal QueryFilterModel(QueryModel query, RequestFilterModel.ConditionType condition, List<object?> values)
+	internal QueryFilterModel(QueryDimensionModel query, RequestFilterModel.ConditionType condition, List<object?> values)
 	{
 		Query = query;
 		Condition = condition;
@@ -43,7 +43,7 @@ internal class QueryFilterModel
 	/// <summary>
 	///		Consulta
 	/// </summary>
-	internal QueryModel Query { get; }
+	internal QueryDimensionModel Query { get; }
 
 	/// <summary>
 	///		Condición

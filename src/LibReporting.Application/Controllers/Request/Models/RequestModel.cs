@@ -122,7 +122,23 @@ internal class RequestModel
 	/// <summary>
 	///		Obtiene la dimensión solicitada
 	/// </summary>
-	internal RequestDimensionModel? GetRequestedDimension(string id) => Dimensions.FirstOrDefault(item => item.Dimension.Id.Equals(id, StringComparison.CurrentCultureIgnoreCase));
+	internal RequestDimensionModel? GetRequestedDimension(string dimensionId) 
+	{
+		RequestDimensionModel? requestDimension = Dimensions.FirstOrDefault(item => item.Dimension.Id.Equals(dimensionId, StringComparison.CurrentCultureIgnoreCase));
+
+			// Si no se ha solicitado la dimensión, se busca si se ha solicitado alguna dimensión relacionada
+			if (requestDimension is null)
+			{
+				BaseDimensionModel? dimension = Report.DataWarehouse.Dimensions[dimensionId];
+
+					if (dimension is not null)
+						foreach (DimensionRelationModel relation in dimension.GetRelations())
+							if (requestDimension is null && relation.Dimension is not null)
+								requestDimension = GetRequestedDimension(relation.DimensionId);
+			}
+			// Devuelve la dimensión solicitada
+			return requestDimension;
+	}
 
 	/// <summary>
 	///		Comprueba si se ha seleccionado un campo de una dimensión relacionada

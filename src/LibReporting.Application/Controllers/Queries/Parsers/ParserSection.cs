@@ -1,6 +1,5 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports.Blocks;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Parsers;
 
@@ -39,8 +38,8 @@ internal class ParserSection
 	private const string HeaderWithPrimaryKeys = "WithPrimaryKeys";
 	private const string HeaderRequired = "Required";
 	private const string HeaderCheckIfNull = "CheckIfNull";
-	private const string HeaderEqual = "Equal";
-	private const string HeaderTemplate = "Template";
+	//private const string HeaderEqual = "Equal";
+	//private const string HeaderTemplate = "Template";
 	private const string HeaderWhenRequestTotals = "WhenRequestTotals";
 	private const string HeaderDefault = "Default";
 	private const string HeaderDataSource = "DataSource";
@@ -228,21 +227,6 @@ internal class ParserSection
 			// Devuelve la relación
 			return dimension;
 	}
-
-	///// <summary>
-	/////		Interpreta las dimensiones de un bloque
-	///// </summary>
-	//private List<ParserDimensionModel> ParseDimensions(BlockInfo block)
-	//{ 
-	//	List<ParserDimensionModel> dimensions = new();
-
-	//		// Interpreta las dimensiones
-	//		foreach (BlockInfo child in block.Blocks)
-	//			if (child.HasHeader(HeaderDimension))
-	//				dimensions.Add(ParseDimension(child));
-	//		// Devuelve las dimensiones
-	//		return dimensions;
-	//}
 
 	/// <summary>
 	///		Interpreta una dimensión

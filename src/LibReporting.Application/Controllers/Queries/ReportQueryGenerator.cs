@@ -336,7 +336,7 @@ internal class ReportQueryGenerator
 	/// <summary>
 	///		Obtiene la lista con los campos asociados a una consulta
 	/// </summary>
-	private List<(string table, string field)> GetListFields(QueryModel query, string tableAlias, bool includePrimaryKey)
+	private List<(string table, string field)> GetListFields(QueryDimensionModel query, string tableAlias, bool includePrimaryKey)
 	{
 		List<(string table, string field)> fields = [];
 
@@ -438,7 +438,7 @@ internal class ReportQueryGenerator
 	/// <summary>
 	///		Obtiene los campos asociados a una consulta
 	/// </summary>
-	private List<string> GetListFields(QueryModel query, bool includeRequestFields, bool includePrimaryKey)
+	private List<string> GetListFields(QueryDimensionModel query, bool includeRequestFields, bool includePrimaryKey)
 	{
 		List<string> fields = [];
 
@@ -458,12 +458,12 @@ internal class ReportQueryGenerator
 	/// </summary>
 	private string GetSqlDimension(BaseDimensionModel dimension, List<ClauseFieldModel> fields)
 	{
-		QueryModel query;
+		QueryDimensionModel query;
 		RequestDimensionModel? request = Request.GetRequestedDimension(dimension.Id);
 
 			// Obtiene la consulta de la solicitud o de la dimensión
 			if (request is not null)
-				query = GetQueryFromRequest(request);
+				query = GetDimensionQuery(dimension, Request);
 			else
 				query = GetQueryFromDimension(dimension);
 			// Añade los campos adicionales
@@ -484,11 +484,10 @@ internal class ReportQueryGenerator
 	/// <summary>
 	///		Obtiene la consulta para una dimensión del informe
 	/// </summary>
-	private QueryModel GetQueryFromDimension(BaseDimensionModel dimension)
+	private QueryDimensionModel GetQueryFromDimension(BaseDimensionModel dimension)
 	{
-		QueryModel query = new(this, dimension.Id, dimension.Id);
+		QueryDimensionModel query = new(this, dimension.Id, dimension.Id);
 
-			aquí está el error
 			// Prepara la consulta
 			query.Prepare(dimension);
 			// Añade sólo los campos clave
@@ -500,28 +499,40 @@ internal class ReportQueryGenerator
 	}
 
 	/// <summary>
+	///		Obtiene la consulta de una dimensión a partir de los datos de la solicitud
+	/// </summary>
+	private QueryDimensionModel GetDimensionQuery(BaseDimensionModel dimension, RequestModel request)
+	{
+		QueryDimensionModel queryDimension = new(this, dimension.Id, dimension.Id);
+
+			aquí debe obtenerlo todo
+			// Devuelve la consulta de la dimensión
+			return queryDimension;
+	}
+
+	/// <summary>
 	///		Obtiene la consulta para una solicitud de una dimensión del informe
 	/// </summary>
-	private QueryModel GetQueryFromRequest(RequestDimensionModel dimensionRequest)
+	private QueryDimensionModel GetQueryFromRequest(RequestDimensionModel dimensionRequest)
 	{
-		List<QueryModel> childsQueries = [];
+		List<QueryDimensionModel> childsQueries = [];
 		BaseDimensionModel dimension = GetDimension(dimensionRequest);
-		QueryModel query = GetChildQuery(dimensionRequest);
+		QueryDimensionModel query = GetChildQuery(dimensionRequest);
 
 			// Obtiene las consultas de las dimensiones hija: si hay algún campo solicitado de alguna dimensión hija, 
 			// necesitaremos también la consulta de esta dimensión para poder hacer el JOIN posterior, por eso las
 			// calculamos antes que la consulta de esta dimensión
 			foreach (RequestDimensionModel childDimension in Request.GetChildRequestedDimensions(dimensionRequest))
 			{
-				QueryModel childQuery = GetQueryFromRequest(childDimension);
+				QueryDimensionModel childQuery = GetQueryFromRequest(childDimension);
 
 					// Añade la query si realmente hay algo que añadir
-					if (childQuery != null)
+					if (childQuery is not null)
 						childsQueries.Add(childQuery);
 			}
 			// Añade las consultas con las dimensiones hija
 			if (childsQueries.Count > 0)
-				foreach (QueryModel childQuery in childsQueries)
+				foreach (QueryDimensionModel childQuery in childsQueries)
 				{
 					QueryJoinModel join = new(QueryJoinModel.JoinType.Inner, childQuery, $"child_{childQuery.Alias}");
 
@@ -540,10 +551,10 @@ internal class ReportQueryGenerator
 	/// <summary>
 	///		Obtiene la consulta de una dimensión
 	/// </summary>
-	private QueryModel GetChildQuery(RequestDimensionModel dimensionRequest)
+	private QueryDimensionModel GetChildQuery(RequestDimensionModel dimensionRequest)
 	{
 		BaseDimensionModel dimension = GetDimension(dimensionRequest);
-		QueryModel query = new(this, dimensionRequest.Dimension.Id, dimension.Id);
+		QueryDimensionModel query = new(this, dimensionRequest.Dimension.Id, dimension.Id);
 		BaseReportingDictionaryModel<DataSourceColumnModel> dimensionColumns = dimension.GetColumns();
 
 			// Prepara la consulta

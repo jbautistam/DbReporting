@@ -1,16 +1,15 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 
 /// <summary>
-///		Clase con los datos de una consulta
+///		Clase con los datos de una consulta para una dimensión
 /// </summary>
-internal class QueryModel
+internal class QueryDimensionModel
 {
-	internal QueryModel(ReportQueryGenerator generator, string sourceId, string alias)
+	internal QueryDimensionModel(ReportQueryGenerator generator, string sourceId, string alias)
 	{
 		Generator = generator;
 		SourceId = sourceId;
@@ -24,24 +23,6 @@ internal class QueryModel
 	{
 		FromTable = baseDimension.GetTableFullName();
 		FromAlias = baseDimension.GetTableAlias();
-	}
-
-	/// <summary>
-	///		Obtiene el nombre de tabla (o la claúsula FROM) y el alias de la tabla de un origen de datos
-	/// </summary>
-	internal void Prepare(BaseDataSourceModel baseDataSource)
-	{
-		FromTable = baseDataSource.GetTableFullNameOrContent();
-		FromAlias = baseDataSource.GetTableAlias();
-	}
-
-	/// <summary>
-	///		Prepara la consulta únicamente con un nombre de tabla / alias (lo utiliza el generador de expresiones para los INNER JOIN con las consultas de dimensión)
-	/// </summary>
-	internal void Prepare(string table, string alias)
-	{
-		FromTable = table;
-		FromAlias = alias;
 	}
 
 	/// <summary>
@@ -380,12 +361,12 @@ internal class QueryModel
 	/// <summary>
 	///		Tabla de la consulta
 	/// </summary>
-	internal string FromTable { get; private set; } = string.Empty;
+	internal string FromTable { get; private set; } = default!;
 
 	/// <summary>
 	///		Alias de la tabla
 	/// </summary>
-	internal string FromAlias { get; private set; } = string.Empty;
+	internal string FromAlias { get; private set; } = default!;
 
 	/// <summary>
 	///		Alias de la consulta
@@ -395,15 +376,15 @@ internal class QueryModel
 	/// <summary>
 	///		Campos de la consulta
 	/// </summary>
-	internal QueryFieldsCollection Fields { get; } = new();
+	internal QueryFieldsCollection Fields { get; } = [];
 
 	/// <summary>
 	///		Subconsultas combinadas
 	/// </summary>
-	internal QueryJoinsCollection Joins { get; } = new();
+	internal QueryJoinsCollection Joins { get; } = [];
 
 	/// <summary>
 	///		Claves foráneas de esta consulta
 	/// </summary>
-	internal QueryForeignKeyCollection ForeignKeys { get; } = new();
+	internal QueryForeignKeyCollection ForeignKeys { get; } = [];
 }

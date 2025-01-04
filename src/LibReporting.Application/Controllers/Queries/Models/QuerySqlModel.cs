@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
+﻿namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 
 /// <summary>
 ///		Datos de una consulta SQL
@@ -78,5 +76,5 @@ internal class QuerySqlModel
 	/// <summary>
 	///		Consultas hija
 	/// </summary>
-	internal List<QuerySqlModel> Queries { get; } = new();
+	internal List<QuerySqlModel> Queries { get; } = [];
 }

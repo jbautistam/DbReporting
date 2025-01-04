@@ -10,7 +10,7 @@ internal class QueryFieldModel
 	// Variables privadas
 	private string _alias = string.Empty;
 
-	internal QueryFieldModel(QueryModel query, bool primaryKey, string table, string field, string alias, 
+	internal QueryFieldModel(QueryDimensionModel query, bool primaryKey, string table, string field, string alias, 
 							 RequestColumnBaseModel.SortOrder orderBy, 
 							 RequestDataSourceColumnModel.AggregationType aggregation, bool visible)
 	{
@@ -46,7 +46,7 @@ internal class QueryFieldModel
 	/// <summary>
 	///		Cosulta a la que se asocia el campo
 	/// </summary>
-	internal QueryModel Query { get; }
+	internal QueryDimensionModel Query { get; }
 
 	/// <summary>
 	///		Indica si es una clave primaria
@@ -121,10 +121,10 @@ internal class QueryFieldModel
 	/// <summary>
 	///		Filtros de la cláusula WHERE
 	/// </summary>
-	internal List<QueryFilterModel> FiltersWhere { get; } = new();
+	internal List<QueryFilterModel> FiltersWhere { get; } = [];
 
 	/// <summary>
 	///		Filtros de la cláusula HAVING
 	/// </summary>
-	internal List<QueryFilterModel> FilterHaving { get; } = new();
+	internal List<QueryFilterModel> FilterHaving { get; } = [];
 }

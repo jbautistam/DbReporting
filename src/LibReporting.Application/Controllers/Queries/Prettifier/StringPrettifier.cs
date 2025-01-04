@@ -144,7 +144,7 @@ public class StringPrettifier
 	/// </summary>
 	public override string ToString()
 	{
-		string[] newLines = new[] { "\n", "\r", "\r\n" };
+		string[] newLines = [ "\n", "\r", "\r\n" ];
 		string sql = Builder.ToString();
 
 			// Quita los saltos de línea duplicados
