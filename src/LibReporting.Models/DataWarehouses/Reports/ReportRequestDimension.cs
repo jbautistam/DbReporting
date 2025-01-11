@@ -8,7 +8,7 @@ public class ReportRequestDimension
 	/// <summary>
 	///		Clave de la dimensión
 	/// </summary>
-	public string DimensionKey { get; set; } = string.Empty;
+	public string DimensionKey { get; set; } = default!;
 
 	/// <summary>
 	///		Indica si la dimensión es obligatoria (aunque no se haya solicitado nada, se debe incluir)

@@ -1,6 +1,9 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
+using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
+using Bau.Libraries.LibReporting.Models.DataWarehouses.Relations;
+using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports.Blocks;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 
@@ -9,20 +12,90 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 /// </summary>
 internal class QueryDimensionModel
 {
-	internal QueryDimensionModel(ReportQueryGenerator generator, string sourceId, string alias)
+	internal QueryDimensionModel(ReportQueryGenerator generator, BaseDimensionModel dimension, List<ClauseFieldModel>? fields)
 	{
 		Generator = generator;
-		SourceId = sourceId;
-		Alias = alias;
+		Dimension = dimension;
+		Prepare(fields);
 	}
 
 	/// <summary>
-	///		Obtiene el nombre de tabla (o la claúsula FROM) y el alias de la tabla para una dimensión
+	///		Prepara la consulta con los datos de la solicitud
 	/// </summary>
-	internal void Prepare(BaseDimensionModel baseDimension)
+	private void Prepare(List<ClauseFieldModel>? fields)
 	{
-		FromTable = baseDimension.GetTableFullName();
-		FromAlias = baseDimension.GetTableAlias();
+		RequestDimensionModel? request = Generator.Request.GetRequestedDimension(Dimension.Id);
+
+			// Obtiene la consulta de la solicitud o de la dimensión
+			if (request is not null)
+				PrepareDimensionQuery(Dimension, Generator.Request);
+			else
+				PrepareFromDimension(Dimension);
+			// Añade los campos adicionales
+			if (fields is not null)
+				foreach (ClauseFieldModel field in fields)
+				{
+					string table = Dimension.GetTableAlias();
+
+						// Añade el campo adicional si no estaba ya en la consulta
+						if (!ExistsField(table, field.Alias))
+							Fields.Add(new QueryFieldModel(this, true, Dimension.GetTableAlias(), field.Field, field.Alias, 
+														   RequestColumnBaseModel.SortOrder.Undefined,
+														   RequestDataSourceColumnModel.AggregationType.NoAggregated, true));
+				}
+	}
+
+	/// <summary>
+	///		Prepara la consulta para una dimensión del informe (añade sólo los campos clave de la dimensión)
+	/// </summary>
+	private void PrepareFromDimension(BaseDimensionModel dimension)
+	{
+		foreach (DataSourceColumnModel column in dimension.GetColumns().EnumerateValues())
+			if (column.IsPrimaryKey)
+				AddPrimaryKey(null, column.Id, column.Alias, true);
+	}
+
+	/// <summary>
+	///		Prepara la consulta de una dimensión a partir de los datos de la solicitud
+	/// </summary>
+	private void PrepareDimensionQuery(BaseDimensionModel dimension, RequestModel request)
+	{
+		// Busca las solicitudes de esta dimensión
+		foreach (RequestDimensionModel requestDimension in request.Dimensions)
+			if (requestDimension.Dimension.Id.Equals(dimension.Id, StringComparison.CurrentCultureIgnoreCase))
+				foreach (RequestDimensionColumnModel columnRequest in requestDimension.Columns)
+				{
+					DataSourceColumnModel? column = columnRequest.Column;
+
+						if (column.IsPrimaryKey)
+							AddPrimaryKey(columnRequest, columnRequest.Column.Id, columnRequest.Column.Alias, columnRequest.Column.Visible);
+						else
+							AddColumn(column.Id, column.Alias, columnRequest);
+				}
+		// Añade los campos clave
+		foreach (DataSourceColumnModel column in dimension.GetColumns().EnumerateValues())
+			if (column.IsPrimaryKey && !ExistsField(column.DataSource.Id, column.Alias))
+				AddPrimaryKey(null, column.Id, column.Alias, false);
+		// Añade las dimensiones hija
+		foreach (DimensionRelationModel relation in dimension.GetRelations())
+			if (relation.Dimension is null)
+				throw new Exceptions.ReportingParserException($"Can't find the dimension {relation.DimensionId}");
+			else
+			{
+				QueryDimensionModel childQuery = new(Generator, relation.Dimension, null);
+
+					// Añade la consulta hija si tiene alguna subconsulta o si alguno de sus campos solicitados no es una clave primaria
+					if (childQuery.Joins.Count > 0 || childQuery.CheckHasFieldsNoPrmaryKey())
+					{
+						QueryJoinModel join = new(QueryJoinModel.JoinType.Inner, childQuery, $"child_{childQuery.Alias}");
+
+							// Asigna las relaciones
+							foreach (RelationForeignKey foreignKey in relation.ForeignKeys)
+								join.Relations.Add(new QueryRelationModel(foreignKey.ColumnId, childQuery.FromAlias, foreignKey.TargetColumnId));
+							// Añade la unión
+							Joins.Add(join);
+					}
+			}
 	}
 
 	/// <summary>
@@ -349,9 +422,27 @@ internal class QueryDimensionModel
 	}
 
 	/// <summary>
+	///		Comprueba si hay algún campo que no sea clave primaria
+	/// </summary>
+	internal bool CheckHasFieldsNoPrmaryKey()
+	{
+		// Comprueba si alguno de los campos es clave primaria
+		foreach (QueryFieldModel field in Fields)
+			if (!field.IsPrimaryKey)
+				return true;
+		// Si ha llegado hasta aquí es porque no hay ninguna clave primaria
+		return false;
+	}
+
+	/// <summary>
 	///		Generador de informes
 	/// </summary>
 	internal ReportQueryGenerator Generator { get; }
+
+	/// <summary>
+	///		Dimensión
+	/// </summary>
+	internal BaseDimensionModel Dimension { get; }
 
 	/// <summary>
 	///		Id del origen de la consulta (código de expresión, código de informe)
@@ -361,12 +452,12 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Tabla de la consulta
 	/// </summary>
-	internal string FromTable { get; private set; } = default!;
+	internal string FromTable => Dimension.GetTableFullName();
 
 	/// <summary>
 	///		Alias de la tabla
 	/// </summary>
-	internal string FromAlias { get; private set; } = default!;
+	internal string FromAlias => Dimension.GetTableAlias();
 
 	/// <summary>
 	///		Alias de la consulta

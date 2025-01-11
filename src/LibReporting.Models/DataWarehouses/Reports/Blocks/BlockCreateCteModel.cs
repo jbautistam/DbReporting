@@ -10,5 +10,5 @@ public class BlockCreateCteModel : BaseBlockModel
     /// <summary>
     ///     Bloques para la creación de la CTE
     /// </summary>
-    public List<BaseBlockModel> Blocks { get; } = new();
+    public List<BaseBlockModel> Blocks { get; } = [];
 }

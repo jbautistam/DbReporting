@@ -10,15 +10,15 @@ public class BlockCreateCteDimensionModel : BaseBlockModel
     /// <summary>
     ///     Clave de la dimensión
     /// </summary>
-    public string DimensionKey { get; set; } = string.Empty;
+    public string DimensionKey { get; set; } = default!;
 
     /// <summary>
     ///     Campos adicionales de la consulta
     /// </summary>
-    public List<ClauseFieldModel> Fields { get; } = new();
+    public List<ClauseFieldModel> Fields { get; } = [];
 
     /// <summary>
     ///     Filtros adicionales
     /// </summary>
-    public List<ClauseFilterModel> Filters { get; } = new();
+    public List<ClauseFilterModel> Filters { get; } = [];
 }

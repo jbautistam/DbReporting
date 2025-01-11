@@ -32,12 +32,12 @@ public class BlockIfRequest : BaseBlockModel
     /// <summary>
     ///		Claves de las dimensiones que se comprueban
     /// </summary>
-    public List<string> DimensionKeys { get; } = new();
+    public List<string> DimensionKeys { get; } = [];
 
     /// <summary>
     ///     Claves de las expresiones que se comprueban
     /// </summary>
-    public List<string> ExpressionKeys { get; } = new();
+    public List<string> ExpressionKeys { get; } = [];
 
     /// <summary>
     ///     Indica si se tiene en cuenta si se han pedido totales
@@ -59,10 +59,10 @@ public class BlockIfRequest : BaseBlockModel
     /// <summary>
     ///     Bloques a generar cuando se cumple la condición
     /// </summary>
-    public List<BaseBlockModel> Then { get; } = new();
+    public List<BaseBlockModel> Then { get; } = [];
 
     /// <summary>
     ///     Bloques a generar cuando no se cumple la condición
     /// </summary>
-    public List<BaseBlockModel> Else { get; } = new();
+    public List<BaseBlockModel> Else { get; } = [];
 }

@@ -4,10 +4,8 @@ using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 using Bau.Libraries.LibReporting.Application.Exceptions;
-using Bau.Libraries.LibReporting.Models.Base;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.Relations;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports.Blocks;
 
@@ -18,6 +16,9 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries;
 /// </summary>
 internal class ReportQueryGenerator
 {
+	// Variables privadas
+	private List<QueryDimensionModel> _queryDimensions = [];
+
 	internal ReportQueryGenerator(RequestModel request) 
 	{
 		Request = request;
@@ -218,8 +219,11 @@ internal class ReportQueryGenerator
 				throw new ReportingParserException($"Can't find the dimension {block.DimensionKey}");
 			else
 			{
-				string sql = GetSqlDimension(dimension, block.Fields);
+				QueryDimensionModel queryDimension = new(this, dimension, block.Fields);
+				string sql = queryDimension.Build();
 				
+					// Añade la consulta de dimensión a la lista interna
+					_queryDimensions.Add(queryDimension);
 					// Añade los filtros adicionales a la consulta
 					sql += Environment.NewLine + GetSqlForFilters(block.Filters);
 					// Devuelve la consulta
@@ -428,8 +432,15 @@ internal class ReportQueryGenerator
 
 					// Añade los campos solicitados a la SQL
 					if (request is not null)
-						foreach (string field in GetListFields(GetQueryFromRequest(request), includeRequestFields, includePrimaryKey))
-							fields.Add((parserDimension.TableAlias, field));
+					{
+						QueryDimensionModel? queryDimension = GetQueryFromRequest(request);
+
+							if (queryDimension is null)
+								throw new ReportingParserException($"Can't find the dimension query for dimension {request.Dimension.Id}");
+							else
+								foreach (string field in GetListFields(queryDimension, includeRequestFields, includePrimaryKey))
+									fields.Add((parserDimension.TableAlias, field));
+					}
 			}
 			// Devuelve la lista de campos
 			return fields;
@@ -454,67 +465,18 @@ internal class ReportQueryGenerator
 	}
 
 	/// <summary>
-	///		Obtiene la SQL de consulta de una dimensión
-	/// </summary>
-	private string GetSqlDimension(BaseDimensionModel dimension, List<ClauseFieldModel> fields)
-	{
-		QueryDimensionModel query;
-		RequestDimensionModel? request = Request.GetRequestedDimension(dimension.Id);
-
-			// Obtiene la consulta de la solicitud o de la dimensión
-			if (request is not null)
-				query = GetDimensionQuery(dimension, Request);
-			else
-				query = GetQueryFromDimension(dimension);
-			// Añade los campos adicionales
-			foreach (ClauseFieldModel field in fields)
-			{
-				string table = dimension.GetTableAlias();
-
-					// Añade el campo adicional si no estaba ya en la consulta
-					if (!query.ExistsField(table, field.Alias))
-						query.Fields.Add(new QueryFieldModel(query, true, dimension.GetTableAlias(), field.Field, field.Alias, 
-															 RequestColumnBaseModel.SortOrder.Undefined,
-															 RequestDataSourceColumnModel.AggregationType.NoAggregated, true));
-			}
-			// Devuelve la cadena SQL de esta dimensión
-			return query.Build();
-	}
-
-	/// <summary>
-	///		Obtiene la consulta para una dimensión del informe
-	/// </summary>
-	private QueryDimensionModel GetQueryFromDimension(BaseDimensionModel dimension)
-	{
-		QueryDimensionModel query = new(this, dimension.Id, dimension.Id);
-
-			// Prepara la consulta
-			query.Prepare(dimension);
-			// Añade sólo los campos clave
-			foreach (DataSourceColumnModel column in dimension.GetColumns().EnumerateValues())
-				if (column.IsPrimaryKey)
-					query.AddPrimaryKey(null, column.Id, column.Alias, true);
-			// Devuelve la consulta
-			return query;
-	}
-
-	/// <summary>
-	///		Obtiene la consulta de una dimensión a partir de los datos de la solicitud
-	/// </summary>
-	private QueryDimensionModel GetDimensionQuery(BaseDimensionModel dimension, RequestModel request)
-	{
-		QueryDimensionModel queryDimension = new(this, dimension.Id, dimension.Id);
-
-			aquí debe obtenerlo todo
-			// Devuelve la consulta de la dimensión
-			return queryDimension;
-	}
-
-	/// <summary>
 	///		Obtiene la consulta para una solicitud de una dimensión del informe
 	/// </summary>
-	private QueryDimensionModel GetQueryFromRequest(RequestDimensionModel dimensionRequest)
+	private QueryDimensionModel? GetQueryFromRequest(RequestDimensionModel dimensionRequest)
 	{
+		// Obtiene la consulta asociada a la dimensión
+		foreach (QueryDimensionModel queryDimension in _queryDimensions)
+			if (queryDimension.Dimension.Id.Equals(dimensionRequest.Dimension.Id))
+				return queryDimension;
+		// Si ha llegado hasta aquí es porque no ha encontrado nada
+		return null;
+
+/*
 		List<QueryDimensionModel> childsQueries = [];
 		BaseDimensionModel dimension = GetDimension(dimensionRequest);
 		QueryDimensionModel query = GetChildQuery(dimensionRequest);
@@ -546,8 +508,10 @@ internal class ReportQueryGenerator
 				}
 			// Devuelve la consulta
 			return query;
+*/
 	}
 
+/*
 	/// <summary>
 	///		Obtiene la consulta de una dimensión
 	/// </summary>
@@ -575,7 +539,6 @@ internal class ReportQueryGenerator
 			// Devuelve la consulta
 			return query;
 	}
-
 	/// <summary>
 	///		Comprueba si la columna está entre las columnas solicitadas
 	/// </summary>
@@ -588,6 +551,7 @@ internal class ReportQueryGenerator
 		// Si llega hasta aquí es porque no lo ha encontrado
 		return false;
 	}
+*/
 
 	/// <summary>
 	///		Crea la sentencia SQL asociada a un bloque que comprueba si se ha solicitado una (o varias) dimensiones

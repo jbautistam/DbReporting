@@ -10,5 +10,5 @@ public class BlockWithModel : BaseBlockModel
     /// <summary>
     ///		Bloques
     /// </summary>
-    public List<BaseBlockModel> Blocks { get; set; } = new();
+    public List<BaseBlockModel> Blocks { get; set; } = [];
 }

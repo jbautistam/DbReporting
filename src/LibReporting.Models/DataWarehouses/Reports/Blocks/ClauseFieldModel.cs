@@ -11,7 +11,7 @@ public class ClauseFieldModel
 	/// <summary>
 	///		Nombre del campo
 	/// </summary>
-	public string Field { get; set; } = string.Empty;
+	public string Field { get; set; } = default!;
 
 	/// <summary>
 	///		Alias del campo

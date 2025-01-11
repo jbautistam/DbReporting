@@ -10,5 +10,5 @@ public class BlockExecutionModel : BaseBlockModel
     /// <summary>
     ///		Sql que se debe ejecutar
     /// </summary>
-    public string Sql { get; set; } = string.Empty;
+    public string Sql { get; set; } = default!;
 }

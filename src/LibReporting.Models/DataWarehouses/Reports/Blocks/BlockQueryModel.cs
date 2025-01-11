@@ -10,5 +10,5 @@ public class BlockQueryModel : BaseBlockModel
     /// <summary>
     ///		Consulta del bloque
     /// </summary>
-    public string Sql { get; set; } = string.Empty;
+    public string Sql { get; set; } = default!;
 }

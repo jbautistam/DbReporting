@@ -8,5 +8,5 @@ public class ClauseFilterModel
 	/// <summary>
 	///		Cadena SQL del filtro
 	/// </summary>
-	public string Sql { get; set; } = string.Empty;
+	public string Sql { get; set; } = default!;
 }
