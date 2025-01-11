@@ -84,7 +84,7 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 				BaseDataSourceModel? dataSource = Manager.Request.Report.DataWarehouse.DataSources[parserDataSource.DataSourceKey];
 
 					if (dataSource is not null)
-						foreach (RequestDataSourceColumnModel requestColumn in Manager.Request.GetRequestedColumns(dataSource))
+						foreach (RequestDataSourceColumnModel requestColumn in Manager.Request.DataSourceColumns.GetRequestedColumns(dataSource))
 							if (requestColumn.FiltersWhere.Count > 0)
 								sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserDataSource.Table, requestColumn.Column.Id, 
 																										requestColumn.FiltersWhere), 

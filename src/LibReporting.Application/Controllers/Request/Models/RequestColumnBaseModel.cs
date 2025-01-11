@@ -1,4 +1,5 @@
 ﻿using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
+using Bau.Libraries.LibReporting.Requests.Models;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 
@@ -26,6 +27,29 @@ public abstract class RequestColumnBaseModel
 	}
 
 	/// <summary>
+	///		Asigna los datos de la columna solicitada
+	/// </summary>
+	internal void AssignColumnRequestData(BaseColumnRequestModel request, RequestColumnBaseModel target)
+	{
+		target.Visible = request.Visible;
+		target.OrderIndex = request.OrderIndex;
+		target.OrderBy = Convert(request.OrderBy);
+		target.FiltersWhere.AddRange(request.FiltersWhere);
+		target.FiltersHaving.AddRange(request.FiltersHaving);
+
+		// Convierte la ordenación
+		SortOrder Convert(BaseColumnRequestModel.SortOrder type)
+		{
+			return type switch
+					{
+						BaseColumnRequestModel.SortOrder.Ascending => SortOrder.Ascending,
+						BaseColumnRequestModel.SortOrder.Descending => SortOrder.Descending,
+						_ => SortOrder.Undefined,
+					};
+		}
+	}
+
+	/// <summary>
 	///		Columna solicitada
 	/// </summary>
 	public DataSourceColumnModel Column { get; }
@@ -48,10 +72,10 @@ public abstract class RequestColumnBaseModel
 	/// <summary>
 	///		Filtro para la cláusula WHERE
 	/// </summary>
-	public List<RequestFilterModel> FiltersWhere { get; } = [];
+	public RequestFilterCollectionModel FiltersWhere { get; } = [];
 
 	/// <summary>
 	///		Filtro para la cláusula HAVING
 	/// </summary>
-	public List<RequestFilterModel> FiltersHaving { get; } = [];
+	public RequestFilterCollectionModel FiltersHaving { get; } = [];
 }

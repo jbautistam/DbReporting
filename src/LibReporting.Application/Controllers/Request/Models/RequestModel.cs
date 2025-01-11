@@ -224,21 +224,6 @@ internal class RequestModel
 	}
 
 	/// <summary>
-	///		Obtiene las columnas solicitadas para un origen de datos
-	/// </summary>
-	internal List<RequestDataSourceColumnModel> GetRequestedColumns(BaseDataSourceModel dataSource)
-	{
-		List<RequestDataSourceColumnModel> columns = [];
-
-			// Obtiene las columnas solicitadas
-			foreach (RequestDataSourceColumnModel column in DataSourceColumns)
-				if (column.Column.DataSource.Id.Equals(dataSource.Id, StringComparison.CurrentCultureIgnoreCase))
-					columns.Add(column);
-			// Devuelve las columnas solicitadas
-			return columns;
-	}
-
-	/// <summary>
 	///		Indica si se han solicitado totales (estamos en la primera página)
 	/// </summary>
 	public bool IsRequestedTotals() => Pagination.IsFirstPage;
@@ -271,7 +256,7 @@ internal class RequestModel
 	/// <summary>
 	///		Solicitudes de orígenes de datos
 	/// </summary>
-	public List<RequestDataSourceColumnModel> DataSourceColumns { get; } = [];
+	public RequestDataSourceColumnCollectionModel DataSourceColumns { get; } = [];
 
 	/// <summary>
 	///		Paginación
