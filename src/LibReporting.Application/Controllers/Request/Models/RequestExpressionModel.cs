@@ -3,9 +3,9 @@
 /// <summary>
 ///		Clase con los datos de una columna solicitada para un listado
 /// </summary>
-public class RequestExpressionColumnModel
+public class RequestExpressionModel
 {
-	public RequestExpressionColumnModel(string expressionId)
+	public RequestExpressionModel(string expressionId)
 	{
 		ExpressionId = expressionId;
 	}

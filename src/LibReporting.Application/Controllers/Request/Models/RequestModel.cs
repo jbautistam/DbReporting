@@ -162,30 +162,6 @@ internal class RequestModel
 	}
 
 	/// <summary>
-	///		Comprueba si se ha solicitado una expresión
-	/// </summary>
-	internal bool IsExpressionRequested(List<string>? ids)
-	{
-		// Comprueba que se hayan solicitado todas las expresiones
-		if (ids is not null)
-			foreach (string id in ids)
-				if (!IsExpressionRequested(id))
-					return false;
-		// Si ha llegado hasta aquí es porque todos las expresiones existen
-		return true;
-	}
-
-	/// <summary>
-	///		Comprueba si se ha solicitado una expresión
-	/// </summary>
-	internal bool IsExpressionRequested(string id) => GetRequestedExpression(id) is not null;
-
-	/// <summary>
-	///		Obtiene la expresión solicitada
-	/// </summary>
-	internal RequestExpressionColumnModel? GetRequestedExpression(string id) => Expressions.FirstOrDefault(item => item.ExpressionId.Equals(id, StringComparison.CurrentCultureIgnoreCase));
-
-	/// <summary>
 	///		Añade una dimensión y columna a la lista
 	/// </summary>
 	internal RequestDimensionColumnModel AddDimension(string dimensionId, string columnId, bool requestByUser)
@@ -290,7 +266,7 @@ internal class RequestModel
 	/// <summary>
 	///		Expresiones solicitadas
 	/// </summary>
-	internal List<RequestExpressionColumnModel> Expressions { get; } = [];
+	internal RequestExpressionCollectionModel Expressions { get; } = [];
 
 	/// <summary>
 	///		Solicitudes de orígenes de datos

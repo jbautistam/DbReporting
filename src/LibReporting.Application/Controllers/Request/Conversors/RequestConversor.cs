@@ -25,7 +25,7 @@ internal class RequestConversor
 			// Convierte los datos
 			ConvertDimensions(converted, request.Dimensions);
 			converted.DataSourceColumns.AddRange(Convert(request.DataSources));
-			converted.Expressions.AddRange(Convert(request.Expressions));
+			converted.Expressions.AddRange(request.Expressions);
 			converted.Parameters.AddRange(Convert(converted.Report, request.Parameters));
 			// Asigna la paginación
 			converted.Pagination.MustPaginate = request.Pagination.MustPaginate;
@@ -118,20 +118,6 @@ internal class RequestConversor
 						_ => RequestDataSourceColumnModel.AggregationType.NoAggregated
 					};
 		}
-	}
-
-	/// <summary>
-	///		Convierte las expresiones
-	/// </summary>
-	private List<RequestExpressionColumnModel> Convert(List<ExpressionColumnRequestModel> expressions)
-	{
-		List<RequestExpressionColumnModel> converted = [];
-
-			// Convierte los orígenes de datos
-			foreach (ExpressionColumnRequestModel requestExpression in expressions)
-				converted.Add(new RequestExpressionColumnModel(requestExpression.ColumnId));
-			// Devuelve los datos convertidos
-			return converted;
 	}
 
 	/// <summary>

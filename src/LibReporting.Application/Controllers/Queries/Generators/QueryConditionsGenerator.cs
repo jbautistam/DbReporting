@@ -104,7 +104,7 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 			// Obtiene las comparaciones de los campos
 			foreach (ParserExpressionModel parserExpression in expressions)
 			{
-				RequestExpressionColumnModel? column = Manager.Request.GetRequestedExpression(parserExpression.Expression);
+				RequestExpressionModel? column = Manager.Request.Expressions.GetRequested(parserExpression.Expression);
 
 					// Añade las condiciones del HAVING
 					if (column is not null)

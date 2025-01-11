@@ -64,7 +64,7 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 	{
 		// Comprueba si se ha solicitado alguna de las expresiones
 		foreach (string key in expression.ExpressionKeys)
-			if (request.IsExpressionRequested(key))
+			if (request.Expressions.IsRequested(key))
 				return true;
 		// Si ha llegado hasta aquí es porque no ha solicitado nada
 		return false;

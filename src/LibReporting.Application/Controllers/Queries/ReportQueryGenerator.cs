@@ -475,83 +475,7 @@ internal class ReportQueryGenerator
 				return queryDimension;
 		// Si ha llegado hasta aquí es porque no ha encontrado nada
 		return null;
-
-/*
-		List<QueryDimensionModel> childsQueries = [];
-		BaseDimensionModel dimension = GetDimension(dimensionRequest);
-		QueryDimensionModel query = GetChildQuery(dimensionRequest);
-
-			// Obtiene las consultas de las dimensiones hija: si hay algún campo solicitado de alguna dimensión hija, 
-			// necesitaremos también la consulta de esta dimensión para poder hacer el JOIN posterior, por eso las
-			// calculamos antes que la consulta de esta dimensión
-			foreach (RequestDimensionModel childDimension in Request.GetChildRequestedDimensions(dimensionRequest))
-			{
-				QueryDimensionModel childQuery = GetQueryFromRequest(childDimension);
-
-					// Añade la query si realmente hay algo que añadir
-					if (childQuery is not null)
-						childsQueries.Add(childQuery);
-			}
-			// Añade las consultas con las dimensiones hija
-			if (childsQueries.Count > 0)
-				foreach (QueryDimensionModel childQuery in childsQueries)
-				{
-					QueryJoinModel join = new(QueryJoinModel.JoinType.Inner, childQuery, $"child_{childQuery.Alias}");
-
-						// Asigna las relaciones
-						foreach (DimensionRelationModel relation in dimension.GetRelations())
-							if (relation.Dimension is not null && relation.Dimension.Id.Equals(childQuery.SourceId, StringComparison.CurrentCultureIgnoreCase))
-								foreach (RelationForeignKey foreignKey in relation.ForeignKeys)
-									join.Relations.Add(new QueryRelationModel(foreignKey.ColumnId, childQuery.FromAlias, foreignKey.TargetColumnId));
-						// Añade la unión
-						query.Joins.Add(join);
-				}
-			// Devuelve la consulta
-			return query;
-*/
 	}
-
-/*
-	/// <summary>
-	///		Obtiene la consulta de una dimensión
-	/// </summary>
-	private QueryDimensionModel GetChildQuery(RequestDimensionModel dimensionRequest)
-	{
-		BaseDimensionModel dimension = GetDimension(dimensionRequest);
-		QueryDimensionModel query = new(this, dimensionRequest.Dimension.Id, dimension.Id);
-		BaseReportingDictionaryModel<DataSourceColumnModel> dimensionColumns = dimension.GetColumns();
-
-			// Prepara la consulta
-			query.Prepare(dimension);
-			// Añade los campos clave
-			foreach (DataSourceColumnModel column in dimensionColumns.EnumerateValues())
-				if (column.IsPrimaryKey)
-					query.AddPrimaryKey(dimensionRequest.GetRequestColumn(column.Id), column.Id, column.Alias, 
-										CheckIsColumnAtColumnRequested(column, dimensionRequest.Columns));
-			// Asigna los campos
-			foreach (RequestDimensionColumnModel columnRequest in dimensionRequest.Columns)
-			{
-				DataSourceColumnModel? column = columnRequest.Column;
-
-					if (column is not null && !column.IsPrimaryKey)
-						query.AddColumn(column.Id, column.Alias, columnRequest);
-			}
-			// Devuelve la consulta
-			return query;
-	}
-	/// <summary>
-	///		Comprueba si la columna está entre las columnas solicitadas
-	/// </summary>
-	private bool CheckIsColumnAtColumnRequested(DataSourceColumnModel column, List<RequestDimensionColumnModel> columnRequests)
-	{
-		// Busca la columna entre las columnas solicitadas
-		foreach (RequestDimensionColumnModel columnRequest in columnRequests)
-			if (column.Id.Equals(columnRequest.Column.Id, StringComparison.CurrentCultureIgnoreCase))
-				return true;
-		// Si llega hasta aquí es porque no lo ha encontrado
-		return false;
-	}
-*/
 
 	/// <summary>
 	///		Crea la sentencia SQL asociada a un bloque que comprueba si se ha solicitado una (o varias) dimensiones
@@ -566,18 +490,13 @@ internal class ReportQueryGenerator
 			else // ... si no hay dimensiones, se pone a true para que se comprueben las expresiones
 				mustExecute = true;
 			if (block.ExpressionKeys.Count > 0)
-				mustExecute &= Request.IsExpressionRequested(block.ExpressionKeys);
+				mustExecute &= Request.Expressions.IsRequested(block.ExpressionKeys);
 			// Obtiene las consultas
 			if (mustExecute)
 				return GetQueries(block.Then);
 			else
 				return GetQueries(block.Else);
 	}
-
-	/// <summary>
-	///		Obtiene la dimensión
-	/// </summary>
-	private BaseDimensionModel GetDimension(RequestDimensionModel dimensionRequest) => dimensionRequest.Dimension;
 	
 	/// <summary>
 	///		Solicitud
