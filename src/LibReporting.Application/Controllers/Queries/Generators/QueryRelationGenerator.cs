@@ -102,7 +102,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 
 			// Añade las tablas de las relaciones
 			foreach (ParserJoinDimensionSectionModel joinDimension in join.JoinDimensions)
-				if (Manager.Request.IsDimensionRequested(joinDimension.DimensionKey))
+				if (Manager.Request.Dimensions.IsRequested(joinDimension.DimensionKey))
 				{
 					(QueryTableModel? tableSource, QueryTableModel? tableDimension) = GetTablesForJoin(join, joinDimension);
 				
@@ -126,8 +126,8 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 			if (relationDimension.WithRequestedFields)
 			{
 				// Obtiene una tabla con todos los campos solicitados para una dimensión
-				tableDimension = Manager.Request.GetRequestedTable(relationDimension.Table, relationDimension.TableAlias, relationDimension.DimensionKey, 
-																   false, true);
+				tableDimension = Manager.Request.Dimensions.GetRequestedTable(relationDimension.Table, relationDimension.TableAlias, relationDimension.DimensionKey, 
+																			  false, true);
 				// Si tenemos una tabla de dimensión, creamos una tabla origen con los mismos campos
 				if (tableDimension is not null)
 					tableSource = tableDimension.Clone(join.Table, join.TableAlias);

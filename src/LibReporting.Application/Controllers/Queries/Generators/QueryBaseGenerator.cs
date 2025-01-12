@@ -23,12 +23,12 @@ internal abstract class QueryBaseGenerator
 			// Obtiene las tablas
 			foreach (ParserDimensionModel dimension in dimensions)
 			{
-				BaseDimensionModel? dimensionRequested = Manager.Request.GetDimensionIfRequest(dimension);
+				BaseDimensionModel? dimensionRequested = Manager.Request.Dimensions.GetIfRequest(dimension);
 
 					if (dimensionRequested is not null)
 					{
-						Models.QueryTableModel? table = Manager.Request.GetRequestedTable(dimension.Table, dimension.TableAlias, dimension.DimensionKey,
-																							 includePrimaryKeys, includeRequestFields);
+						Models.QueryTableModel? table = Manager.Request.Dimensions.GetRequestedTable(dimension.Table, dimension.TableAlias, dimension.DimensionKey,
+																									 includePrimaryKeys, includeRequestFields);
 
 							if (table is not null)
 								tables.Add(table);

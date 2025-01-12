@@ -3,12 +3,12 @@
 /// <summary>
 ///		Datos de un filtro solicitado
 /// </summary>
-public class RequestFilterModel
+internal class RequestFilterModel
 {
 	/// <summary>
 	///		Tipo de condición
 	/// </summary>
-	public enum ConditionType
+	internal enum ConditionType
 	{
 		/// <summary>Sin condición</summary>
 		Undefined,
@@ -33,10 +33,10 @@ public class RequestFilterModel
 	/// <summary>
 	///		Condición que se debe utilizar
 	/// </summary>
-	public ConditionType Condition { get; set; }
+	internal ConditionType Condition { get; set; }
 
 	/// <summary>
 	///		Valores del filtro
 	/// </summary>
-	public List<object?> Values { get; } = [];
+	internal List<object?> Values { get; } = [];
 }

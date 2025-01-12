@@ -3,9 +3,9 @@
 /// <summary>
 ///		Clase con los datos de una columna solicitada para un listado
 /// </summary>
-public class RequestExpressionModel
+internal class RequestExpressionModel
 {
-	public RequestExpressionModel(string expressionId)
+	internal RequestExpressionModel(string expressionId)
 	{
 		ExpressionId = expressionId;
 	}
@@ -13,5 +13,5 @@ public class RequestExpressionModel
 	/// <summary>
 	///		Código de expresión
 	/// </summary>
-	public string ExpressionId { get; }
+	internal string ExpressionId { get; }
 }

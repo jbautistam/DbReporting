@@ -5,12 +5,12 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// <summary>
 ///		Clase con los datos de una columna solicitada para un listado
 /// </summary>
-public class RequestDataSourceColumnModel : RequestColumnBaseModel
+internal class RequestDataSourceColumnModel : RequestColumnBaseModel
 {
 	/// <summary>
 	///		Modo de agregación por esta columna
 	/// </summary>
-	public enum AggregationType
+	internal enum AggregationType
 	{
 		/// <summary>Sin agregación</summary>
 		NoAggregated,
@@ -26,7 +26,7 @@ public class RequestDataSourceColumnModel : RequestColumnBaseModel
 		StandardDeviation
 	}
 	
-	public RequestDataSourceColumnModel(DataSourceColumnModel column, AggregationType aggregatedBy) : base(column) 
+	internal RequestDataSourceColumnModel(DataSourceColumnModel column, AggregationType aggregatedBy) : base(column) 
 	{
 		AggregatedBy = aggregatedBy;
 	}
@@ -34,5 +34,5 @@ public class RequestDataSourceColumnModel : RequestColumnBaseModel
 	/// <summary>
 	///		Modo de agregación
 	/// </summary>
-	public AggregationType AggregatedBy { get; }
+	internal AggregationType AggregatedBy { get; }
 }

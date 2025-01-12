@@ -6,19 +6,24 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// <summary>
 ///		Lista de <see cref="RequestDataSourceColumnModel"/>
 /// </summary>
-public class RequestDataSourceColumnCollectionModel : List<RequestDataSourceColumnModel>
+internal class RequestDataSourceColumnCollectionModel : List<RequestDataSourceColumnModel>
 {
+	internal RequestDataSourceColumnCollectionModel(RequestModel request)
+	{
+		Request = request;
+	}
+
 	/// <summary>
 	///		Convierte las solicitudes de <see cref="RequestDataSourceColumnModel"/>
 	/// </summary>
-	internal void AddRange(ReportingManager manager, List<DataSourceRequestModel> requestDataSources)
+	internal void AddRange(List<DataSourceRequestModel> requestDataSources)
 	{
 		List<RequestDataSourceColumnModel> converted = [];
 
-			// Convierte los orígenes de datos
 			foreach (DataSourceRequestModel requestDataSource in requestDataSources)
 			{
-				BaseDataSourceModel? dataSource = manager.Schema.DataWarehouses.GetDataSource(requestDataSource.ReportDataSourceId);
+				BaseDataSourceModel? dataSource = Request.Report.DataWarehouse.DataSources[requestDataSource.ReportDataSourceId];
+				// BaseDataSourceModel? dataSource = manager.Schema.DataWarehouses.GetDataSource(requestDataSource.ReportDataSourceId);
 
 					if (dataSource is null)
 						throw new Exceptions.ReportingParserException($"Can't find the data source {requestDataSource.ReportDataSourceId}");
@@ -34,7 +39,7 @@ public class RequestDataSourceColumnCollectionModel : List<RequestDataSourceColu
 									RequestDataSourceColumnModel requestDataSourceColumn = new(column, Convert(requestColumn.AggregatedBy));
 
 										// Asigna los datos de la solicitud de la columna
-										requestDataSourceColumn.AssignColumnRequestData(requestColumn, requestDataSourceColumn);
+										requestDataSourceColumn.AssignColumnRequestData(requestColumn);
 										// Convierte los datos
 										converted.Add(requestDataSourceColumn);
 								}
@@ -70,4 +75,9 @@ public class RequestDataSourceColumnCollectionModel : List<RequestDataSourceColu
 			// Devuelve las columnas solicitadas
 			return columns;
 	}
+
+	/// <summary>
+	///		Solicitud a la que se asocia la colección
+	/// </summary>
+	internal RequestModel Request { get; }
 }

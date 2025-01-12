@@ -6,12 +6,12 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// <summary>
 ///		Clase base para las columnas
 /// </summary>
-public abstract class RequestColumnBaseModel
+internal abstract class RequestColumnBaseModel
 {
 	/// <summary>
 	///		Modo de ordenación
 	/// </summary>
-	public enum SortOrder
+	internal enum SortOrder
 	{
 		/// <summary>No se define ningún orden</summary>
 		Undefined,
@@ -21,7 +21,7 @@ public abstract class RequestColumnBaseModel
 		Descending
 	}
 
-	public RequestColumnBaseModel(DataSourceColumnModel column)
+	internal RequestColumnBaseModel(DataSourceColumnModel column)
 	{
 		Column = column;
 	}
@@ -29,13 +29,13 @@ public abstract class RequestColumnBaseModel
 	/// <summary>
 	///		Asigna los datos de la columna solicitada
 	/// </summary>
-	internal void AssignColumnRequestData(BaseColumnRequestModel request, RequestColumnBaseModel target)
+	internal void AssignColumnRequestData(BaseColumnRequestModel request)
 	{
-		target.Visible = request.Visible;
-		target.OrderIndex = request.OrderIndex;
-		target.OrderBy = Convert(request.OrderBy);
-		target.FiltersWhere.AddRange(request.FiltersWhere);
-		target.FiltersHaving.AddRange(request.FiltersHaving);
+		Visible = request.Visible;
+		OrderIndex = request.OrderIndex;
+		OrderBy = Convert(request.OrderBy);
+		FiltersWhere.AddRange(request.FiltersWhere);
+		FiltersHaving.AddRange(request.FiltersHaving);
 
 		// Convierte la ordenación
 		SortOrder Convert(BaseColumnRequestModel.SortOrder type)
@@ -52,30 +52,30 @@ public abstract class RequestColumnBaseModel
 	/// <summary>
 	///		Columna solicitada
 	/// </summary>
-	public DataSourceColumnModel Column { get; }
+	internal DataSourceColumnModel Column { get; }
 
 	/// <summary>
 	///		Indica si esta columna es visible en la consulta final o sólo para los filtros
 	/// </summary>
-	public bool Visible { get; set; } = true;
+	internal bool Visible { get; set; } = true;
 
 	/// <summary>
 	///		Indice para la ordenación del campo
 	/// </summary>
-	public int OrderIndex { get; set; }
+	internal int OrderIndex { get; set; }
 
 	/// <summary>
 	///		Modo de ordenación
 	/// </summary>
-	public SortOrder OrderBy { get; set; }
+	internal SortOrder OrderBy { get; set; }
 
 	/// <summary>
 	///		Filtro para la cláusula WHERE
 	/// </summary>
-	public RequestFilterCollectionModel FiltersWhere { get; } = [];
+	internal RequestFilterCollectionModel FiltersWhere { get; } = [];
 
 	/// <summary>
 	///		Filtro para la cláusula HAVING
 	/// </summary>
-	public RequestFilterCollectionModel FiltersHaving { get; } = [];
+	internal RequestFilterCollectionModel FiltersHaving { get; } = [];
 }

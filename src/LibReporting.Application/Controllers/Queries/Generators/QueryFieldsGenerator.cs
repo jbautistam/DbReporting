@@ -37,10 +37,10 @@ internal class QueryFieldsGenerator : QueryBaseGenerator
 
 			// Obtiene los campos
 			foreach (ParserFieldsDimensionSectionModel fieldDimension in dimensions)
-				if (Manager.Request.IsDimensionRequested(fieldDimension.DimensionKey))
+				if (Manager.Request.Dimensions.IsRequested(fieldDimension.DimensionKey))
 				{
-					QueryTableModel? table = Manager.Request.GetRequestedTable(fieldDimension.Table, fieldDimension.Table, fieldDimension.DimensionKey,
-																				  fieldDimension.WithPrimaryKeys, fieldDimension.WithRequestedFields);
+					QueryTableModel? table = Manager.Request.Dimensions.GetRequestedTable(fieldDimension.Table, fieldDimension.Table, fieldDimension.DimensionKey,
+																						  fieldDimension.WithPrimaryKeys, fieldDimension.WithRequestedFields);
 
 						if (table is not null)
 							sql = sql.AddWithSeparator(GetSqlFields(fieldDimension, table), ",");

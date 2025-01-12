@@ -24,7 +24,7 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 			// Añade la SQL para las expresiones normales
 			sql = GetSql(Section.Expressions, Manager.Request);
 			// Se añade la SQL para las expresiones de totales
-			if (Manager.Request.IsRequestedTotals())
+			if (Manager.Request.Pagination.IsRequestedTotals())
 				sql = sql.AddWithSeparator(GetSql(Section.WhenRequestTotals, Manager.Request), "," + Environment.NewLine);
 			// Añade una coma si es necesario
 			if (Section.WithComma && !string.IsNullOrWhiteSpace(sql))

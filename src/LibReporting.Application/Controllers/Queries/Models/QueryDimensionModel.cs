@@ -24,7 +24,7 @@ internal class QueryDimensionModel
 	/// </summary>
 	private void Prepare(List<ClauseFieldModel>? fields)
 	{
-		RequestDimensionModel? request = Generator.Request.GetRequestedDimension(Dimension.Id);
+		RequestDimensionModel? request = Generator.Request.Dimensions.GetRequested(Dimension.Id);
 
 			// Obtiene la consulta de la solicitud o de la dimensión
 			if (request is not null)

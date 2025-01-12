@@ -1,5 +1,4 @@
 ﻿using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 using Bau.Libraries.LibReporting.Requests.Models;
 
@@ -23,10 +22,10 @@ internal class RequestConversor
 		RequestModel converted = new(Manager, GetReport(request.DataWarehouseId, request.ReportId));
 
 			// Convierte los datos
-			ConvertDimensions(converted, request.Dimensions);
-			converted.DataSourceColumns.AddRange(Manager, request.DataSources);
+			converted.Dimensions.AddRange(request.Dimensions);
+			converted.DataSourceColumns.AddRange(request.DataSources);
 			converted.Expressions.AddRange(request.Expressions);
-			converted.Parameters.AddRange(Convert(converted.Report, request.Parameters));
+			converted.Parameters.AddRange(request.Parameters);
 			// Asigna la paginación
 			converted.Pagination.MustPaginate = request.Pagination.MustPaginate;
 			converted.Pagination.Page = request.Pagination.Page;
@@ -53,41 +52,6 @@ internal class RequestConversor
 					else
 						return report;
 			}
-	}
-
-	/// <summary>
-	///		Convierte las dimensiones
-	/// </summary>
-	private void ConvertDimensions(RequestModel request, List<DimensionRequestModel> requestDimensions)
-	{
-		foreach (DimensionRequestModel requestDimension in requestDimensions)
-			foreach (DimensionColumnRequestModel requestColumn in requestDimension.Columns)
-			{
-				RequestDimensionColumnModel dimensionColumn = request.AddDimension(requestDimension.DimensionId, requestColumn.ColumnId, true);
-
-					// Asigna los datos de la columna solicitada
-					AssignColumnRequestData(requestColumn, dimensionColumn);
-			}
-	}
-
-
-	/// <summary>
-	///		Convierte la lista de parámetros
-	/// </summary>
-	private List<RequestParameterModel> Convert(ReportModel report, List<ParameterRequestModel> parameters)
-	{
-		List<RequestParameterModel> converted = [];
-
-			// Convierte los parámetros
-			foreach (ParameterRequestModel parameter in parameters)
-			{
-				ReportParameterModel? reportParameter = report.Parameters[parameter.Key];
-
-					if (reportParameter is not null)
-						converted.Add(new RequestParameterModel(reportParameter, parameter.Value));
-			}
-			// Devuelve la lista convertida
-			return converted;
 	}
 
 	/// <summary>

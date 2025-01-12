@@ -51,12 +51,12 @@ internal class ReportQueryGenerator
 		foreach (ReportRequestDimension fixedRequest in report.RequestDimensions)
 			if (fixedRequest.Required || CheckIsRequestedAnyField(request, fixedRequest))
 				foreach (ReportRequestDimensionField field in fixedRequest.Fields)
-					request.AddDimension(fixedRequest.DimensionKey, field.Field, false);
+					request.Dimensions.Add(fixedRequest.DimensionKey, field.Field, false);
 
 		// Comprueba si se ha solicitado alguno de los campos considerados como obligatorios
 		bool CheckIsRequestedAnyField(RequestModel reportRequest, ReportRequestDimension fixedRequest)
 		{
-			RequestDimensionModel? dimensionRequest = reportRequest.GetRequestedDimension(fixedRequest.DimensionKey);
+			RequestDimensionModel? dimensionRequest = reportRequest.Dimensions.GetRequested(fixedRequest.DimensionKey);
 
 				// Si se ha solicitado la dimensión
 				if (dimensionRequest is not null)
@@ -277,7 +277,7 @@ internal class ReportQueryGenerator
 			// Obtiene los campos
 			foreach (ParserDimensionModel dimension in dimensions)
 			{
-				BaseDimensionModel? dimensionJoin = Request.GetDimensionIfRequest(dimension);
+				BaseDimensionModel? dimensionJoin = Request.Dimensions.GetIfRequest(dimension);
 
 					if (dimensionJoin is not null)
 					{
@@ -368,7 +368,7 @@ internal class ReportQueryGenerator
 			{
 				List<(string tableDimension, string fieldDimension)> fields = GetFieldsRequest(parserDimension, parserDimension.WithRequestedFields, 
 																							   parserDimension.WithPrimaryKeys);
-				RequestDimensionModel? requestDimension = Request.GetRequestedDimension(parserDimension.DimensionKey);
+				RequestDimensionModel? requestDimension = Request.Dimensions.GetRequested(parserDimension.DimensionKey);
 
 					// Obtiene las columnas ordenables
 					if (requestDimension is not null)
@@ -423,12 +423,12 @@ internal class ReportQueryGenerator
 	private List<(string tableDimension, string fieldDimension)> GetFieldsRequest(ParserDimensionModel parserDimension, bool includeRequestFields, bool includePrimaryKey)
 	{
 		List<(string tableDimension, string fieldDimension)> fields = [];
-		BaseDimensionModel? dimension = Request.GetDimensionIfRequest(parserDimension);
+		BaseDimensionModel? dimension = Request.Dimensions.GetIfRequest(parserDimension);
 
 			// Si se ha solicitado algo de esta dimensión, se obtienen los datos
 			if (dimension is not null)
 			{
-				RequestDimensionModel? request = Request.GetRequestedDimension(dimension.Id);
+				RequestDimensionModel? request = Request.Dimensions.GetRequested(dimension.Id);
 
 					// Añade los campos solicitados a la SQL
 					if (request is not null)
@@ -486,7 +486,7 @@ internal class ReportQueryGenerator
 
 			// Comprueba si se debe ejecutar
 			if (block.DimensionKeys.Count > 0)
-				mustExecute = Request.IsDimensionRequested(block.DimensionKeys);
+				mustExecute = Request.Dimensions.IsRequested(block.DimensionKeys);
 			else // ... si no hay dimensiones, se pone a true para que se comprueben las expresiones
 				mustExecute = true;
 			if (block.ExpressionKeys.Count > 0)

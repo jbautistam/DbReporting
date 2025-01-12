@@ -5,9 +5,9 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// <summary>
 ///		Colunma solicitada de una dimensión
 /// </summary>
-public class RequestDimensionModel
+internal class RequestDimensionModel
 {
-	public RequestDimensionModel(BaseDimensionModel dimension)
+	internal RequestDimensionModel(BaseDimensionModel dimension)
 	{
 		Dimension = dimension;
 	}
@@ -20,10 +20,10 @@ public class RequestDimensionModel
 	/// <summary>
 	///		Código de dimensión
 	/// </summary>
-	public BaseDimensionModel Dimension { get; }
+	internal BaseDimensionModel Dimension { get; }
 
 	/// <summary>
 	///		Columnas
 	/// </summary>
-	public List<RequestDimensionColumnModel> Columns { get; } = [];
+	internal List<RequestDimensionColumnModel> Columns { get; } = [];
 }

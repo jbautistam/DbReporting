@@ -5,15 +5,9 @@
 /// </summary>
 public class ReportingParserException : Exception
 {
-	public ReportingParserException()
-	{
-	}
+	public ReportingParserException() {}
 
-	public ReportingParserException(string message) : base(message)
-	{
-	}
+	public ReportingParserException(string message) : base(message) {}
 
-	public ReportingParserException(string message, Exception innerException) : base(message, innerException)
-	{
-	}
+	public ReportingParserException(string message, Exception innerException) : base(message, innerException) {}
 }

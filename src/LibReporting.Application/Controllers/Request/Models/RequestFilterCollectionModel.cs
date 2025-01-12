@@ -5,7 +5,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// <summary>
 ///		Lista de <see cref="RequestFilterModel"/>
 /// </summary>
-public class RequestFilterCollectionModel : List<RequestFilterModel>
+internal class RequestFilterCollectionModel : List<RequestFilterModel>
 {
 	/// <summary>
 	///		Añade un <see cref="List{FilterRequestModel}"/>
