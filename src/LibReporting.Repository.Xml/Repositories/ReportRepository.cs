@@ -134,7 +134,7 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 	/// </summary>
 	private List<BaseBlockModel> LoadBlocks(MLNodesCollection nodesML)
 	{
-		List<BaseBlockModel> blocks = new();
+		List<BaseBlockModel> blocks = [];
 
 			// Carga los bloques de los nodos
 			foreach (MLNode nodeML in nodesML)
@@ -304,7 +304,7 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 	/// </summary>
 	private List<ReportRequestDimension> LoadRequests(MLNode rootML)
 	{
-		List<ReportRequestDimension> requests = new();
+		List<ReportRequestDimension> requests = [];
 
 			// Carga las dimensiones solicitadas
 			foreach (MLNode nodeML in rootML.Nodes)
@@ -403,7 +403,7 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 	/// </summary>
 	private List<string> LoadExpressions(MLNode nodeML)
 	{
-		List<string> expressions = new();
+		List<string> expressions = [];
 		string fields = nodeML.Attributes[TagName].Value.TrimIgnoreNull();
 
 			// Carga los campos en la lista

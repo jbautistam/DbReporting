@@ -85,7 +85,7 @@ internal class QueryDimensionModel
 				QueryDimensionModel childQuery = new(Generator, relation.Dimension, null);
 
 					// Añade la consulta hija si tiene alguna subconsulta o si alguno de sus campos solicitados no es una clave primaria
-					if (childQuery.Joins.Count > 0 || childQuery.CheckHasFieldsNoPrmaryKey())
+					if (childQuery.Joins.Count > 0 || childQuery.HasFieldsNoPrimaryKey())
 					{
 						QueryJoinModel join = new(QueryJoinModel.JoinType.Inner, childQuery, $"child_{childQuery.Alias}");
 
@@ -225,27 +225,45 @@ internal class QueryDimensionModel
 	/// </summary>
 	private string GetSqlFields()
 	{
-		string sqlFields = string.Empty;
+		string sql = string.Empty;
 
 			// Añade las claves
 			foreach (QueryFieldModel field in Fields)
 				if (field.IsPrimaryKey)
-					sqlFields = sqlFields.AddWithSeparator(GetSqlField(field), ",");
+					sql = sql.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos
 			foreach (QueryFieldModel field in Fields)
 				if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
-					sqlFields = sqlFields.AddWithSeparator(GetSqlField(field), ",");
+					sql = sql.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos (no clave) de los JOIN hijo (dimensiones hija) que no estén agregados
-			foreach (QueryJoinModel join in Joins)
-				foreach (QueryFieldModel field in join.Query.Fields)
-					if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
-						sqlFields = sqlFields.AddWithSeparator(GetSqlField(field), ",");
+			sql = sql.AddWithSeparator(GetSqlFields(Joins), ",");
 			// Añade los campos agrupados
 			foreach (QueryFieldModel field in Fields)
 				if (field.Aggregation != RequestDataSourceColumnModel.AggregationType.NoAggregated)
-					sqlFields = sqlFields.AddWithSeparator($"{field.GetAggregation(FromAlias)} AS {Generator.SqlTools.GetFieldName(field.Alias)}", ",");
+					sql = sql.AddWithSeparator($"{field.GetAggregation(FromAlias)} AS {Generator.SqlTools.GetFieldName(field.Alias)}", ",");
 			// Devuelve los campos
-			return sqlFields;
+			return sql;
+	}
+
+	/// <summary>
+	///		Obtiene la cadena SQL de los campos de tablas relacionadas
+	/// </summary>
+	private string GetSqlFields(List<QueryJoinModel> joins)
+	{
+		string sql = string.Empty;
+
+			// Añade los campos
+			foreach (QueryJoinModel join in joins)
+			{
+				// Añade los campos de la consulta relacionada
+				foreach (QueryFieldModel field in join.Query.Fields)
+					if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
+						sql = sql.AddWithSeparator(GetSqlField(field), ",");
+				// Añade los campos de las relaciones hija
+				sql = sql.AddWithSeparator(GetSqlFields(join.Query.Joins), ",");
+			}
+			// Devuelve la cadena SQL
+			return sql;
 	}
 
 	/// <summary>
@@ -424,7 +442,7 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Comprueba si hay algún campo que no sea clave primaria
 	/// </summary>
-	internal bool CheckHasFieldsNoPrmaryKey()
+	internal bool HasFieldsNoPrimaryKey()
 	{
 		// Comprueba si alguno de los campos es clave primaria
 		foreach (QueryFieldModel field in Fields)
@@ -445,11 +463,6 @@ internal class QueryDimensionModel
 	internal BaseDimensionModel Dimension { get; }
 
 	/// <summary>
-	///		Id del origen de la consulta (código de expresión, código de informe)
-	/// </summary>
-	internal string SourceId { get; }
-
-	/// <summary>
 	///		Tabla de la consulta
 	/// </summary>
 	internal string FromTable => Dimension.GetTableFullName();
@@ -462,7 +475,7 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Alias de la consulta
 	/// </summary>
-	internal string Alias { get; }
+	internal string Alias => Dimension.Id;
 
 	/// <summary>
 	///		Campos de la consulta

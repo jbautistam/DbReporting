@@ -220,25 +220,6 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 			return columns;
 	}
 
-/*
-	/// <summary>
-	///		Obtiene las solicitudes hija de una solicitud de dimensión (las solicitudes asociadas a dimensiones hija)
-	/// </summary>
-	private List<RequestDimensionModel> GetChildRequestedDimensions(RequestDimensionModel dimensionRequest)
-	{
-		List<RequestDimensionModel> requestDimensions = [];
-
-			// Obtiene las solicitudes
-			foreach (DimensionRelationModel relation in dimensionRequest.Dimension.GetRelations())
-				foreach (RequestDimensionModel requestDimension in this)
-					if (relation.Dimension is not null &&
-							relation.Dimension.Id.Equals(requestDimension.Dimension.Id, StringComparison.CurrentCultureIgnoreCase))
-						requestDimensions.Add(requestDimension);
-			// Devuelve la lista encontrada
-			return requestDimensions;
-	}
-*/
-
 	/// <summary>
 	///		Solicitud a la que se asocian las dimensiones
 	/// </summary>

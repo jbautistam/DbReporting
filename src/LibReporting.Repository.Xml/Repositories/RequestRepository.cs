@@ -100,7 +100,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// </summary>
 	private List<DimensionColumnRequestModel> LoadDimensionColumns(MLNode rootML)
 	{
-		List<DimensionColumnRequestModel> columns = new();
+		List<DimensionColumnRequestModel> columns = [];
 
 			// Carga las columnas
 			foreach (MLNode nodeML in rootML.Nodes)
@@ -139,7 +139,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// </summary>
 	private List<DataSourceColumnRequestModel> LoadDataSourceColumns(MLNode rootML)
 	{
-		List<DataSourceColumnRequestModel> columns = new();
+		List<DataSourceColumnRequestModel> columns = [];
 
 			// Carga las columnas
 			foreach (MLNode nodeML in rootML.Nodes)

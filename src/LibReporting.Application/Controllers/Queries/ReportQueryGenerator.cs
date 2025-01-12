@@ -33,8 +33,6 @@ internal class ReportQueryGenerator
 			throw new ReportingParserException($"Unknown report {Request.Report.Id}. {Request.Report.GetType().ToString()}");
 		else
 		{
-			// Inicializa el almacén de datos
-			Request.Manager.Schema.Initialize();
 			// Normaliza la solicitud
 			NormalizeRequest(Request, reportAdvanced);
 			// Devuelve la SQL generada

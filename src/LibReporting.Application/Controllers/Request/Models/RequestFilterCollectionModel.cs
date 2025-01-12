@@ -22,7 +22,7 @@ internal class RequestFilterCollectionModel : List<RequestFilterModel>
 				// Añade los valores
 				converted.Values.AddRange(filter.Values);
 				// Añade el filtro
-				filters.Add(filter);
+				Add(converted);
 		}
 
 		// Convierte la condición

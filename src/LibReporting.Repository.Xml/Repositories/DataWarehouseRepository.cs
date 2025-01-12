@@ -159,15 +159,15 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 	private DataSourceColumnModel LoadColumn(BaseDataSourceModel dataSource, MLNode rootML)
 	{
 		return new DataSourceColumnModel(dataSource)
-				{
-					Id = rootML.Attributes[TagSourceId].Value.TrimIgnoreNull(),
-					Alias = rootML.Attributes[TagAlias].Value.TrimIgnoreNull(),
-					Type = rootML.Attributes[TagType].Value.GetEnum(DataSourceColumnModel.FieldType.Unknown),
-					Required = rootML.Attributes[TagRequired].Value.GetBool(),
-					IsPrimaryKey = rootML.Attributes[TagPrimaryKey].Value.GetBool(),
-					Visible = rootML.Attributes[TagVisible].Value.GetBool(true),
-					FormulaSql = rootML.Nodes[TagFormula].Value.TrimIgnoreNull()
-				};
+						{
+							Id = rootML.Attributes[TagSourceId].Value.TrimIgnoreNull(),
+							Alias = rootML.Attributes[TagAlias].Value.TrimIgnoreNull(),
+							Type = rootML.Attributes[TagType].Value.GetEnum(DataSourceColumnModel.FieldType.Unknown),
+							Required = rootML.Attributes[TagRequired].Value.GetBool(),
+							IsPrimaryKey = rootML.Attributes[TagPrimaryKey].Value.GetBool(),
+							Visible = rootML.Attributes[TagVisible].Value.GetBool(true),
+							FormulaSql = rootML.Nodes[TagFormula].Value.TrimIgnoreNull()
+						};
 	}
 
 	/// <summary>
@@ -442,5 +442,4 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 			// Devuelve el nodo
 			return rootML;
 	}
-
 }

@@ -8,15 +8,6 @@ public class DataWarehouseModel : Base.BaseReportingModel
 	public DataWarehouseModel(ReportingSchemaModel schema)
 	{
 		Schema = schema;
-		TreeDimensions = new Dimensions.TreeDimensionModel(this);
-	}
-
-	/// <summary>
-	///		Inicializa el <see cref="DataWarehouseModel"/>
-	/// </summary>
-	public void Initialize()
-	{
-		TreeDimensions.Fill();
 	}
 
 	/// <summary>
@@ -67,11 +58,6 @@ public class DataWarehouseModel : Base.BaseReportingModel
 	///		Dimensiones del esquema
 	/// </summary>
 	public Base.BaseReportingDictionaryModel<Dimensions.BaseDimensionModel> Dimensions { get; } = new();
-
-	/// <summary>
-	///		Árbol de dimensiones del esquema
-	/// </summary>
-	public Dimensions.TreeDimensionModel TreeDimensions { get; }
 
 	/// <summary>
 	///		Informes

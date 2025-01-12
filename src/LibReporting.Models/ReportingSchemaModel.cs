@@ -6,15 +6,6 @@
 public class ReportingSchemaModel
 {
 	/// <summary>
-	///		Inicializa el esquema
-	/// </summary>
-	public void Initialize()
-	{
-		foreach (DataWarehouses.DataWarehouseModel dataWarehouse in DataWarehouses.EnumerateValues())
-			dataWarehouse.Initialize();
-	}
-
-	/// <summary>
 	///		Limpia el esquema
 	/// </summary>
 	public void Clear()

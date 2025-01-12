@@ -7,7 +7,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Prettifier;
 /// <summary>
 ///		Generador de cadenas
 /// </summary>
-public class StringPrettifier
+internal class StringPrettifier
 {
 	// Variables privadas
 	private int _indent;
@@ -15,7 +15,7 @@ public class StringPrettifier
 	/// <summary>
 	///		Añade una cadena
 	/// </summary>
-	public void Append(string text)
+	internal void Append(string text)
 	{
 		AppendText(text, 0, string.Empty);
 	}
@@ -23,7 +23,7 @@ public class StringPrettifier
 	/// <summary>
 	///		Añade una cadena con un máximo de caracteres por fila
 	/// </summary>
-	public void Append(string text, int maxCharactersLength, string separator)
+	internal void Append(string text, int maxCharactersLength, string separator)
 	{
 		AppendText(text, maxCharactersLength, separator);
 	}
@@ -31,7 +31,7 @@ public class StringPrettifier
 	/// <summary>
 	///		Añade una nueva línea
 	/// </summary>
-	public void NewLine()
+	internal void NewLine()
 	{
 		Builder.Append(Environment.NewLine);
 	}
@@ -39,7 +39,7 @@ public class StringPrettifier
 	/// <summary>
 	///		Incrementa la indentación
 	/// </summary>
-	public void Indent()
+	internal void Indent()
 	{
 		_indent++;
 	}
@@ -47,7 +47,7 @@ public class StringPrettifier
 	/// <summary>
 	///		Decrementa la indentación
 	/// </summary>
-	public void Unindent()
+	internal void Unindent()
 	{
 		// Quita la indentación
 		_indent--;
@@ -162,7 +162,7 @@ public class StringPrettifier
 	{
 		// Comprueba si existe la cadena
 		foreach (string newLine in newLines)
-			if (sql.IndexOf(newLine + newLine) >= 0)
+			if (sql.Contains(newLine + newLine))
 				return true;
 		// Si ha llegado hasta aquí es porque no existe
 		return false;

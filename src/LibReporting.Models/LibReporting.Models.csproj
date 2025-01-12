@@ -19,6 +19,8 @@
   <ItemGroup>
     <Compile Remove="DataWarehouses\DataSets\SqlSelectModel.cs" />
     <Compile Remove="DataWarehouses\Dimensions\DimensionRelationColumnModel.cs" />
+    <Compile Remove="DataWarehouses\Dimensions\TreeDimensionModel.cs" />
+    <Compile Remove="DataWarehouses\Dimensions\TreeDimensionNodeModel.cs" />
     <Compile Remove="DataWarehouses\Reports\Blocks\ClauseJoinModel.cs" />
     <Compile Remove="DataWarehouses\Reports\ReportAdvancedModel.cs" />
     <Compile Remove="DataWarehouses\Reports\ReportAdvancedRequestDimension.cs" />
