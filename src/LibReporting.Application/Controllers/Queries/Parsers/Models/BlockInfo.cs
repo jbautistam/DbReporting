@@ -120,5 +120,5 @@ internal class BlockInfo
 	/// <summary>
 	///		Bloques hijo
 	/// </summary>
-	internal List<BlockInfo> Blocks { get; } = new();
+	internal List<BlockInfo> Blocks { get; } = [];
 }

@@ -13,7 +13,11 @@ public class report_generation_sql_should
 	/// </summary>
 	[Theory]
 	[InlineData("Sales/Reporting-Sql Server - SalesSamples.Schema.xml", 
+				"Sales/ManualRequests/Sales/Sales.request.xml")]
+/*
+	[InlineData("Sales/Reporting-Sql Server - SalesSamples.Schema.xml", 
 				"Sales/ManualRequests/Products.request.xml")]
+*/
 	public void convert_to_sql(string schema, string fileRequest)
 	{
 		string schemaFileName = Tools.FileHelper.GetFullFileName(schema);
@@ -89,10 +93,10 @@ public class report_generation_sql_should
 					else
 						try
 						{
-							string sql = Tools.ReportHelper.GetSqlResponse(schemaFile, requestFile, page);
+							string generatedSql = Tools.ReportHelper.GetSqlResponse(schemaFile, requestFile, page);
 
 								// Compara la SQL de salida con el archivo
-								if (!CompareSql(sql, File.ReadAllText(responseFile)))
+								if (!CompareSql(generatedSql, File.ReadAllText(responseFile)))
 									error = $"The response for {requestFile} page {page.ToString()} has error";
 						}
 						catch (Exception exception)

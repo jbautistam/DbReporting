@@ -13,10 +13,10 @@ internal class ParserFieldsSectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Dimensiones que se deben añadir a la lista de campos
     /// </summary>
-    internal List<ParserFieldsDimensionSectionModel> ParserDimensions { get; } = new();
+    internal List<ParserFieldsDimensionSectionModel> ParserDimensions { get; } = [];
 
     /// <summary>
     ///     Expresiones que se deben añadir a la lista de campos
     /// </summary>
-    internal List<ParserIfRequestSectionModel> ParserExpressions { get; } = new();
+    internal List<ParserIfRequestSectionModel> ParserExpressions { get; } = [];
 }

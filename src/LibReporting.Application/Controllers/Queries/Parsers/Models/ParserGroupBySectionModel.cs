@@ -13,7 +13,7 @@ internal class ParserGroupBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Dimensiones del GROUP BY
     /// </summary>
-    internal List<ParserDimensionModel> Dimensions { get; } = new();
+    internal List<ParserDimensionModel> Dimensions { get; } = [];
 
     /// <summary>
     ///		Sql adicional

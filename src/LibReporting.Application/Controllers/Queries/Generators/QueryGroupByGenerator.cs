@@ -1,4 +1,5 @@
-﻿using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
+﻿using Bau.Libraries.LibHelper.Extensors;
+using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -7,9 +8,10 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 /// </summary>
 internal class QueryGroupByGenerator : QueryBaseGenerator
 {
-	internal QueryGroupByGenerator(ReportQueryGenerator manager, ParserGroupBySectionModel section) : base(manager)
+	internal QueryGroupByGenerator(ReportQueryGenerator manager, ParserGroupBySectionModel section, Models.QueryDimensionsCollection queryDimensions) : base(manager)
 	{
 		Section = section;
+		QueryDimensions = queryDimensions;
 	}
 
 	/// <summary>
@@ -17,7 +19,45 @@ internal class QueryGroupByGenerator : QueryBaseGenerator
 	/// </summary>
 	internal override string GetSql()
 	{
-		return string.Empty;
+		string sql = GetSqlFieldsForDimensions(Section.Dimensions);
+
+			// Añade la SQL adicional
+			sql = sql.AddWithSeparator(Section.Sql, ",");
+			// Obtiene la cadena de salida
+			if (!string.IsNullOrWhiteSpace(sql))
+				sql = $" GROUP BY {sql}";
+			// Devuelve la cadena con los campos
+			return sql;
+	}
+
+	/// <summary>
+	///		Obtiene la cadena SQL para los campos solicitados de las dimensiones
+	/// </summary>
+	private string GetSqlFieldsForDimensions(List<ParserDimensionModel> dimensions)
+	{
+		string sql = string.Empty;
+
+			// Obtiene los campos
+			foreach (ParserDimensionModel dimension in dimensions)
+			{
+				List<string> fields = QueryDimensions.GetFieldsRequest(dimension.DimensionKey, dimension.WithRequestedFields, dimension.WithPrimaryKeys);
+
+					// Añade los campos solicitados a la SQL
+					foreach (string field in fields)
+					{
+						string sqlField = string.Empty;
+
+							// Añade el nombre del campo
+							if (dimension.CheckIfNull)
+								sqlField = $"IsNull({Manager.SqlTools.GetFieldName(dimension.TableAlias, field)}, {Manager.SqlTools.GetFieldName(dimension.AdditionalTable, field)}) AS {field}";
+							else
+								sqlField = Manager.SqlTools.GetFieldName(dimension.TableAlias, field);
+							// Añade el campo a la cadena SQL
+							sql = sql.AddWithSeparator(sqlField, ",");
+					}
+			}
+			// Devuelve la cadena SQL
+			return sql;
 	}
 
 	/// <summary>
@@ -25,4 +65,8 @@ internal class QueryGroupByGenerator : QueryBaseGenerator
 	/// </summary>
 	internal ParserGroupBySectionModel Section { get; }
 
+	/// <summary>
+	///		Colección de consultas de dimensiones 
+	/// </summary>
+	internal Models.QueryDimensionsCollection QueryDimensions { get; }
 }

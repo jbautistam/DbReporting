@@ -11,10 +11,10 @@
 ///		-Operator: AND | OR | ...
 ///		-Sql: A = B
 /// </example>
-internal class ParserHavingSectionModel : ParserCondiciontSectionModel
+internal class ParserHavingSectionModel : ParserConditionSectionModel
 {
     /// <summary>
     ///     Bloques con las expresiones a filtrar
     /// </summary>
-    internal List<ParserExpressionModel> Expressions { get; } = new();
+    internal List<ParserExpressionModel> Expressions { get; } = [];
 }

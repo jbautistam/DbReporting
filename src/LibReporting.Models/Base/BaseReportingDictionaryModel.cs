@@ -11,7 +11,7 @@ public class BaseReportingDictionaryModel<TypeData> where TypeData : BaseReporti
 	}
 
 	/// <summary>
-	///		Añade un elemmento
+	///		Añade un elemento
 	/// </summary>
 	public void Add(TypeData value)
 	{
@@ -103,7 +103,7 @@ public class BaseReportingDictionaryModel<TypeData> where TypeData : BaseReporti
 	/// </summary>
 	public IEnumerable<TypeData> EnumerateValuesSorted()
 	{
-		List<TypeData> items = new();
+		List<TypeData> items = [];
 
 			// Añade los elementos
 			foreach (TypeData item in EnumerateValues())

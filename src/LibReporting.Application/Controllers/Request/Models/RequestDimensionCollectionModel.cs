@@ -1,9 +1,9 @@
-﻿using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
-using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
+﻿using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 using Bau.Libraries.LibReporting.Models.Base;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Relations;
+using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 using Bau.Libraries.LibReporting.Requests.Models;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
@@ -34,9 +34,35 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 	}
 
 	/// <summary>
+	///		Normaliza la solicitud añadiendo las dimensiones que aparezcan en el informe como obligatorios
+	///	pero para las que no se haya añadido ningún campo
+	/// </summary>
+	internal void Normalize()
+	{
+		foreach (ReportRequestDimension fixedRequest in Request.Report.RequestDimensions)
+			if (fixedRequest.Required || CheckIsRequestedAnyField(Request, fixedRequest))
+				foreach (ReportRequestDimensionField field in fixedRequest.Fields)
+					Request.Dimensions.Add(fixedRequest.DimensionKey, field.Field, false);
+
+		// Comprueba si se ha solicitado alguno de los campos considerados como obligatorios
+		bool CheckIsRequestedAnyField(RequestModel reportRequest, ReportRequestDimension fixedRequest)
+		{
+			RequestDimensionModel? dimensionRequest = reportRequest.Dimensions.GetRequested(fixedRequest.DimensionKey);
+
+				// Si se ha solicitado la dimensión
+				if (dimensionRequest is not null)
+					foreach (ReportRequestDimensionField field in fixedRequest.Fields)
+						if (dimensionRequest.GetRequestColumn(field.Field) is not null)
+							return true;
+				// Si ha llegado hasta aquí es porque no se ha solicitado
+				return false;
+		}
+	}
+
+	/// <summary>
 	///		Añade una dimensión y columna a la lista
 	/// </summary>
-	internal RequestDimensionColumnModel Add(string dimensionId, string columnId, bool requestByUser)
+	private RequestDimensionColumnModel Add(string dimensionId, string columnId, bool requestByUser)
 	{
 		BaseDimensionModel? dimension = Request.Report.DataWarehouse.Dimensions[dimensionId];
 
@@ -139,30 +165,7 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 			return isRelated;
 	}
 
-	/// <summary>
-	///		Obtiene los datos de una dimensión si se ha solicitado
-	/// </summary>
-	internal BaseDimensionModel? GetIfRequest(ParserDimensionModel parserDimension)
-	{
-		return GetIfRequest(parserDimension.DimensionKey, parserDimension.Required, parserDimension.RelatedDimensions, 
-							parserDimension.IfNotRequestDimensions);
-	}
-
-	/// <summary>
-	///		Obtiene los datos de una dimensión si se ha solicitado
-	/// </summary>
-	internal BaseDimensionModel? GetIfRequest(string dimensionKey, bool required, List<string>? relatedDimensions, List<string>? notRequestedDimensions)
-	{
-		RequestDimensionModel? requestDimension = GetRequested(dimensionKey);
-
-			if (requestDimension is not null && 
-					(required || 
-					 (IsRequested(relatedDimensions) && !IsRequested(notRequestedDimensions))))
-				return requestDimension.Dimension;
-			else
-				return null;
-	}
-
+/*
 	/// <summary>
 	///		Obtiene los campos solicitados para una dimensión
 	/// </summary>
@@ -183,6 +186,7 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 					return queryTable;
 			}
 	}
+*/
 
 	/// <summary>
 	///		Obtiene los campos solicitados para una dimensión

@@ -69,7 +69,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 					if (rootML.Name == TagRoot)
 					{
 						// Asigna las propiedades
-						dataWarehouse.Id = id;
+						dataWarehouse.Id = Path.GetFileNameWithoutExtension(id);
 						dataWarehouse.Name = rootML.Nodes[TagName].Value.TrimIgnoreNull();
 						dataWarehouse.Description = rootML.Nodes[TagDescription].Value.TrimIgnoreNull();
 						// Carga las dimensiones y orígenes de datos
@@ -278,6 +278,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 		MLNode rootML = fileML.Nodes.Add(TagRoot);
 
 			// Añade las propiedades básicas
+			rootML.Nodes.Add(TagId, Path.GetFileNameWithoutExtension(id));
 			rootML.Nodes.Add(TagName, dataWarehouse.Name);
 			rootML.Nodes.Add(TagDescription, dataWarehouse.Description);
 			// Añade los nodos de orígenes de datos
@@ -346,7 +347,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 	/// </summary>
 	private MLNodesCollection GetNodesParameters(List<DataSourceSqlParameterModel> parameters)
 	{
-		MLNodesCollection nodesML = new();
+		MLNodesCollection nodesML = [];
 
 			// Añade los parámetros
 			foreach (DataSourceSqlParameterModel parameter in parameters)
@@ -367,7 +368,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 	/// </summary>
 	private MLNodesCollection GetNodesColumns(Models.Base.BaseReportingDictionaryModel<DataSourceColumnModel> columns)
 	{
-		MLNodesCollection nodesML = new();
+		MLNodesCollection nodesML = [];
 
 			// Añade los nodos
 			foreach (DataSourceColumnModel column in columns.EnumerateValues())

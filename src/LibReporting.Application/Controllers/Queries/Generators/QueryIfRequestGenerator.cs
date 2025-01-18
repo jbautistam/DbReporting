@@ -36,14 +36,13 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la SQL de una lista de expresiones
 	/// </summary>
-	//TODO: la comprobación de expresiones solicitadas debería ir a la Request
 	private string GetSql(List<ParserIfRequestExpressionSectionModel> expressions, RequestModel request)
 	{
 		string sql = string.Empty;
 
 			// Añade las SQL de las expresiones solicitadas
 			foreach (ParserIfRequestExpressionSectionModel expression in expressions)
-				if (expression.IsDefault || IsRequested(expression, request))
+				if (expression.IsDefault || Manager.Request.Expressions.IsRequested(expression.ExpressionKeys))
 				{
 					string separator = ", ";
 
@@ -55,19 +54,6 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 				}
 			// Devuelve la cadena solicitada
 			return sql;
-	}
-
-	/// <summary>
-	///		Comprueba si se ha solicitado alguna de las expresiones asociadas
-	/// </summary>
-	private bool IsRequested(ParserIfRequestExpressionSectionModel expression, RequestModel request)
-	{
-		// Comprueba si se ha solicitado alguna de las expresiones
-		foreach (string key in expression.ExpressionKeys)
-			if (request.Expressions.IsRequested(key))
-				return true;
-		// Si ha llegado hasta aquí es porque no ha solicitado nada
-		return false;
 	}
 	
 	/// <summary>

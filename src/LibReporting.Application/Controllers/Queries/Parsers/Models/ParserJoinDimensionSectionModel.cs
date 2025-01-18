@@ -81,5 +81,5 @@ internal class ParserJoinDimensionSectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Campos por los que se hace la unión
     /// </summary>
-    internal List<(string fieldDimension, string fieldTable)> Fields { get; } = new();
+    internal List<(string fieldDimension, string fieldTable)> Fields { get; } = [];
 }

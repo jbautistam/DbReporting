@@ -10,7 +10,7 @@ internal abstract class ParserBaseSectionModel
 	/// </summary>
 	protected List<string> SplitContent(string content, string? separator = null)
 	{
-		List<string> parts = new();
+		List<string> parts = [];
 
 			// Si hay algo que separar
 			if (!string.IsNullOrWhiteSpace(content))

@@ -21,6 +21,11 @@ internal class ParserFieldsDimensionSectionModel : ParserBaseSectionModel
     internal string AdditionalTable { get; set; } = string.Empty;
 
     /// <summary>
+    ///     Indica si se debe comprobar si es nulo con respecto a la tabla adicional
+    /// </summary>
+    internal bool CheckIfNull { get; set; }
+
+    /// <summary>
     ///		Indica si se deben incluir las claves primarias en la lista de campos
     /// </summary>
     internal bool WithPrimaryKeys { get; set; }

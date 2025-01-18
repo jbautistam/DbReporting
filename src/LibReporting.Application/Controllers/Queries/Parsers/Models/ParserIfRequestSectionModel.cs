@@ -8,12 +8,12 @@ internal class ParserIfRequestSectionModel : ParserBaseSectionModel
 	/// <summary>
 	///     Expresiones solicitadas
 	/// </summary>
-	internal List<ParserIfRequestExpressionSectionModel> Expressions { get; } = new();
+	internal List<ParserIfRequestExpressionSectionModel> Expressions { get; } = [];
 
     /// <summary>
     ///     Expresiones que se comprueban cuando se solicitan totales
     /// </summary>
-    internal List<ParserIfRequestExpressionSectionModel> WhenRequestTotals { get; } = new();
+    internal List<ParserIfRequestExpressionSectionModel> WhenRequestTotals { get; } = [];
 
     /// <summary>
     ///     Indica si se debe añadir una coma al generar la SQL

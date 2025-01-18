@@ -26,7 +26,7 @@ internal class ParserIfRequestExpressionSectionModel : ParserBaseSectionModel
 	/// <summary>
 	///		Clave de las expresiones solicitadas
 	/// </summary>
-	internal List<string> ExpressionKeys { get; } = new();
+	internal List<string> ExpressionKeys { get; } = [];
 
     /// <summary>
     ///     Indica si no se debe añadir coma a la SQL

@@ -10,10 +10,10 @@
 ///		-Operator: AND | OR | ...
 ///		-Sql: A = B
 /// </example>
-internal class ParserWhereSectionModel : ParserCondiciontSectionModel
+internal class ParserWhereSectionModel : ParserConditionSectionModel
 {
     /// <summary>
     ///     Bloques con los orígenes de datos
     /// </summary>
-    internal List<ParserDataSourceModel> DataSources { get; } = new();
+    internal List<ParserDataSourceModel> DataSources { get; } = [];
 }

@@ -16,7 +16,7 @@ internal class ParserPartitionBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Dimensiones del PARTITION BY
     /// </summary>
-    internal List<ParserDimensionModel> Dimensions { get; } = new();
+    internal List<ParserDimensionModel> Dimensions { get; } = [];
 
     /// <summary>
     ///		Campos adicionales

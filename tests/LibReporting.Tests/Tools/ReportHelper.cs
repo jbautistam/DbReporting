@@ -13,7 +13,7 @@ internal static class ReportHelper
 	internal static string GetSqlResponse(string schemaFile, string requestFile, int page = 0)
 	{
 		ReportingSolutionManager manager = new();
-		ReportRequestModel request = manager.LoadRequest(requestFile);
+		ReportRequestModel? request = manager.LoadRequest(requestFile);
 
 			if (request is null)
 				throw new Exception($"Can't load the request: {requestFile}");

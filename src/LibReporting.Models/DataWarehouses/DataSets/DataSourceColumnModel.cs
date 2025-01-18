@@ -33,6 +33,9 @@ public class DataSourceColumnModel : Base.BaseReportingModel
 		DataSource = dataSource;
 	}
 
+	/// <summary>
+	///		Clona un <see cref="DataSourceColumnModel"/>
+	/// </summary>
 	public DataSourceColumnModel Clone(BaseDataSourceModel targetDataSource)
 	{
 		return new DataSourceColumnModel(targetDataSource)

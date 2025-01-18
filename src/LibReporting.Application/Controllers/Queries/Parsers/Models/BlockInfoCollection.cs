@@ -24,7 +24,7 @@ internal class BlockInfoCollection
 	/// </summary>
 	private List<BlockInfo> CreateBlocks(List<BlockInfo> readedBlocks)
 	{ 
-		List<BlockInfo> blocks = new();
+		List<BlockInfo> blocks = [];
 		BlockInfo? actual = null;
 
 			// Crea los bloques con las líneas a nivel del tabulador inicial
@@ -71,7 +71,7 @@ internal class BlockInfoCollection
 	private List<BlockInfo> ConvertLines(string content)
 	{ 
 		string[] lines = content.Split('\r', '\n');
-		List<BlockInfo> linesInfo = new();
+		List<BlockInfo> linesInfo = [];
 
 			// Añade las líneas
 			if (lines is not null)
@@ -140,5 +140,5 @@ internal class BlockInfoCollection
 	/// <summary>
 	///		Bloques de la colección
 	/// </summary>
-	internal List<BlockInfo> Blocks { get; } = new();
+	internal List<BlockInfo> Blocks { get; } = [];
 }

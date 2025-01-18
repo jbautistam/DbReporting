@@ -38,8 +38,6 @@ internal class ParserSection
 	private const string HeaderWithPrimaryKeys = "WithPrimaryKeys";
 	private const string HeaderRequired = "Required";
 	private const string HeaderCheckIfNull = "CheckIfNull";
-	//private const string HeaderEqual = "Equal";
-	//private const string HeaderTemplate = "Template";
 	private const string HeaderWhenRequestTotals = "WhenRequestTotals";
 	private const string HeaderDefault = "Default";
 	private const string HeaderDataSource = "DataSource";
@@ -185,13 +183,11 @@ internal class ParserSection
 					join.JoinDimensions.Add(ParseJoinDimension(child.Content, child));
 				else if (child.HasHeader(HeaderTable))
 					join.Table = child.Content;
-				else if (child.HasHeader(HeaderAlias))
-					join.TableAlias = child.Content;
 				else if (child.HasHeader(HeaderSql))
 					join.Sql = child.GetChildsContent();
 				else if (child.HasHeader(HeaderNoDimensionSql))
 					join.SqlNoDimension = child.GetChildsContent();
-				else if (child.HasHeader(HeaderOn))
+				else if (child.HasHeader(HeaderOn)) //TODO: eliminar ... esto es para asegurarnos que la cláusula ON pueda estar fuera de la dimensión
 				{
 					if (join.JoinDimensions.Count > 0)
 						foreach (ParserJoinDimensionSectionModel dimension in join.JoinDimensions)

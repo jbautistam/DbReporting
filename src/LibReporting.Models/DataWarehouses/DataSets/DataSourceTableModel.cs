@@ -58,14 +58,14 @@ public class DataSourceTableModel : BaseDataSourceModel
 			// Devuelve el nombre completo
 			return fullName; 
 
-			// Normaliza un nombre
-			string NormalizeName(string value, string charStart, string charEnd)
-			{
-				if (string.IsNullOrWhiteSpace(value))
-					return string.Empty;
-				else
-					return $"{charStart}{value.Trim()}{charEnd}";
-			}
+		// Normaliza un nombre
+		string NormalizeName(string value, string charStart, string charEnd)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+				return string.Empty;
+			else
+				return $"{charStart}{value.Trim()}{charEnd}";
+		}
 	}
 
 	/// <summary>

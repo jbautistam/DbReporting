@@ -3,7 +3,7 @@
 /// <summary>
 ///		Sección base con datos de una condición (WHERE o HAVING)
 /// </summary>
-internal class ParserCondiciontSectionModel : ParserBaseSectionModel
+internal class ParserConditionSectionModel : ParserBaseSectionModel
 {
     /// <summary>
     ///     Sql adicional

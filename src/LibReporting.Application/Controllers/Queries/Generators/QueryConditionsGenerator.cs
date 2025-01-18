@@ -6,11 +6,11 @@ using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
 /// <summary>
-///		Clase con los datos para generar la SQL de <see cref="ParserCondiciontSectionModel"/>
+///		Clase con los datos para generar la SQL de <see cref="ParserConditionSectionModel"/>
 /// </summary>
 internal class QueryConditionsGenerator : QueryBaseGenerator
 {
-	internal QueryConditionsGenerator(ReportQueryGenerator manager, ParserCondiciontSectionModel section) : base(manager)
+	internal QueryConditionsGenerator(ReportQueryGenerator manager, ParserConditionSectionModel section) : base(manager)
 	{
 		Section = section;
 	}
@@ -50,7 +50,7 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Añade la cláusula WHERE o HAVING dependiendo del tipo de condición
 	/// </summary>
-	private string GetClause(ParserCondiciontSectionModel section, string sql)
+	private string GetClause(ParserConditionSectionModel section, string sql)
 	{
 		if (!string.IsNullOrWhiteSpace(sql))
 			return $" {GetClause(section)} {sql}";
@@ -61,7 +61,7 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la cláusula de la sección
 	/// </summary>
-	private string GetClause(ParserCondiciontSectionModel section)
+	private string GetClause(ParserConditionSectionModel section)
 	{
 		return section switch
 					{
@@ -119,5 +119,5 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Sección que se está generando
 	/// </summary>
-	internal ParserCondiciontSectionModel Section { get; }
+	internal ParserConditionSectionModel Section { get; }
 }

@@ -9,9 +9,10 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 /// </summary>
 internal class QueryFieldsGenerator : QueryBaseGenerator
 {
-	internal QueryFieldsGenerator(ReportQueryGenerator manager, ParserFieldsSectionModel section) : base(manager)
+	internal QueryFieldsGenerator(ReportQueryGenerator manager, ParserFieldsSectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
 	{
 		Section = section;
+		QueryDimensions = queryDimensions;
 	}
 
 	/// <summary>
@@ -37,32 +38,26 @@ internal class QueryFieldsGenerator : QueryBaseGenerator
 
 			// Obtiene los campos
 			foreach (ParserFieldsDimensionSectionModel fieldDimension in dimensions)
-				if (Manager.Request.Dimensions.IsRequested(fieldDimension.DimensionKey))
-				{
-					QueryTableModel? table = Manager.Request.Dimensions.GetRequestedTable(fieldDimension.Table, fieldDimension.Table, fieldDimension.DimensionKey,
-																						  fieldDimension.WithPrimaryKeys, fieldDimension.WithRequestedFields);
+			{
+				List<string> fields = QueryDimensions.GetFieldsRequest(fieldDimension.DimensionKey, fieldDimension.WithRequestedFields, fieldDimension.WithPrimaryKeys);
 
-						if (table is not null)
-							sql = sql.AddWithSeparator(GetSqlFields(fieldDimension, table), ",");
-				}
+					// Añade los campos solicitados a la SQL
+					foreach (string field in fields)
+					{
+						string sqlField = string.Empty;
+
+							// Añade el nombre del campo
+							sqlField = Manager.SqlTools.GetFieldName(fieldDimension.Table, field);
+							// Añade el nombre del campo
+							if (fieldDimension.CheckIfNull)
+								sqlField = $"IsNull({Manager.SqlTools.GetFieldName(fieldDimension.Table, field)}, {Manager.SqlTools.GetFieldName(fieldDimension.AdditionalTable, field)}) AS {field}";
+							else
+								sqlField = Manager.SqlTools.GetFieldName(fieldDimension.Table, field);
+							// Añade el campo a la cadena SQL
+							sql = sql.AddWithSeparator(sqlField, ",");
+					}
+			}
 			// Devuelve la cadena SQL
-			return sql;
-	}
-
-	/// <summary>
-	///		Obtiene la SQL de los campos
-	/// </summary>
-	private string GetSqlFields(ParserFieldsDimensionSectionModel fielDimension, QueryTableModel table)
-	{
-		string sql = string.Empty;
-
-			// Genera la SQL para las columnas de la tabla
-			foreach (QueryTableColumnModel column in table.Columns)
-				if (string.IsNullOrEmpty(fielDimension.AdditionalTable))
-					sql = sql.AddWithSeparator(column.GetFieldName(), ",");
-				else
-					sql = sql.AddWithSeparator($"IsNull({column.GetFieldName(fielDimension.AdditionalTable)}, {column.GetFieldName()}) AS {column.NameParts.Alias}", ",");
-			// Devuelve la SQL
 			return sql;
 	}
 	
@@ -70,4 +65,9 @@ internal class QueryFieldsGenerator : QueryBaseGenerator
 	///		Sección que se está generando
 	/// </summary>
 	internal ParserFieldsSectionModel Section { get; }
+
+	/// <summary>
+	///		Consultas de dimensiones
+	/// </summary>
+	internal QueryDimensionsCollection QueryDimensions { get; }
 }

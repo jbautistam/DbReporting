@@ -56,26 +56,25 @@
 	                		SUM(Sales.PurchasePrice) AS PurchasePrice, SUM(Sales.Taxes) AS Taxes
 	                	FROM Fact.Sales
 	                	{{
-	                		InnerJoin 
+	                		InnerJoin
+								-Table: Sales
 	                			-Dimension: Shops 
 	                				--Table: ShopsCte
-								-Table: Sales
-								-On: ShopId-ShopId
+	                				--On: ShopId-ShopId
 	                	}}
 	                	{{
-	                		InnerJoin 
+	                		InnerJoin
+								-Table: Sales
 	                			-Dimension: Products 
 	                				--Table: ProductsCte
-								-Table: Sales
-								-On: ProductId-ProductId
+									--On: ProductId-ProductId
 	                	}}
 	                	{{
-	                		InnerJoin 
+	                		InnerJoin
+	                			-Table: Sales
 	                			-Dimension: Calendar 
 	                				--Table: CalendarCte
-								-Table: Sales
-								-On: CalendarId-CalendarId
-								-Required
+	                				--On: CalendarId-CalendarId
 	                	}}
 						{{
 	                		GroupBy

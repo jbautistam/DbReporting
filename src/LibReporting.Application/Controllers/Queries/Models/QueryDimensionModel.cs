@@ -12,11 +12,12 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 /// </summary>
 internal class QueryDimensionModel
 {
-	internal QueryDimensionModel(ReportQueryGenerator generator, BaseDimensionModel dimension, List<ClauseFieldModel>? fields)
+	internal QueryDimensionModel(ReportQueryGenerator generator, BaseDimensionModel dimension, List<ClauseFieldModel>? fields, List<ClauseFilterModel>? filters)
 	{
 		Generator = generator;
 		Dimension = dimension;
 		Prepare(fields);
+		Filters = filters;
 	}
 
 	/// <summary>
@@ -82,7 +83,7 @@ internal class QueryDimensionModel
 				throw new Exceptions.ReportingParserException($"Can't find the dimension {relation.DimensionId}");
 			else
 			{
-				QueryDimensionModel childQuery = new(Generator, relation.Dimension, null);
+				QueryDimensionModel childQuery = new(Generator, relation.Dimension, null, null);
 
 					// Añade la consulta hija si tiene alguna subconsulta o si alguno de sus campos solicitados no es una clave primaria
 					if (childQuery.Joins.Count > 0 || childQuery.HasFieldsNoPrimaryKey())
@@ -202,7 +203,7 @@ internal class QueryDimensionModel
 			prettifier.NewLine();
 			// Añade los WHERE
 			prettifier.Indent();
-			prettifier.Append(GetSqlClauseFilters(true));
+			prettifier.Append(GetSqlWhere());
 			prettifier.Unindent();
 			prettifier.NewLine();
 			// Añade los GROUP BY
@@ -212,7 +213,7 @@ internal class QueryDimensionModel
 			prettifier.NewLine();
 			// Añade los HAVING
 			prettifier.Indent();
-			prettifier.Append(GetSqlClauseFilters(false));
+			prettifier.Append(GetSqlHaving());
 			prettifier.Unindent();
 			prettifier.NewLine();
 			// Devuelve la consulta SQL
@@ -281,21 +282,45 @@ internal class QueryDimensionModel
 	}
 
 	/// <summary>
-	///		Obtiene la cadena de filtros incluyendo la cláusula WHERE / HAVING adecuada
+	///		Obtiene la cadena SQL de la condición WHERE
 	/// </summary>
-	private string GetSqlClauseFilters(bool whereClause)
+	private string GetSqlWhere()
 	{
-		string sql = GetSqlFilters(whereClause);
+		string sql = GetSqlFilters(true) + Environment.NewLine + GetSqlForFilters(Filters);
 
-			// Asigna la cláusula
+			// Añade la cláusula WHERE si tiene algún filtro
 			if (!string.IsNullOrWhiteSpace(sql))
-			{
-				if (whereClause)
-					sql = $"WHERE {sql}" + Environment.NewLine;
-				else
-					sql = $"HAVING {sql}" + Environment.NewLine;
-			}
-			// Devuelve la cadena SQL del filtro
+				sql = $" WHERE {sql}";
+			// Devuelve la cadena SQL
+			return sql;
+	}
+
+	/// <summary>
+	///		Obtiene la cadena SQL adicional para los filtros
+	/// </summary>
+	private string GetSqlForFilters(List<ClauseFilterModel>? filters)
+	{
+		string sql = string.Empty;
+
+			// Añade los filtros
+			if (filters is not null)
+				foreach (ClauseFilterModel filter in filters)
+					sql = sql.AddWithSeparator(filter.Sql + Environment.NewLine, " AND ");
+			// Devuelve la cadena SQL
+			return sql;
+	}
+
+	/// <summary>
+	///		Obtiene la cadena SQL de la condición WHERE
+	/// </summary>
+	private string GetSqlHaving()
+	{
+		string sql = GetSqlFilters(false);
+
+			// Añade la cláusula HAVING si es necesario
+			if (!string.IsNullOrWhiteSpace(sql))
+				sql = $" HAVING {sql}";
+			// Devuelve el filtro
 			return sql;
 	}
 
@@ -481,6 +506,11 @@ internal class QueryDimensionModel
 	///		Campos de la consulta
 	/// </summary>
 	internal QueryFieldsCollection Fields { get; } = [];
+
+	/// <summary>
+	///		Filtros de la consulta de dimensión
+	/// </summary>
+	internal List<ClauseFilterModel>? Filters { get; }
 
 	/// <summary>
 	///		Subconsultas combinadas

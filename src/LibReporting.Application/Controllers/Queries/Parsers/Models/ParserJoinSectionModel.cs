@@ -22,65 +22,28 @@ internal class ParserJoinSectionModel : ParserBaseSectionModel
 		CrossJoin
 	}
 
-    /// <summary>
-    ///		Obtiene la cadena adecuada para un tipo de JOIN
-    /// </summary>
-    internal string GetJoin()
-    {
-	        return Join switch
-	                    {
-		                    JoinType.InnerJoin => " INNER JOIN ",
-		                    JoinType.CrossJoin => " CROSS JOIN ",
-		                    JoinType.FullJoin => " FULL OUTER JOIN ",
-		                    JoinType.LeftJoin => " LEFT JOIN ",
-		                    JoinType.RightJoin => " RIGHT JOIN ",
-		                    _ => throw new Exceptions.ReportingParserException($"Join type unknown: {Join.ToString()}"),
-	                    };
-	}
-
 	/// <summary>
 	///		Tipo de unión
 	/// </summary>
 	internal JoinType Join { get; set; }
 
     /// <summary>
-    ///     Nombre de tabla
+    ///     Nombre de tabla con la que se relaciona la dimensión
     /// </summary>
-    internal string Table { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     Alias de la tabla
-    /// </summary>
-    internal string TableAlias { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     Tabla con la que se hace el join
-    /// </summary>
-    internal string TableJoin
-    {
-        get
-        {
-            if (!string.IsNullOrWhiteSpace(TableAlias))
-                return TableAlias;
-            else if (!string.IsNullOrWhiteSpace(Table))
-                return Table;
-            else
-                return string.Empty;
-        }
-    }
+    internal string Table { get; set; } = default!;
 
     /// <summary>
     ///     Relaciones asociadas al JOIN
     /// </summary>
-    internal List<ParserJoinDimensionSectionModel> JoinDimensions { get; } = new();
+    internal List<ParserJoinDimensionSectionModel> JoinDimensions { get; } = [];
 
     /// <summary>
     ///     Sql adicional
     /// </summary>
-    internal string Sql { get; set; } = string.Empty;
+    internal string? Sql { get; set; }
 
     /// <summary>
     ///     Sql que se debe añadir cuando no hay nada en el Join
     /// </summary>
-    internal string SqlNoDimension { get; set; } = string.Empty;
+    internal string? SqlNoDimension { get; set; }
 }
