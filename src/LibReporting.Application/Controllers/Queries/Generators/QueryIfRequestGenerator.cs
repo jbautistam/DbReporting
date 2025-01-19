@@ -50,7 +50,8 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 						if (!expression.WithComma)
 							separator = string.Empty;
 						// Añade la consulta SQL
-						sql = sql.AddWithSeparator(expression.Sql.TrimIgnoreNull(), separator + Environment.NewLine);
+						if (!string.IsNullOrWhiteSpace(expression.Sql))
+							sql = sql.AddWithSeparator(expression.Sql.TrimIgnoreNull(), separator + Environment.NewLine);
 				}
 			// Devuelve la cadena solicitada
 			return sql;

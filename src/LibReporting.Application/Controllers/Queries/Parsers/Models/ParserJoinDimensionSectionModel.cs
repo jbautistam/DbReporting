@@ -46,12 +46,12 @@ internal class ParserJoinDimensionSectionModel : ParserBaseSectionModel
 	/// <summary>
 	///		Clave de la dimensión
 	/// </summary>
-	internal string DimensionKey { get; set; } = string.Empty;
+	internal string DimensionKey { get; set; } = default!;
 
     /// <summary>
     ///		Tabla de la dimensión
     /// </summary>
-    internal string Table { get; set; } = string.Empty;
+    internal string Table { get; set; } = default!;
 
     /// <summary>
     ///     Alias que se debe utilizar para tabla de dimensión

@@ -15,7 +15,7 @@ internal class ParserOrderBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Dimensiones del ORDER BY
     /// </summary>
-    internal List<ParserDimensionModel> Dimensions { get; } = new();
+    internal List<ParserDimensionModel> Dimensions { get; } = []
 
     /// <summary>
     ///     Indica si el ORDER BY es obligatorio (por ejemplo porque tiene paginación)
@@ -25,5 +25,5 @@ internal class ParserOrderBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Sql adicional
     /// </summary>
-    internal string AdditionalSql { get; set; } = string.Empty;
+    internal string AdditionalSql { get; set; } = default!;
 }

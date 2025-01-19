@@ -23,7 +23,8 @@ internal class QueryGroupByGenerator : QueryBaseGenerator
 		string sql = GetSqlFieldsForDimensions(Section.Dimensions);
 
 			// Añade la SQL adicional
-			sql = sql.AddWithSeparator(Section.Sql, ",");
+			if (!string.IsNullOrWhiteSpace(Section.Sql))
+				sql = sql.AddWithSeparator(Section.Sql, ",");
 			// Obtiene la cadena de salida
 			if (!string.IsNullOrWhiteSpace(sql))
 				sql = $" GROUP BY {sql}";

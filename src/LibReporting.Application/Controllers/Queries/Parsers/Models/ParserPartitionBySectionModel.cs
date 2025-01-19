@@ -21,10 +21,10 @@ internal class ParserPartitionBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Campos adicionales
     /// </summary>
-    internal string Additional { get; set; } = string.Empty;
+    internal string Additional { get; set; } = default!;
 
     /// <summary>
     ///		Campos de ORDER BY
     /// </summary>
-    internal string OrderBy { get; set; } = string.Empty;
+    internal string OrderBy { get; set; } = default!;
 }

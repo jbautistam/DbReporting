@@ -394,6 +394,7 @@ internal class QueryDimensionModel
 					QueryJoinModel.JoinType.Left => "LEFT JOIN",
 					QueryJoinModel.JoinType.Right => "RIGHT JOIN",
 					QueryJoinModel.JoinType.Full => "FULL OUTER JOIN",
+					QueryJoinModel.JoinType.Cross => "CROSS JOIN",
 					_ => "INNER JOIN"
 				};
 	}

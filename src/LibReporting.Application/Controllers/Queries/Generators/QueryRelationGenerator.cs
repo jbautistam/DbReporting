@@ -1,7 +1,6 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -12,7 +11,6 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 {
 	// Registros privadas
 	private record JoinField(string FieldSource, string FieldTarget);
-	//private record JoinTableField(string TableTarget, string TableTargetAlias, JoinField Fields);
 
 	internal QueryRelationGenerator(ReportQueryGenerator manager, ParserJoinSectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
 	{
@@ -83,6 +81,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 			// Devuelve la cadena SQL creada
 			return sql;
 
+		//TODO: esto se podría combinar con el QueryGroupByGenerator y posiblemente con otros
 		// Obtiene una cadena de comparación de campos
 		string GetFieldCompare(string tableSource, string fieldSource, string tableTarget, string fieldTarget, bool checkIfNull)
 		{
@@ -176,211 +175,6 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 			// Devuelve los campos
 			return fields;			
 	}
-
-	/*
-		/// <summary>
-		///		Obtiene la SQL de la dimensión
-		/// </summary>
-		private string GetSqlJoin(ParserJoinSectionModel section, ParserJoinDimensionSectionModel joinDimension, QueryDimensionModel queryDimension)
-		{
-			List<JoinField> joinFields = GetJoinFields(joinDimension, queryDimension);
-			string sql = $"{section.GetJoin()} {GetJoinDimensionTableName(joinDimension)}";
-
-				// Añade la comparación con los campos solicitados para la dimensión
-				if (joinDimension.WithRequestedFields)
-					sql = GetJoinCompareRequestedFields(section.Table, joinDimension.TableAlias, queryDimension, joinDimension.CheckIfNull);
-				else if (joinDimension.Fields.Count > 0)
-					sql = GetJoinCompareFields(section.Table, joinDimension.TableAlias, joinDimension.Fields, joinDimension.CheckIfNull);
-				else
-					sql = GetJoinPrimaryKeys(section.Table, joinDimension.TableAlias, queryDimension, joinDimension.CheckIfNull);
-				// Devuelve la cadena SQL
-				return sql;
-
-			// Obtiene el nombre de la tabla de la dimensión para el Join teniendo en cuenta si tiene o no alias
-			string GetJoinDimensionTableName(ParserJoinDimensionSectionModel joinDimension)
-			{
-				if (!string.IsNullOrWhiteSpace(joinDimension.TableAlias) && 
-						!joinDimension.TableAlias.Equals(joinDimension.TableAlias, StringComparison.CurrentCultureIgnoreCase))
-					return $"{joinDimension.Table} AS {joinDimension.TableAlias}";
-				else
-					return joinDimension.Table;
-			}
-		}
-
-		/// <summary>
-		///		Obtiene las comparaciones entre campos
-		/// </summary>
-		private string GetJoinCompareFields(string tableSource, string tableTarget, List<(string fieldDimension, string fieldTable)> fields, bool checkIfNull)
-		{
-			string sql = string.Empty;
-
-				// Añade las comparaciones
-				foreach ((string fieldDimension, string fieldTable) in fields)
-					sql = sql.AddWithSeparator(GetFieldCompare(tableSource, fieldTable, tableTarget, fieldTable, checkIfNull), " AND ") + Environment.NewLine;
-				// Devuelve la cadena SQL
-				return sql;			
-		}
-
-		/// <summary>
-		///		Obtiene la comparación con los campos definidos en la consulta
-		/// </summary>
-		private string GetJoinCompareRequestedFields(string tableSource, string tableTarget, QueryDimensionModel queryDimension, bool checkIfNull)
-		{
-		aquí me quedé
-		throw new NotImplementedException();
-		}
-
-		/// <summary>
-		///		Genera el JOIN con la clave principal
-		/// </summary>
-		private string GetJoinPrimaryKeys(string table, string tableAlias, QueryDimensionModel queryDimension, bool checkIfNull)
-		{
-		throw new NotImplementedException();
-		}
-
-		/// <summary>
-		///		Obtiene una cadena de comparación de campos
-		/// </summary>
-		private string GetFieldCompare(string tableSource, string fieldSource, string tableTarget, string fieldTarget, bool checkIfNull)
-		{
-			if (!checkIfNull)
-				return $"{Manager.SqlTools.GetFieldName(tableSource, fieldSource)} = {Manager.SqlTools.GetFieldName(tableTarget, fieldTarget)}";
-			else //TODO: debería comparar con el valor predeterminado del tipo del campo
-				return $"IsNull({Manager.SqlTools.GetFieldName(tableSource, fieldSource)}, '') = IsNull({Manager.SqlTools.GetFieldName(tableTarget, fieldTarget)}, '')";
-		}
-
-		/// <summary>
-		///		Concatena las SQL de relaciones
-		/// </summary>
-		private string ConcatSql(List<(string dimensionTable, string dimensionAlias, string join)> sqlJoins)
-		{
-			string sql = string.Empty, lastTable = string.Empty;
-
-				// Genera la cadena SQL
-				foreach ((string dimensionTable, string dimensionAlias, string join) in sqlJoins)
-				{
-					string table = string.Empty;
-
-						// Añade la tabla
-						if (string.IsNullOrWhiteSpace(lastTable) || !lastTable.Equals(dimensionAlias, StringComparison.CurrentCultureIgnoreCase))
-						{
-							// Asigna el nombre de tabla
-							if (!dimensionTable.Equals(dimensionAlias, StringComparison.CurrentCultureIgnoreCase))
-								table = $"{dimensionTable} AS {dimensionAlias}";
-							else
-								table = dimensionTable;
-							// Guarda la última tabla añadida
-							lastTable = dimensionAlias;
-						}
-						// Si tiene que añadir un nombre de tabla, lo añade, si no, añade una cláusula AND
-						if (!string.IsNullOrWhiteSpace(table))
-							sql = sql.AddWithSeparator(@$"{Section.GetJoin()} {table}
-																ON ", 
-														" ");
-						else
-							sql += " AND ";
-						// Añade la relación
-						sql = sql.AddWithSeparator(join, Environment.NewLine);
-				}
-				// Devuelve la cadena SQL generada
-				return sql;
-		}
-
-		/// <summary>
-		///		Obtiene las SQL de las JOINS de la relación de tablas dimensiones
-		/// </summary>
-		private List<(string dimensionTable, string dimensionAlias, string join)> GetSqlJoins(ParserJoinSectionModel section)
-		{
-			List<(string dimensionTable, string dimensionAlias, string sql)> sqlJoins = [];
-
-				// Crea las SQL de las dimensiones
-				foreach ((QueryTableModel tableSource, QueryTableModel tableDimension, bool checkIfNull) in GetRelatedTables(section))
-				{
-					string sql = tableSource.GetSqlJoinOn(tableDimension, checkIfNull);
-
-						// Si hay algo que añadir, lo añade a la lista de relaciones
-						if (!string.IsNullOrWhiteSpace(sql))
-							sqlJoins.Add((tableDimension.NameParts.Name, tableDimension.NameParts.Alias, sql));
-				}
-				// Devuelve las SQL de las JOINS
-				return sqlJoins;
-		}
-
-		/// <summary>
-		///		Obtiene las SQL de las JOINS de la relación de tablas dimensiones
-		/// </summary>
-		private List<(string dimensionTable, string dimensionAlias, string join)> GetSqlJoins(ParserJoinSectionModel section)
-		{
-			List<(string dimensionTable, string dimensionAlias, string sql)> sqlJoins = [];
-
-				// Crea las SQL de las dimensiones
-				foreach ((QueryTableModel tableSource, QueryTableModel tableDimension, bool checkIfNull) in GetRelatedTables(section))
-				{
-					string sql = tableSource.GetSqlJoinOn(tableDimension, checkIfNull);
-
-						// Si hay algo que añadir, lo añade a la lista de relaciones
-						if (!string.IsNullOrWhiteSpace(sql))
-							sqlJoins.Add((tableDimension.NameParts.Name, tableDimension.NameParts.Alias, sql));
-				}
-				// Devuelve las SQL de las JOINS
-				return sqlJoins;
-		}
-
-		/// <summary>
-		///		Obtiene las tablas relacionadas
-		/// </summary>
-		private List<(QueryTableModel tableSource, QueryTableModel tableDimension, bool checkIfNull)> GetRelatedTables(ParserJoinSectionModel join)
-		{
-			List<(QueryTableModel tableSource, QueryTableModel tableDimension, bool checkIfNull)> tables = [];
-
-				// Añade las tablas de las relaciones
-				foreach (ParserJoinDimensionSectionModel joinDimension in join.JoinDimensions)
-					if (Manager.Request.Dimensions.IsRequested(joinDimension.DimensionKey))
-					{
-						(QueryTableModel? tableSource, QueryTableModel? tableDimension) = GetTablesForJoin(join, joinDimension);
-
-							// Si se han encontrado tablas realmente, se añaden
-							if (tableSource is not null && tableDimension is not null)
-								tables.Add((tableSource, tableDimension, joinDimension.CheckIfNull || joinDimension.WithRequestedFields));
-					}
-				// Devuelve la lista de datos
-				return tables;
-		}
-
-		/// <summary>
-		///		Obtiene las tablas para las que se hace un JOIN
-		/// </summary>
-		private (QueryTableModel? tableSource, QueryTableModel? tableDimension) GetTablesForJoin(ParserJoinSectionModel join, 
-																								 ParserJoinDimensionSectionModel relationDimension)
-		{
-			QueryTableModel? tableDimension = null, tableSource = null;
-
-				// Crea las tablas de origen y los campos de relación
-				if (relationDimension.WithRequestedFields)
-				{
-					// Obtiene una tabla con todos los campos solicitados para una dimensión
-					tableDimension = Manager.Request.Dimensions.GetRequestedTable(relationDimension.Table, relationDimension.TableAlias, relationDimension.DimensionKey, 
-																				  false, true);
-					// Si tenemos una tabla de dimensión, creamos una tabla origen con los mismos campos
-					if (tableDimension is not null)
-						tableSource = tableDimension.Clone(join.Table, join.TableAlias);
-				}
-				else if (relationDimension.Fields.Count > 0)
-				{
-					// Crea las tablas
-					tableSource = new QueryTableModel(join.Table, join.TableAlias);
-					tableDimension = new QueryTableModel(relationDimension.Table, relationDimension.TableAlias);
-					// Añade los campos
-					foreach ((string fieldTable, string fieldDimension) in relationDimension.Fields)
-					{
-						tableSource.AddColumn(false, fieldTable, fieldTable, DataSourceColumnModel.FieldType.Unknown);
-						tableDimension.AddColumn(false, fieldDimension, fieldDimension, DataSourceColumnModel.FieldType.Unknown);
-					}
-				}
-				// Devuelve la tabla origen y la lista de campos
-				return (tableSource, tableDimension);
-		}
-	*/
 
 	/// <summary>
 	///		Sección que se está generando

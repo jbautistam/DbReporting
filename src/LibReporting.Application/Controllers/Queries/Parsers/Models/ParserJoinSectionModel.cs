@@ -5,6 +5,7 @@
 /// </summary>
 internal class ParserJoinSectionModel : ParserBaseSectionModel
 {
+	//TODO: ¿esto no es lo mismo que QueryJoinModel?
 	/// <summary>
 	///		Tipo de join
 	/// </summary>

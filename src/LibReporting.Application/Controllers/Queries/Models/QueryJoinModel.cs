@@ -17,7 +17,9 @@ internal class QueryJoinModel
 		/// <summary>RIGHT JOIN</summary>
 		Right,
 		/// <summary>FULL OUTER JOIN</summary>
-		Full
+		Full,
+		/// <summary>CROSS JOIN</summary>
+		Cross
 	}
 
 	internal QueryJoinModel(JoinType type, QueryDimensionModel query, string alias)
