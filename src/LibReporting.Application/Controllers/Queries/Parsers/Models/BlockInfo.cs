@@ -66,6 +66,16 @@ internal class BlockInfo
 	internal bool HasHeader(string key) => !string.IsNullOrWhiteSpace(Header) && Header.Equals(key, StringComparison.CurrentCultureIgnoreCase);
 
 	/// <summary>
+	///		Obtiene un valor lógico. Si no se le ha pasado ningún valor, se considera true
+	/// </summary>
+	internal bool GetBooleanValue()
+	{
+		string value = Content;
+
+			return string.IsNullOrWhiteSpace(value) || value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
+	}
+
+	/// <summary>
 	///		Comprueba si existe una clave
 	/// </summary>
 	internal bool ExistsChildHeader(string key)

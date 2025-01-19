@@ -28,7 +28,6 @@ internal class ParserSection
 	private const string HeaderIfRequest = "IfRequest";
 	private const string HeaderPartitionBy = "PartitionBy";
 	private const string HeaderWithComma = "WithComma";
-	private const string HeaderWithoutComma = "WithoutComma";
 	private const string HeaderTable = "Table";
 	private const string HeaderAlias = "Alias";
 	private const string HeaderOnRequestFields = "OnRequestFields";
@@ -136,7 +135,7 @@ internal class ParserSection
 				if (child.HasHeader(HeaderDimension))
 					fields.ParserDimensions.Add(ParseFieldDimension(child.Content, child));
 				else if (child.HasHeader(HeaderWithComma))
-					fields.WithComma = true;
+					fields.WithComma = child.GetBooleanValue();
 			// Devuelve los datos del campo
 			return fields;
 	}
@@ -158,9 +157,9 @@ internal class ParserSection
 				else if (child.HasHeader(HeaderAdditionalTable))
 					dimension.AdditionalTable = child.Content;
 				else if (child.HasHeader(HeaderOnRequestFields))
-					dimension.WithRequestedFields = true;
+					dimension.WithRequestedFields = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderWithPrimaryKeys))
-					dimension.WithPrimaryKeys = true;
+					dimension.WithPrimaryKeys = child.GetBooleanValue();
 			// Si no se ha seleccionado el tipo de campos, se recogen los solicitados
 			if (!dimension.WithRequestedFields && !dimension.WithPrimaryKeys)
 				dimension.WithRequestedFields = true;
@@ -215,9 +214,9 @@ internal class ParserSection
 				else if (child.HasHeader(HeaderAlias))
 					dimension.TableAlias = child.Content;
 				else if (child.HasHeader(HeaderOnRequestFields))
-					dimension.WithRequestedFields = true;
+					dimension.WithRequestedFields = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderCheckIfNull))
-					dimension.CheckIfNull = true;
+					dimension.CheckIfNull = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderOn))
 					dimension.AddFieldsJoin(child.Content);
 			// Devuelve la relación
@@ -245,15 +244,18 @@ internal class ParserSection
 				else if (child.HasHeader(HeaderAlias))
 					dimension.TableAlias = child.Content;
 				else if (child.HasHeader(HeaderWithPrimaryKeys))
-					dimension.WithPrimaryKeys = true;
+					dimension.WithPrimaryKeys = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderWithRequestedFields) || child.HasHeader(HeaderOnRequestFields))
-					dimension.WithRequestedFields = true;
+					dimension.WithRequestedFields = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderRequired))
-					dimension.Required = true;
+					dimension.Required = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderIfRequest))
 					dimension.AddRelatedDimensions(child.Content);
 				else if (child.HasHeader(HeaderCheckIfNull))
-					dimension.CheckIfNull = true;
+					dimension.CheckIfNull = child.GetBooleanValue();
+			// Se solicitan los campos se no se ha solicitado nada
+			if (!dimension.WithPrimaryKeys && !dimension.WithRequestedFields)
+				dimension.WithRequestedFields = true;
 			// Devuelve los datos de la dimensión
 			return dimension;
 	}
@@ -378,7 +380,7 @@ internal class ParserSection
 				else if (child.HasHeader(HeaderSql))
 					section.AdditionalSql = child.GetChildsContent();
 				else if (child.HasHeader(HeaderRequired))
-					section.Required = true;
+					section.Required = child.GetBooleanValue();
 			// Devuelve la cláusula
 			return section;
 	}
@@ -401,7 +403,7 @@ internal class ParserSection
 				else if (child.HasHeader(HeaderExpression))
 					section.Expressions.Add(ParseRequestExpression(child));
 				else if (child.HasHeader(HeaderWithComma))
-					section.WithComma = true;
+					section.WithComma = child.GetBooleanValue();
 			// Devuelve la cláusula
 			return section;
 	}
@@ -417,11 +419,11 @@ internal class ParserSection
 			if (block.HasHeader(HeaderExpression))
 				section.AddExpressions(block.Content);
 			else if (block.HasHeader(HeaderDefault))
-				section.IsDefault = true;
+				section.IsDefault = block.GetBooleanValue();
 			// Añade los SQL
 			foreach (BlockInfo child in block.Blocks)
-				if (child.HasHeader(HeaderWithoutComma))
-					section.WithoutComma = true;
+				if (child.HasHeader(HeaderWithComma))
+					section.WithComma = block.GetBooleanValue();
 				else if (child.HasHeader(HeaderSql))
 					section.Sql += child.GetChildsContent();
 				else

@@ -1,5 +1,6 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
+using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
@@ -28,33 +29,13 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 			// Obtiene los campos para ORDER BY
 			foreach (ParserDimensionModel parserDimension in Section.Dimensions)
 			{
-				RequestDimensionModel? requestDimension = Manager.Request.Dimensions.GetRequested(parserDimension.DimensionKey);
+				List<QueryFieldModel> fields = QueryDimensions.GetFieldsRequest(parserDimension.DimensionKey);
 
-					// Obtiene las columnas solicitadas ordenables
-					if (requestDimension is not null)
-					{
-						List<string> fields = QueryDimensions.GetFieldsRequest(parserDimension.DimensionKey, parserDimension.WithRequestedFields, 
-																			   parserDimension.WithPrimaryKeys);
-
-							foreach (string field in fields)
-							{
-								BaseDimensionModel? dimension = Manager.Request.Report.DataWarehouse.Dimensions[parserDimension.DimensionKey];
-
-									if (dimension is not null)
-									{
-										DataSourceColumnModel? column = dimension.GetColumn(field, true);
-
-											if (column is not null)
-											{
-												RequestDimensionColumnModel? requestColumn = requestDimension.GetRequestColumn(column.Id);
-
-													// Añade los datos de ordenación
-													if (requestColumn is not null && requestColumn.OrderBy != RequestColumnBaseModel.SortOrder.Undefined)
-														fieldsSort.Add((parserDimension.Table, field, requestColumn.OrderIndex, requestColumn.OrderBy));
-											}
-									}
-							}
-					}
+					// Añade los datos de ordenación
+					foreach (QueryFieldModel field in fields)
+						if (field.IsPrimaryKey && parserDimension.WithPrimaryKeys || (!field.IsPrimaryKey && parserDimension.WithRequestedFields))
+							if (field.OrderBy != RequestColumnBaseModel.SortOrder.Undefined)
+								fieldsSort.Add((parserDimension.Table, field.Alias, field.OrderIndex, field.OrderBy));
 			}
 			// Ordena por el índice
 			fieldsSort.Sort((first, second) => first.orderIndex.CompareTo(second.orderIndex));

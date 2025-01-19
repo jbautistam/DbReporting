@@ -47,7 +47,7 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 					string separator = ", ";
 
 						// Quita el separador si la sección indica que no se deben añadir
-						if (expression.WithoutComma)
+						if (!expression.WithComma)
 							separator = string.Empty;
 						// Añade la consulta SQL
 						sql = sql.AddWithSeparator(expression.Sql.TrimIgnoreNull(), separator + Environment.NewLine);

@@ -1,5 +1,6 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
+using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -44,20 +45,23 @@ internal class QueryPartitionByGenerator : QueryBaseGenerator
 			// Obtiene los campos
 			foreach (ParserDimensionModel dimension in dimensions)
 			{
-				List<string> fields = QueryDimensions.GetFieldsRequest(dimension.DimensionKey, dimension.WithRequestedFields, dimension.WithPrimaryKeys);
+				List<QueryFieldModel> fields = QueryDimensions.GetFieldsRequest(dimension.DimensionKey);
 
+					//TODO: esto se podría combinar con el QueryGroupByGenerator y posiblemente con otros
 					// Añade los campos solicitados a la SQL
-					foreach (string field in fields)
-					{
-						string sqlField = string.Empty;
+					foreach (QueryFieldModel field in fields)
+						if (field.IsPrimaryKey && dimension.WithPrimaryKeys || (!field.IsPrimaryKey && dimension.WithRequestedFields))
+						{
+							string sqlField = string.Empty;
 
-							if (dimension.CheckIfNull)
-								sqlField = $"IsNull({Manager.SqlTools.GetFieldName(dimension.TableAlias, field)}, {Manager.SqlTools.GetFieldName(dimension.AdditionalTable, field)}) AS {field}";
-							else
-								sqlField = Manager.SqlTools.GetFieldName(dimension.TableAlias, field);
-							// Añade el campo a la cadena SQL
-							sql = sql.AddWithSeparator(sqlField, ",");
-					}
+								// Añade el campo a la consulta
+								if (dimension.CheckIfNull)
+									sqlField = $"IsNull({Manager.SqlTools.GetFieldName(dimension.TableAlias, field.Alias)}, {Manager.SqlTools.GetFieldName(dimension.AdditionalTable, field.Alias)}) AS {field}";
+								else
+									sqlField = Manager.SqlTools.GetFieldName(dimension.TableAlias, field.Alias);
+								// Añade el campo a la cadena SQL
+								sql = sql.AddWithSeparator(sqlField, ",");
+						}
 			}
 			// Devuelve la cadena SQL
 			return sql;

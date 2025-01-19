@@ -11,7 +11,8 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 internal class QueryRelationGenerator : QueryBaseGenerator
 {
 	// Registros privadas
-	private record JoinField(string FieldSource, string TableTarget, string FieldTarget);
+	private record JoinField(string FieldSource, string FieldTarget);
+	//private record JoinTableField(string TableTarget, string TableTargetAlias, JoinField Fields);
 
 	internal QueryRelationGenerator(ReportQueryGenerator manager, ParserJoinSectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
 	{
@@ -24,7 +25,6 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// </summary>
 	internal override string GetSql()
 	{
-		parece que está bien pero esto es lo que hay que seguir probando
 		if (Section.JoinDimensions.Count == 0)
 			throw new Exceptions.ReportingParserException($"Can't find relations at join {Section.Join.ToString()} with table {Section.Table}");
 		else
@@ -58,8 +58,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 
 					// Crea el join con los campos a la consulta
 					if (queryDimension is not null)
-						sql = sql.AddWithSeparator(GetSqlJoin(section.Join, section.Table, GetJoinFields(joinDimension, queryDimension), 
-															  joinDimension.CheckIfNull), 
+						sql = sql.AddWithSeparator(GetSqlJoin(section, joinDimension, GetJoinFields(joinDimension, queryDimension)), 
 												   Environment.NewLine);
 			}
 			// Devuelve la cadena SQL
@@ -69,17 +68,18 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la cadena SQL del JOIN
 	/// </summary>
-	private string GetSqlJoin(ParserJoinSectionModel.JoinType join, string table, List<JoinField> joinFields, bool checkIfNull)
+	private string GetSqlJoin(ParserJoinSectionModel section, ParserJoinDimensionSectionModel joinDimension, List<JoinField> joinFields)
 	{
 		string sql = string.Empty;
 
 			// Añade la SQL de los campos
 			foreach (JoinField joinField in joinFields)
-				sql = sql.AddWithSeparator(GetFieldCompare(table, joinField.FieldSource, joinField.TableTarget, joinField.FieldTarget, checkIfNull),
+				sql = sql.AddWithSeparator(GetFieldCompare(section.Table, joinField.FieldSource, joinDimension.TableAlias, 
+														   joinField.FieldTarget, joinDimension.CheckIfNull),
 										   Environment.NewLine + "AND");
 			// Si hay algún campo, obtiene la cadena final
 			if (!string.IsNullOrWhiteSpace(sql))
-				sql = $"{GetJoinClause(join)} {sql}";
+				sql = $"{GetJoinClause(section.Join)} {GetJoinDimensionTableName(joinDimension)} {Environment.NewLine} ON {sql}";
 			// Devuelve la cadena SQL creada
 			return sql;
 
@@ -92,6 +92,15 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 				return $"IsNull({Manager.SqlTools.GetFieldName(tableSource, fieldSource)}, '') = IsNull({Manager.SqlTools.GetFieldName(tableTarget, fieldTarget)}, '')";
 		}
 
+		// Obtiene el nombre de la tabla de la dimensión para el Join teniendo en cuenta si tiene o no alias
+		string GetJoinDimensionTableName(ParserJoinDimensionSectionModel joinDimension)
+		{
+			if (!string.IsNullOrWhiteSpace(joinDimension.TableAlias) && 
+					!joinDimension.TableAlias.Equals(joinDimension.TableAlias, StringComparison.CurrentCultureIgnoreCase))
+				return $"{joinDimension.Table} AS {joinDimension.TableAlias}";
+			else
+				return joinDimension.Table;
+		}
 	}
 
 	/// <summary>
@@ -115,39 +124,25 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// </summary>
 	private List<JoinField> GetJoinFields(ParserJoinDimensionSectionModel joinDimension, QueryDimensionModel queryDimension)
 	{
-		string tableDimension = GetJoinDimensionTableName(joinDimension);
-
-			// Obtiene los campos que se van a relacionar
-			if (joinDimension.WithRequestedFields)
-				return GetJoinFieldsRequested(tableDimension, queryDimension);
-			else if (joinDimension.Fields.Count > 0)
-				return GetJoinFieldsWithDimension(tableDimension, joinDimension.Fields);
-			else
-				return GetJoinFieldsPrimaryKey(tableDimension, queryDimension);
-
-		// Obtiene el nombre de la tabla de la dimensión para el Join teniendo en cuenta si tiene o no alias
-		string GetJoinDimensionTableName(ParserJoinDimensionSectionModel joinDimension)
-		{
-			if (!string.IsNullOrWhiteSpace(joinDimension.TableAlias) && 
-					!joinDimension.TableAlias.Equals(joinDimension.TableAlias, StringComparison.CurrentCultureIgnoreCase))
-				return $"{joinDimension.Table} AS {joinDimension.TableAlias}";
-			else
-				return joinDimension.Table;
-		}
-
+		if (joinDimension.WithRequestedFields)
+			return GetJoinFieldsRequested(queryDimension);
+		else if (joinDimension.Fields.Count > 0)
+			return GetJoinFieldsWithDimension(joinDimension.Fields);
+		else
+			return GetJoinFieldsPrimaryKey(queryDimension);
 	}
 
 	/// <summary>
 	///		Obtiene la lista de campos solicitados para el JOIN
 	/// </summary>
-	private List<JoinField> GetJoinFieldsRequested(string tableDimension, QueryDimensionModel queryDimension)
+	private List<JoinField> GetJoinFieldsRequested(QueryDimensionModel queryDimension)
 	{
 		List<JoinField> fields = [];
 
 			// Obtiene los campos solicitados
 			foreach (QueryFieldModel field in queryDimension.Fields)
 				if (!field.IsPrimaryKey)
-					fields.Add(new JoinField(field.Alias, tableDimension, field.Alias));
+					fields.Add(new JoinField(field.Alias, field.Alias));
 			// Devuelve la lista de campos
 			return fields;
 	}
@@ -155,14 +150,14 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la lista de campos solicitados para el JOIN para la clave primaria de la dimensión
 	/// </summary>
-	private List<JoinField> GetJoinFieldsPrimaryKey(string tableDimension, QueryDimensionModel queryDimension)
+	private List<JoinField> GetJoinFieldsPrimaryKey(QueryDimensionModel queryDimension)
 	{
 		List<JoinField> fields = [];
 
 			// Obtiene los campos solicitados
 			foreach (QueryFieldModel field in queryDimension.Fields)
 				if (field.IsPrimaryKey)
-					fields.Add(new JoinField(field.Alias, tableDimension, field.Alias));
+					fields.Add(new JoinField(field.Alias, field.Alias));
 			// Devuelve la lista de campos
 			return fields;
 	}
@@ -170,14 +165,14 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene las comparaciones entre campos
 	/// </summary>
-	private List<JoinField> GetJoinFieldsWithDimension(string tableDimension, List<(string fieldDimension, string fieldTable)> requested)
+	private List<JoinField> GetJoinFieldsWithDimension(List<(string fieldDimension, string fieldTable)> requested)
 	{
 		List<JoinField> fields = [];
 		string sql = string.Empty;
 
 			// Añade las comparaciones
 			foreach ((string fieldDimension, string fieldTable) in requested)
-				fields.Add(new JoinField(fieldTable, tableDimension, fieldDimension));
+				fields.Add(new JoinField(fieldTable, fieldDimension));
 			// Devuelve los campos
 			return fields;			
 	}
@@ -253,8 +248,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 			else //TODO: debería comparar con el valor predeterminado del tipo del campo
 				return $"IsNull({Manager.SqlTools.GetFieldName(tableSource, fieldSource)}, '') = IsNull({Manager.SqlTools.GetFieldName(tableTarget, fieldTarget)}, '')";
 		}
-	*/
-	/*
+
 		/// <summary>
 		///		Concatena las SQL de relaciones
 		/// </summary>

@@ -41,7 +41,7 @@ internal class QueryDimensionModel
 						// Añade el campo adicional si no estaba ya en la consulta
 						if (!ExistsField(table, field.Alias))
 							Fields.Add(new QueryFieldModel(this, true, Dimension.GetTableAlias(), field.Field, field.Alias, 
-														   RequestColumnBaseModel.SortOrder.Undefined,
+														   RequestColumnBaseModel.SortOrder.Undefined, 0,
 														   RequestDataSourceColumnModel.AggregationType.NoAggregated, true));
 				}
 	}
@@ -104,7 +104,7 @@ internal class QueryDimensionModel
 	/// </summary>
 	internal void AddPrimaryKey(RequestColumnBaseModel? requestColumn, string columnId, string columnAlias, bool visible)
 	{
-		QueryFieldModel field = new(this, true, FromAlias, columnId, columnAlias, RequestColumnBaseModel.SortOrder.Undefined, 
+		QueryFieldModel field = new(this, true, FromAlias, columnId, columnAlias, RequestColumnBaseModel.SortOrder.Undefined, 0,
 									RequestDataSourceColumnModel.AggregationType.NoAggregated, visible);
 
 			// Añade los filtros
@@ -147,7 +147,8 @@ internal class QueryDimensionModel
 
 			// Si no existía, lo añade
 			if (field is null)
-				field = new QueryFieldModel(this, false, FromAlias, columnId, columnAlias, requestColumn.OrderBy, aggregatedBy, requestColumn.Visible);
+				field = new QueryFieldModel(this, false, FromAlias, columnId, columnAlias, requestColumn.OrderBy, 
+											requestColumn.OrderIndex, aggregatedBy, requestColumn.Visible);
 			// Devuelve el campo
 			return field;
 	}

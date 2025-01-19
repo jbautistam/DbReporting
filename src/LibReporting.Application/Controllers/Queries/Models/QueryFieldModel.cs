@@ -11,7 +11,7 @@ internal class QueryFieldModel
 	private string _alias = string.Empty;
 
 	internal QueryFieldModel(QueryDimensionModel query, bool primaryKey, string table, string field, string alias, 
-							 RequestColumnBaseModel.SortOrder orderBy, 
+							 RequestColumnBaseModel.SortOrder orderBy, int orderIndex,
 							 RequestDataSourceColumnModel.AggregationType aggregation, bool visible)
 	{
 		Query = query;
@@ -22,7 +22,10 @@ internal class QueryFieldModel
 		Aggregation = aggregation;
 		Visible = visible;
 		if (Visible)
+		{
 			OrderBy = orderBy;
+			OrderIndex = orderIndex;
+		}
 	}
 
 	/// <summary>
@@ -112,6 +115,11 @@ internal class QueryFieldModel
 	///		Ordenación
 	/// </summary>
 	internal RequestColumnBaseModel.SortOrder OrderBy { get; }
+
+	/// <summary>
+	///		Posición de la ordenación por este campo
+	/// </summary>
+	internal int OrderIndex { get; }
 
 	/// <summary>
 	///		Indica si la columna es visible en la consulta
