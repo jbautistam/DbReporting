@@ -47,7 +47,7 @@ public class report_execution_should
 	/// </summary>
 	[Theory(Skip = "Todavía no")]
 	[InlineData("Sales/Test-Sales.Reporting.xml", 
-				"Sales/Sales/NoDimensions - Filtered.request.xml")]
+				"Sales/ManualRequests/Sales/Sales.request.xml")]
 	public void execute_to_sql(string fileName, string fileRequest)
 	{
 		ExecuteSql(FileHelper.GetFullFileName(fileName), FileHelper.GetFullFileName(fileRequest)).Should().BeNullOrWhiteSpace();

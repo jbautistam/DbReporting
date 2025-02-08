@@ -7,6 +7,7 @@
 /// GroupBy 
 ///     -Dimension:Users 
 ///         --Table:UsersCte
+///     -Sql: sql adicional
 /// </example>
 internal class ParserGroupBySectionModel : ParserBaseSectionModel
 {

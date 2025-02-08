@@ -361,7 +361,7 @@ internal class ParserSection
 				if (child.HasHeader(HeaderDimension))
 					section.Dimensions.Add(ParseDimension(child));
 				else if (child.HasHeader(HeaderSql))
-					section.Sql = child.GetChildsContent();
+					section.Sql = child.Content;
 			// Devuelve la cláusula
 			return section;
 	}

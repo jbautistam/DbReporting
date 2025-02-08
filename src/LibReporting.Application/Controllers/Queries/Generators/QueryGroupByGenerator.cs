@@ -72,5 +72,5 @@ internal class QueryGroupByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Colección de consultas de dimensiones 
 	/// </summary>
-	internal Models.QueryDimensionsCollection QueryDimensions { get; }
+	internal QueryDimensionsCollection QueryDimensions { get; }
 }
