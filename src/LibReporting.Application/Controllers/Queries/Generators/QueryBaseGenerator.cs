@@ -31,7 +31,6 @@ internal abstract class QueryBaseGenerator
 			{
 				List<QueryFieldModel> fields = queryDimensions.GetFieldsRequest(dimension.DimensionKey);
 
-					//TODO: esto se podría combinar con el QueryFieldsGenerator y posiblemente con otros
 					// Añade los campos solicitados a la SQL
 					foreach (QueryFieldModel field in fields)
 						if (MustIncludeField(field, dimension.WithPrimaryKeys, dimension.WithRequestedFields, onlyVisibleFields))
@@ -49,22 +48,24 @@ internal abstract class QueryBaseGenerator
 			}
 			// Devuelve la cadena SQL
 			return sql;
+	}
 
-		// Comprueba si se debe incluir el campo en la salida de la cadena SQL
-		bool MustIncludeField(QueryFieldModel field, bool withPrimaryKeys, bool withRequestedFields, bool onlyVisibleFields)
+	/// <summary>
+	///		Comprueba si se debe incluir el campo en la salida de la cadena SQL
+	/// </summary>
+	protected bool MustIncludeField(QueryFieldModel field, bool withPrimaryKeys, bool withRequestedFields, bool onlyVisibleFields)
+	{
+		if (field.IsPrimaryKey && withPrimaryKeys)
+			return true;
+		else if (withRequestedFields) 
 		{
-			if (field.IsPrimaryKey && withPrimaryKeys)
+			if (!onlyVisibleFields || (field.Visible && onlyVisibleFields))
 				return true;
-			else if (withRequestedFields) 
-			{
-				if (!onlyVisibleFields || (field.Visible && onlyVisibleFields))
-					return true;
-				else
-					return false;
-			}
 			else
 				return false;
 		}
+		else
+			return false;
 	}
 
 	/// <summary>

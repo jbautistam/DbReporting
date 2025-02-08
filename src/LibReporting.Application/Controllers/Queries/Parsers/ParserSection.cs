@@ -367,16 +367,14 @@ internal class ParserSection
 
 			// Asigna las propiedades
 			foreach (BlockInfo child in block.Blocks)
-				if (child.HasHeader(HeaderWhenRequestTotals))
-				{
-					// Añade todas las expresiones que se deben comprobar cuando se han solicitado los totales
-					foreach (BlockInfo childBlock in child.Blocks)
-						section.WhenRequestTotals.Add(ParseRequestExpression(childBlock));
-				}
-				else if (child.HasHeader(HeaderExpression))
+				if (child.HasHeader(HeaderExpression))
 					section.Expressions.Add(ParseRequestExpression(child));
+				else if (child.HasHeader(HeaderWhenRequestTotals))
+					section.WhenRequestTotals = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderWithComma))
 					section.WithComma = child.GetBooleanValue();
+				else if (child.HasHeader(HeaderSql))
+					section.Sql = child.GetChildsContent();
 			// Devuelve la cláusula
 			return section;
 	}
@@ -388,19 +386,12 @@ internal class ParserSection
 	{
 		ParserIfRequestExpressionSectionModel section = new();
 
-			// Añade las expresiones de la cabecera
-			if (block.HasHeader(HeaderExpression))
-				section.AddExpressions(block.Content);
-			else if (block.HasHeader(HeaderDefault))
-				section.IsDefault = block.GetBooleanValue();
-			// Añade los SQL
+			// Añade las claves de expresión
+			section.AddExpressions(block.Content);
+			// Añade los datos asociados con el contenido de la expresión
 			foreach (BlockInfo child in block.Blocks)
-				if (child.HasHeader(HeaderWithComma))
-					section.WithComma = block.GetBooleanValue();
-				else if (child.HasHeader(HeaderSql))
-					section.Sql += child.GetChildsContent();
-				else
-					section.Sql += child.Line + " ";
+				if (child.HasHeader(HeaderSql))
+					section.Sql = Sql.AddWithSeparator(child.GetChildsContent(), Environment.NewLine);
 			// Devuelve la sección interpretada
 			return section;
 	}

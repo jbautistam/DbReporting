@@ -24,8 +24,8 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 			// Añade la SQL para las expresiones normales
 			sql = GetSql(Section.Expressions, Manager.Request);
 			// Se añade la SQL para las expresiones de totales
-			if (Manager.Request.Pagination.IsRequestedTotals())
-				sql = sql.AddWithSeparator(GetSql(Section.WhenRequestTotals, Manager.Request), "," + Environment.NewLine);
+			if (MustAddWhenTotals(Manager.Request) && !string.IsNullOrWhiteSpace(Section.Sql))
+				sql = sql.AddWithSeparator(Section.Sql, "," + Environment.NewLine);
 			// Añade una coma si es necesario
 			if (Section.WithComma && !string.IsNullOrWhiteSpace(sql))
 				sql += ", ";
@@ -41,22 +41,21 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 		string sql = string.Empty;
 
 			// Añade las SQL de las expresiones solicitadas
-			foreach (ParserIfRequestExpressionSectionModel expression in expressions)
-				if (expression.IsDefault || Manager.Request.Expressions.IsRequested(expression.ExpressionKeys))
-				{
-					string separator = ", ";
-
-						// Quita el separador si la sección indica que no se deben añadir
-						if (!expression.WithComma)
-							separator = string.Empty;
-						// Añade la consulta SQL
-						if (!string.IsNullOrWhiteSpace(expression.Sql))
-							sql = sql.AddWithSeparator(expression.Sql.TrimIgnoreNull(), separator + Environment.NewLine);
-				}
+			foreach (ParserIfRequestExpressionSectionModel sectionExpression in expressions)
+				if (MustAddWhenTotals(request) || Manager.Request.Expressions.IsRequested(sectionExpression.Expressions))
+					if (!string.IsNullOrWhiteSpace(sectionExpression.Sql))
+						sql = sql.AddWithSeparator(sectionExpression.Sql.TrimIgnoreNull(), "," + Environment.NewLine);
+					else
+						throw new Exceptions.ReportingParserException("Can't find the SQL for section 'IfRequest expressions'");
 			// Devuelve la cadena solicitada
 			return sql;
 	}
 	
+	/// <summary>
+	///		Comprueba si se debe añadir una consulta al consultar totales
+	/// </summary>
+	private bool MustAddWhenTotals(RequestModel request) => request.Pagination.IsRequestedTotals() && Section.WhenRequestTotals;
+
 	/// <summary>
 	///		Sección que se está generando
 	/// </summary>

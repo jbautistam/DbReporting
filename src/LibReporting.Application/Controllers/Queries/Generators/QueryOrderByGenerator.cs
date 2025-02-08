@@ -31,7 +31,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 
 					// Añade los datos de ordenación
 					foreach (QueryFieldModel field in fields)
-						if ((field.IsPrimaryKey && parserDimension.WithPrimaryKeys) || (!field.IsPrimaryKey && field.Visible && parserDimension.WithRequestedFields))
+						if (MustIncludeField(field, parserDimension.WithPrimaryKeys, parserDimension.WithRequestedFields, true))
 							if (field.OrderBy != RequestColumnBaseModel.SortOrder.Undefined)
 								fieldsSort.Add((parserDimension.Table, field.Alias, field.OrderIndex, field.OrderBy));
 			}

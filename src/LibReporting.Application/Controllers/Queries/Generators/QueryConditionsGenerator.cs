@@ -87,7 +87,7 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 						foreach (RequestDataSourceColumnModel requestColumn in Manager.Request.DataSourceColumns.GetRequestedColumns(dataSource))
 							if (requestColumn.FiltersWhere.Count > 0)
 								sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserDataSource.Table, requestColumn.Column.Id, 
-																										requestColumn.FiltersWhere), 
+																									  requestColumn.FiltersWhere), 
 															" AND ");
 			}
 			// Devuelve la cadena SQL
