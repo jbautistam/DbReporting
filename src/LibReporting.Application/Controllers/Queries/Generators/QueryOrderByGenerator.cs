@@ -2,8 +2,6 @@
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -12,7 +10,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 /// </summary>
 internal class QueryOrderByGenerator : QueryBaseGenerator
 {
-	internal QueryOrderByGenerator(ReportQueryGenerator manager, ParserOrderBySectionModel section, Models.QueryDimensionsCollection queryDimensions) : base(manager)
+	internal QueryOrderByGenerator(ReportQueryGenerator manager, ParserOrderBySectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
 	{
 		Section = section;
 		QueryDimensions = queryDimensions;
@@ -33,7 +31,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 
 					// Añade los datos de ordenación
 					foreach (QueryFieldModel field in fields)
-						if (field.IsPrimaryKey && parserDimension.WithPrimaryKeys || (!field.IsPrimaryKey && parserDimension.WithRequestedFields))
+						if ((field.IsPrimaryKey && parserDimension.WithPrimaryKeys) || (!field.IsPrimaryKey && field.Visible && parserDimension.WithRequestedFields))
 							if (field.OrderBy != RequestColumnBaseModel.SortOrder.Undefined)
 								fieldsSort.Add((parserDimension.Table, field.Alias, field.OrderIndex, field.OrderBy));
 			}
@@ -43,7 +41,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 			foreach ((string table, string field, int orderIndex, RequestColumnBaseModel.SortOrder sortOrder) in fieldsSort)
 				sql = sql.AddWithSeparator($"{Manager.SqlTools.GetFieldName(table, field)} {GetSorting(sortOrder)}", ",");
 			// Si hay una cadena SQL adicional en la sección, se añade
-			sql = sql.AddWithSeparator(Section.AdditionalSql, ",");
+			sql = sql.AddWithSeparator(Section.Sql, ",");
 			// Si es obligatorio y está vacío, ordena por el primer campo
 			if (Section.Required && string.IsNullOrWhiteSpace(sql))
 				sql = "1";
@@ -71,5 +69,5 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Consultas de dimensiones
 	/// </summary>
-	internal Models.QueryDimensionsCollection QueryDimensions { get; }
+	internal QueryDimensionsCollection QueryDimensions { get; }
 }

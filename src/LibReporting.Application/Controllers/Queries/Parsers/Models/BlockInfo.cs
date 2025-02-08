@@ -93,7 +93,7 @@ internal class BlockInfo
 	/// </summary>
 	internal string GetChildsContent() 
 	{
-		string result = string.Empty;
+		string result = Content;
 
 			// Añade el contenido de los hijos
 			foreach (BlockInfo block in Blocks)

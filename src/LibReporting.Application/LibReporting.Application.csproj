@@ -11,6 +11,7 @@
 		<Compile Remove="Controllers\Queries\Models\QueryTableColumnModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableNameModel.cs" />
+		<Compile Remove="Controllers\Queries\Parsers\Models\ParserFieldsDimensionSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\Models\ParserJoinRelationSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\Models\ParserWhereConditionSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\ParserParametersSection.cs" />

@@ -6,7 +6,7 @@
 /// <example>
 /// -PartitionBy 
 ///     -Dimension:Users
-///     -Additional
+///     -Sql
 ///         YearMonth
 ///     -OrderBy
 ///         Date
@@ -21,10 +21,10 @@ internal class ParserPartitionBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Campos adicionales
     /// </summary>
-    internal string Additional { get; set; } = default!;
+    internal string? Sql { get; set; }
 
     /// <summary>
     ///		Campos de ORDER BY
     /// </summary>
-    internal string OrderBy { get; set; } = default!;
+    internal string? OrderBy { get; set; }
 }

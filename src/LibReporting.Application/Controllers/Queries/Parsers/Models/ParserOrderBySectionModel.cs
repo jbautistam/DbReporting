@@ -25,5 +25,5 @@ internal class ParserOrderBySectionModel : ParserBaseSectionModel
     /// <summary>
     ///		Sql adicional
     /// </summary>
-    internal string AdditionalSql { get; set; } = default!;
+    internal string? Sql { get; set; }
 }
