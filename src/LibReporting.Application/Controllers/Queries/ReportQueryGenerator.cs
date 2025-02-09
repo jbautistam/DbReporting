@@ -94,7 +94,10 @@ internal class ReportQueryGenerator
 							queries.Add(GetQuery(block, queries));
 						break;
 					case BlockCreateCteDimensionModel block:
-							queries.Add(GetQuery(block));
+							QuerySqlModel? query = GetQuery(block);
+
+								if (query is not null)
+									queries.Add(query);
 						break;
 					case BlockCreateCteModel block:
 							queries.Add(GetQuery(block));
@@ -177,13 +180,14 @@ internal class ReportQueryGenerator
 	/// <summary>
 	///		Crea la SQL de un bloque de CTE a partir de una dimensión
 	/// </summary>
-	private QuerySqlModel GetQuery(BlockCreateCteDimensionModel block)
+	private QuerySqlModel? GetQuery(BlockCreateCteDimensionModel block)
 	{
 		BaseDimensionModel? dimension = Request.Report.DataWarehouse.Dimensions[block.DimensionKey];
 
+			// Obtiene la consulta SQL asociada a este bloque si es obligatorio o si se ha solicitado algún campo de esta dimensión
 			if (dimension is null)
 				throw new ReportingParserException($"Can't find the dimension {block.DimensionKey}");
-			else
+			else if (block.Required || Request.Dimensions.IsRequested(block.DimensionKey))
 			{
 				QueryDimensionModel queryDimension = new(this, dimension, block.Fields, block.Filters);
 				string sql = queryDimension.Build();
@@ -193,6 +197,8 @@ internal class ReportQueryGenerator
 					// Devuelve la consulta
 					return new QuerySqlModel(QuerySqlModel.QueryType.Cte, block.Key, sql);
 			}
+			else
+				return null;
 	}
 
 	/// <summary>

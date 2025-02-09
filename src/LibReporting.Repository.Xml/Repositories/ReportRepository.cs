@@ -225,7 +225,8 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 	{
 		BlockCreateCteDimensionModel block = new(rootML.Attributes[TagName].Value.TrimIgnoreNull())
 												{ 
-													DimensionKey = rootML.Attributes[TagDimension].Value.TrimIgnoreNull()
+													DimensionKey = rootML.Attributes[TagDimension].Value.TrimIgnoreNull(),
+													Required = rootML.Attributes[TagRequired].Value.GetBool()
 												};
 
 			// Carga los objetos asociados

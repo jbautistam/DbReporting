@@ -13,6 +13,11 @@ public class BlockCreateCteDimensionModel : BaseBlockModel
     public string DimensionKey { get; set; } = default!;
 
     /// <summary>
+    ///     Indica si la creación de esta consulta por dimensión es obligatoria
+    /// </summary>
+    public bool Required { get; set; }
+
+    /// <summary>
     ///     Campos adicionales de la consulta
     /// </summary>
     public List<ClauseFieldModel> Fields { get; } = [];
