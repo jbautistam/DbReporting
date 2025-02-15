@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibReporting.Conversors", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B5640A26-738B-4A1F-8B55-D00D2431CDFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibReporting.Test.Console", "tests\LibReporting.Test.Console\LibReporting.Test.Console.csproj", "{1C577EB6-7210-4260-8695-9B33C06AE5BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{D372CC79-2F1B-4270-AFDF-7B820450D7ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D372CC79-2F1B-4270-AFDF-7B820450D7ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D372CC79-2F1B-4270-AFDF-7B820450D7ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C577EB6-7210-4260-8695-9B33C06AE5BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C577EB6-7210-4260-8695-9B33C06AE5BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C577EB6-7210-4260-8695-9B33C06AE5BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C577EB6-7210-4260-8695-9B33C06AE5BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +74,7 @@ Global
 		{D6641D30-DF66-4AB2-91EE-F18D1DDBDF48} = {23297B84-6ED2-439B-99F7-FC369DBBD8E8}
 		{A9BD4F58-61C3-47F5-89BE-10D56B5D3875} = {23297B84-6ED2-439B-99F7-FC369DBBD8E8}
 		{D372CC79-2F1B-4270-AFDF-7B820450D7ED} = {B5640A26-738B-4A1F-8B55-D00D2431CDFC}
+		{1C577EB6-7210-4260-8695-9B33C06AE5BF} = {23297B84-6ED2-439B-99F7-FC369DBBD8E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3466A10A-B830-46D9-9F7A-9DEAA48EE3D3}

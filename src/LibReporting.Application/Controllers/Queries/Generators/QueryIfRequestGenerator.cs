@@ -41,12 +41,15 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 		string sql = string.Empty;
 
 			// Añade las SQL de las expresiones solicitadas
-			foreach (ParserIfRequestExpressionSectionModel sectionExpression in expressions)
-				if (MustAddWhenTotals(request) || Manager.Request.Expressions.IsRequested(sectionExpression.Expressions))
-					if (!string.IsNullOrWhiteSpace(sectionExpression.Sql))
-						sql = sql.AddWithSeparator(sectionExpression.Sql.TrimIgnoreNull(), "," + Environment.NewLine);
-					else
-						throw new Exceptions.ReportingParserException("Can't find the SQL for section 'IfRequest expressions'");
+			if (expressions.Count == 0 && !request.Pagination.IsRequestedTotals())
+				throw new Exceptions.ReportingParserException("IfRequest hasn't expression keys");
+			else
+				foreach (ParserIfRequestExpressionSectionModel sectionExpression in expressions)
+					if (Manager.Request.Expressions.IsRequested(sectionExpression.Expressions))
+						if (!string.IsNullOrWhiteSpace(sectionExpression.Sql))
+							sql = sql.AddWithSeparator(sectionExpression.Sql.TrimIgnoreNull(), "," + Environment.NewLine);
+						else
+							throw new Exceptions.ReportingParserException($"Can't find the SQL for section 'IfRequest expressions' for expressions '{sectionExpression.Expressions[0]}'");
 			// Devuelve la cadena solicitada
 			return sql;
 	}

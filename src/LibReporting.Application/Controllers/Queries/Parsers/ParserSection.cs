@@ -391,7 +391,7 @@ internal class ParserSection
 			// Añade los datos asociados con el contenido de la expresión
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderSql))
-					section.Sql = Sql.AddWithSeparator(child.GetChildsContent(), Environment.NewLine);
+					section.Sql = child.GetChildsContent();
 			// Devuelve la sección interpretada
 			return section;
 	}
