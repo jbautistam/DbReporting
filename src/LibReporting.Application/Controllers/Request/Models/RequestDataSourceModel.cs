@@ -9,7 +9,6 @@ internal class RequestDataSourceModel
 	{
 		Parent = parent;
 		Id = id;
-		Columns = new RequestDataSourceColumnCollectionModel(this);
 	}
 
 	/// <summary>
@@ -25,5 +24,5 @@ internal class RequestDataSourceModel
 	/// <summary>
 	///		Solicitudes de columnas para este origen de datos
 	/// </summary>
-	internal RequestDataSourceColumnCollectionModel Columns { get; }
+	internal RequestColumnCollectionModel Columns { get; } = [];
 }

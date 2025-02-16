@@ -1,7 +1,6 @@
 ﻿using Bau.Libraries.LibHelper.Extensors;
 using Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
@@ -106,7 +105,7 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 			// Obtiene las comparaciones de los campos
 			foreach (ParserExpressionModel parserExpression in expressions)
 			{
-				RequestColumnModel? column = Manager.Request.Expressions.GetRequested(parserExpression.Expression);
+				RequestColumnModel? column = Manager.Request.Expressions.Get(parserExpression.Expression);
 
 					// Añade las condiciones del HAVING
 					if (column is not null)

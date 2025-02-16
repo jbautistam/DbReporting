@@ -68,12 +68,7 @@ internal class BlockInfo
 	/// <summary>
 	///		Obtiene un valor lógico. Si no se le ha pasado ningún valor, se considera true
 	/// </summary>
-	internal bool GetBooleanValue()
-	{
-		string value = Content;
-
-			return string.IsNullOrWhiteSpace(value) || value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
-	}
+	internal bool GetBooleanValue() => string.IsNullOrWhiteSpace(Content) || Content.Equals("true", StringComparison.CurrentCultureIgnoreCase);
 
 	/// <summary>
 	///		Comprueba si existe una clave

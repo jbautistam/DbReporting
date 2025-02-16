@@ -42,6 +42,9 @@ internal class ParserSection
 	private const string HeaderOperator = "Operator";
 	private const string HeaderAggregation = "Aggregation";
 	private const string HeaderNoDimensionSql = "SqlNoDimension";
+	// Separadores
+	private const string StartSeparator = "{{";
+	private const string EndSeparator = "}}";
 
 	internal ParserSection(string sql)
 	{	
@@ -54,7 +57,7 @@ internal class ParserSection
 	internal List<(string marker, ParserBaseSectionModel section)> Parse()
 	{
 		List<(string marker, ParserBaseSectionModel section)> sections = [];
-		List<string> placeholders = Sql.Extract("{{", "}}", false);
+		List<string> placeholders = Sql.Extract(StartSeparator, EndSeparator, false);
 
 			// Interpreta las secciones
 			foreach (string placeholder in placeholders)
@@ -424,10 +427,10 @@ internal class ParserSection
 	/// </summary>
 	internal void RemoveMarkers()
 	{
-		while (!string.IsNullOrWhiteSpace(Sql) && (Sql.IndexOf("{{") >= 0 || Sql.IndexOf("}}") >= 0))
+		while (!string.IsNullOrWhiteSpace(Sql) && (Sql.IndexOf(StartSeparator) >= 0 || Sql.IndexOf(EndSeparator) >= 0))
 		{
-			Sql = Sql.Replace("{{", string.Empty);
-			Sql = Sql.Replace("}}", string.Empty);
+			Sql = Sql.Replace(StartSeparator, string.Empty);
+			Sql = Sql.Replace(EndSeparator, string.Empty);
 		}
 	}
 

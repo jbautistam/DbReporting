@@ -41,7 +41,7 @@ internal class RequestModel
 	/// <summary>
 	///		Expresiones solicitadas
 	/// </summary>
-	internal RequestExpressionCollectionModel Expressions { get; } = [];
+	internal RequestColumnCollectionModel Expressions { get; } = [];
 
 	/// <summary>
 	///		Solicitudes de orígenes de datos

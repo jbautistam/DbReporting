@@ -66,12 +66,12 @@ internal class RequestColumnModel
 		{
 			return type switch
 					{
-						ColumnRequestModel.AggregationType.Sum => RequestColumnModel.AggregationType.Sum,
-						ColumnRequestModel.AggregationType.Max => RequestColumnModel.AggregationType.Max,
-						ColumnRequestModel.AggregationType.Min => RequestColumnModel.AggregationType.Min,
-						ColumnRequestModel.AggregationType.Average => RequestColumnModel.AggregationType.Average,
-						ColumnRequestModel.AggregationType.StandardDeviation => RequestColumnModel.AggregationType.StandardDeviation,
-						_ => RequestColumnModel.AggregationType.NoAggregated
+						ColumnRequestModel.AggregationType.Sum => AggregationType.Sum,
+						ColumnRequestModel.AggregationType.Max => AggregationType.Max,
+						ColumnRequestModel.AggregationType.Min => AggregationType.Min,
+						ColumnRequestModel.AggregationType.Average => AggregationType.Average,
+						ColumnRequestModel.AggregationType.StandardDeviation => AggregationType.StandardDeviation,
+						_ => AggregationType.NoAggregated
 					};
 		}
 	}

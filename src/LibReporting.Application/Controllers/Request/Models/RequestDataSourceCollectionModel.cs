@@ -19,18 +19,26 @@ internal class RequestDataSourceCollectionModel : List<RequestDataSourceModel>
 	{
 		foreach (DataRequestModel requestDataSource in requestDataSources)
 		{
-			RequestDataSourceModel dataSource = new(this, requestDataSource.Id);
+			RequestDataSourceModel? dataSource = Get(requestDataSource.Id);
 
+				// Si no se había añadido ya este origen de datos			
+				if (dataSource is null)
+				{
+					dataSource = new RequestDataSourceModel(this, requestDataSource.Id);
+					Add(dataSource);
+				}
 				// Añade las columnas
-				foreach (ColumnRequestModel column in requestDataSource.Columns)
-					dataSource.Columns.Add(new RequestColumnModel(column));
-				// Añade el origen de datos
-				Add(dataSource);
+				dataSource.Columns.AddRange(requestDataSource.Columns);
 		}
 	}
 
 	/// <summary>
-	///		Solicitud a la que se asocian los orígenes de daots
+	///		Obtiene un origen de datos por su Id
+	/// </summary>
+	internal RequestDataSourceModel? Get(string id) => this.FirstOrDefault(item => item.Id.Equals(id, StringComparison.CurrentCultureIgnoreCase));
+
+	/// <summary>
+	///		Solicitud a la que se asocian los orígenes de datos
 	/// </summary>
 	internal RequestModel Request { get; }
 }

@@ -82,7 +82,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 			// Si realmente se ha solicitado esta dimensión
 			if (requestDimension is not null)
 			{
-				RequestColumnModel? requestColumn = requestDimension.GetRequestColumn(field.Field);
+				RequestColumnModel? requestColumn = requestDimension.Columns.Get(field.Field);
 
 					if (requestColumn is not null && requestColumn.OrderBy != RequestColumnModel.SortOrder.Undefined)
 						return new SortField(dimension.Table, field.Alias, requestColumn.OrderIndex, requestColumn.OrderBy);
@@ -96,7 +96,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 	/// </summary>
 	private SortField? GetSortExpressionRequest(ParserExpressionModel expression)
 	{
-		RequestColumnModel? requestExpression = Manager.Request.Expressions.GetRequested(expression.Expression);
+		RequestColumnModel? requestExpression = Manager.Request.Expressions.Get(expression.Expression);
 
 			// Si realmente se ha solicitado esta expresión
 			if (requestExpression is not null && requestExpression.OrderBy != RequestColumnModel.SortOrder.Undefined)
@@ -108,7 +108,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la cadena SQL con la cláusula de ordenación del campo
 	/// </summary>
-	string GetSqlOrderField(SortField sort)
+	private string GetSqlOrderField(SortField sort)
 	{
 		string sql = GetSortType(sort.Type);
 

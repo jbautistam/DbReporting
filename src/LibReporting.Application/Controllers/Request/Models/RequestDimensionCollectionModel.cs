@@ -46,7 +46,7 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 				// Si se ha solicitado la dimensión
 				if (dimensionRequest is not null)
 					foreach (ReportRequestDimensionField field in fixedRequest.Fields)
-						if (dimensionRequest.GetRequestColumn(field.Field) is not null)
+						if (dimensionRequest.Columns.Get(field.Field) is not null)
 							return true;
 				// Si ha llegado hasta aquí es porque no se ha solicitado
 				return false;
