@@ -3,7 +3,7 @@
 /// <summary>
 ///		Clase con los datos de un JOIN
 /// </summary>
-internal class QueryJoinModel
+internal class QueryDimensionJoinModel
 {
 	/// <summary>
 	///		Tipo de unión
@@ -22,7 +22,7 @@ internal class QueryJoinModel
 		Cross
 	}
 
-	internal QueryJoinModel(JoinType type, QueryDimensionModel query, string alias)
+	internal QueryDimensionJoinModel(JoinType type, QueryDimensionModel query, string alias)
 	{
 		Type = type;
 		Query = query;
@@ -47,5 +47,5 @@ internal class QueryJoinModel
 	/// <summary>
 	///		Campos de relación
 	/// </summary>
-	internal List<QueryRelationModel> Relations { get; } = [];
+	internal List<QueryDimensionRelationModel> Relations { get; } = [];
 }

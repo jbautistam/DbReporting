@@ -10,40 +10,14 @@ internal class QueryFieldModel
 	// Variables privadas
 	private string _alias = string.Empty;
 
-	internal QueryFieldModel(QueryDimensionModel query, bool primaryKey, string table, string field, string alias, 
-							 RequestColumnBaseModel.SortOrder orderBy, int orderIndex,
-							 RequestDataSourceColumnModel.AggregationType aggregation, bool visible)
+	internal QueryFieldModel(QueryDimensionModel query, bool primaryKey, string table, string field, string alias, bool visible)
 	{
 		Query = query;
 		IsPrimaryKey = primaryKey;
 		Table = table;
 		Field = field;
 		Alias = alias;
-		Aggregation = aggregation;
 		Visible = visible;
-		if (Visible)
-		{
-			OrderBy = orderBy;
-			OrderIndex = orderIndex;
-		}
-	}
-
-	/// <summary>
-	///		Obtiene la agregación necesaria del campo
-	/// </summary>
-	internal string GetAggregation(string table)
-	{
-		string computed = Query.Generator.SqlTools.GetFieldName(table, Field);
-
-			return Aggregation switch
-						{
-							RequestDataSourceColumnModel.AggregationType.Average => $"AVG({computed})",
-							RequestDataSourceColumnModel.AggregationType.Max => $"MAX({computed})",
-							RequestDataSourceColumnModel.AggregationType.Min => $"MIN({computed})",
-							RequestDataSourceColumnModel.AggregationType.StandardDeviation => $"STDDEV({computed})",
-							RequestDataSourceColumnModel.AggregationType.Sum => $"SUM({computed})",
-							_ => computed
-						};
 	}
 
 	/// <summary>
@@ -80,25 +54,6 @@ internal class QueryFieldModel
 				{
 					// Genera el alias inicial
 					alias = $"{Table}_{Field}";
-					// Añade la agregación si es necesario
-					switch (Aggregation)
-					{
-						case RequestDataSourceColumnModel.AggregationType.Average:
-								alias += "_AVG";
-							break;
-						case RequestDataSourceColumnModel.AggregationType.Max:
-								alias += "_MAX";
-							break;
-						case RequestDataSourceColumnModel.AggregationType.Min:
-								alias += "_MIN";
-							break;
-						case RequestDataSourceColumnModel.AggregationType.StandardDeviation:
-								alias += "_STD";
-							break;
-						case RequestDataSourceColumnModel.AggregationType.Sum:
-								alias += "_SUM";
-							break;
-					}
 				}
 				// Devuelve el alias
 				return alias;
@@ -109,17 +64,7 @@ internal class QueryFieldModel
 	/// <summary>
 	///		Agregación
 	/// </summary>
-	internal RequestDataSourceColumnModel.AggregationType Aggregation { get; }
-
-	/// <summary>
-	///		Ordenación
-	/// </summary>
-	internal RequestColumnBaseModel.SortOrder OrderBy { get; }
-
-	/// <summary>
-	///		Posición de la ordenación por este campo
-	/// </summary>
-	internal int OrderIndex { get; }
+	internal RequestColumnModel.AggregationType Aggregation { get; }
 
 	/// <summary>
 	///		Indica si la columna es visible en la consulta

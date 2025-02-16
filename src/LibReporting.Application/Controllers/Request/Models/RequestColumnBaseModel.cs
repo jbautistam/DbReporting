@@ -8,19 +8,6 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// </summary>
 internal abstract class RequestColumnBaseModel
 {
-	/// <summary>
-	///		Modo de ordenación
-	/// </summary>
-	internal enum SortOrder
-	{
-		/// <summary>No se define ningún orden</summary>
-		Undefined,
-		/// <summary>Orden ascendente</summary>
-		Ascending,
-		/// <summary>Orden descendente</summary>
-		Descending
-	}
-
 	internal RequestColumnBaseModel(DataSourceColumnModel column)
 	{
 		Column = column;
@@ -29,7 +16,7 @@ internal abstract class RequestColumnBaseModel
 	/// <summary>
 	///		Asigna los datos de la columna solicitada
 	/// </summary>
-	internal void AssignColumnRequestData(BaseColumnRequestModel request)
+	internal void AssignColumnRequestData(ColumnRequestModel request)
 	{
 		Visible = request.Visible;
 		OrderIndex = request.OrderIndex;
@@ -38,13 +25,13 @@ internal abstract class RequestColumnBaseModel
 		FiltersHaving.AddRange(request.FiltersHaving);
 
 		// Convierte la ordenación
-		SortOrder Convert(BaseColumnRequestModel.SortOrder type)
+		RequestColumnModel.SortOrder Convert(ColumnRequestModel.SortOrder type)
 		{
 			return type switch
 					{
-						BaseColumnRequestModel.SortOrder.Ascending => SortOrder.Ascending,
-						BaseColumnRequestModel.SortOrder.Descending => SortOrder.Descending,
-						_ => SortOrder.Undefined,
+						ColumnRequestModel.SortOrder.Ascending => RequestColumnModel.SortOrder.Ascending,
+						ColumnRequestModel.SortOrder.Descending => RequestColumnModel.SortOrder.Descending,
+						_ => RequestColumnModel.SortOrder.Undefined,
 					};
 		}
 	}
@@ -67,7 +54,7 @@ internal abstract class RequestColumnBaseModel
 	/// <summary>
 	///		Modo de ordenación
 	/// </summary>
-	internal SortOrder OrderBy { get; set; }
+	internal RequestColumnModel.SortOrder OrderBy { get; set; }
 
 	/// <summary>
 	///		Filtro para la cláusula WHERE

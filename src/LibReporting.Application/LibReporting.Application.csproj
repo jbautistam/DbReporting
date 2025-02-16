@@ -8,6 +8,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="Controllers\Queries\Models\QueryForeignKeyCollection.cs" />
+		<Compile Remove="Controllers\Queries\Models\QueryForeignKeyModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableColumnModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableNameModel.cs" />
@@ -25,12 +27,15 @@
 		<Compile Remove="Controllers\Queries\ReportQueryGenerator_Old.cs" />
 		<Compile Remove="Controllers\ReportController.cs" />
 		<Compile Remove="Controllers\Request\Models\ReportRequestModel.cs" />
-		<Compile Remove="Controllers\Request\Models\RequestColumnModel.cs" />
+		<Compile Remove="Controllers\Request\Models\RequestColumnBaseModel.cs" />
+		<Compile Remove="Controllers\Request\Models\RequestDataSourceColumnModel.cs" />
+		<Compile Remove="Controllers\Request\Models\RequestDimensionColumnModel.cs" />
+		<Compile Remove="Controllers\Request\Models\RequestExpressionModel.cs" />
 		<Compile Remove="Controllers\Request\ReportRequestController.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Bau.Libraries.LibHelper" Version="1.1.33" />
+	  <PackageReference Include="Bau.Libraries.LibHelper" Version="1.1.37" />
 	</ItemGroup>
 
 	<ItemGroup>

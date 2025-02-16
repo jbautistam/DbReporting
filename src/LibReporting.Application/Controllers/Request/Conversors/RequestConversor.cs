@@ -23,7 +23,7 @@ internal class RequestConversor
 
 			// Convierte los datos
 			converted.Dimensions.AddRange(request.Dimensions);
-			converted.DataSourceColumns.AddRange(request.DataSources);
+			converted.DataSources.AddRange(request.DataSources);
 			converted.Expressions.AddRange(request.Expressions);
 			converted.Parameters.AddRange(request.Parameters);
 			// Asigna la paginación

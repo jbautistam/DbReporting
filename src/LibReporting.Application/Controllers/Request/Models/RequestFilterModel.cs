@@ -36,6 +36,11 @@ internal class RequestFilterModel
 	internal ConditionType Condition { get; set; }
 
 	/// <summary>
+	///		Modo de agregación (para los HAVING)
+	/// </summary>
+	public RequestColumnModel.AggregationType AggregatedBy { get; set; }
+
+	/// <summary>
 	///		Valores del filtro
 	/// </summary>
 	internal List<object?> Values { get; } = [];

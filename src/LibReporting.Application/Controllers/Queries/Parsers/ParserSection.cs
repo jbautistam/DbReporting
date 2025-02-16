@@ -24,11 +24,11 @@ internal class ParserSection
 	private const string HeaderSubquery = "Subquery";
 	private const string HeaderGroupBy = "GroupBy";
 	private const string HeaderHaving = "Having";
-	private const string HeaderPagination = "Pagination";
 	private const string HeaderIfRequest = "IfRequest";
 	private const string HeaderPartitionBy = "PartitionBy";
 	private const string HeaderWithComma = "WithComma";
 	private const string HeaderTable = "Table";
+	private const string HeaderField = "Field";
 	private const string HeaderAlias = "Alias";
 	private const string HeaderOnRequestFields = "OnRequestFields";
 	private const string HeaderWithRequestedFields = "WithRequestedFields";
@@ -38,7 +38,6 @@ internal class ParserSection
 	private const string HeaderRequired = "Required";
 	private const string HeaderCheckIfNull = "CheckIfNull";
 	private const string HeaderWhenRequestTotals = "WhenRequestTotals";
-	private const string HeaderDefault = "Default";
 	private const string HeaderDataSource = "DataSource";
 	private const string HeaderOperator = "Operator";
 	private const string HeaderAggregation = "Aggregation";
@@ -111,8 +110,6 @@ internal class ParserSection
 						sections.Add(ParseHaving(block));
 					else if (block.HasHeader(HeaderOrderBy))
 						sections.Add(ParseOrderBy(block));
-					else if (block.HasHeader(HeaderPagination))
-						sections.Add(new ParserPaginationSectionModel());
 					else if (block.HasHeader(HeaderIfRequest))
 						sections.Add(ParseIfRequestExpression(block));
 					else if (block.HasHeader(HeaderPartitionBy))
@@ -289,15 +286,14 @@ internal class ParserSection
 	/// </summary>
 	private ParserExpressionModel ParseExpression(BlockInfo block)
 	{
-		ParserExpressionModel expression = new()
-											{
-												Expression = block.Content.TrimIgnoreNull()
-											};
+		ParserExpressionModel expression = new(block.Content.TrimIgnoreNull());
 
 			// Interpreta los bloques hijo
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderTable))
 					expression.Table = child.Content.TrimIgnoreNull();
+				else if (child.HasHeader(HeaderField))
+					expression.Field = child.Content.TrimIgnoreNull();
 				else if (child.HasHeader(HeaderAggregation))
 					expression.Aggregation = child.Content.TrimIgnoreNull();
 			// Devuelve los datos de la expresión
@@ -350,10 +346,10 @@ internal class ParserSection
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderDimension))
 					section.Dimensions.Add(ParseDimension(child));
+				else if (child.HasHeader(HeaderExpression))
+					section.Expressions.Add(ParseExpression(child));
 				else if (child.HasHeader(HeaderSql))
 					section.Sql = child.GetChildsContent();
-				else if (child.HasHeader(HeaderRequired))
-					section.Required = child.GetBooleanValue();
 			// Devuelve la cláusula
 			return section;
 	}
@@ -382,9 +378,9 @@ internal class ParserSection
 	/// <summary>
 	///		Interpreta los datos de una expresión asociada a una sentencia IfRequest
 	/// </summary>
-	private ParserIfRequestExpressionSectionModel ParseRequestExpression(BlockInfo block)
+	private ParserIfRequestSectionExpressionModel ParseRequestExpression(BlockInfo block)
 	{
-		ParserIfRequestExpressionSectionModel section = new();
+		ParserIfRequestSectionExpressionModel section = new();
 
 			// Añade las claves de expresión
 			section.AddExpressions(block.Content);

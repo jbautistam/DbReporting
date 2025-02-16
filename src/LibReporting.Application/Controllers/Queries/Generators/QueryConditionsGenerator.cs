@@ -78,18 +78,20 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 	{
 		string sql = string.Empty;
 
+/*
 			// Añade las consultas del origen de datos
 			foreach (ParserDataSourceModel parserDataSource in dataSources)
 			{
 				BaseDataSourceModel? dataSource = Manager.Request.Report.DataWarehouse.DataSources[parserDataSource.DataSourceKey];
 
 					if (dataSource is not null)
-						foreach (RequestDataSourceColumnModel requestColumn in Manager.Request.DataSourceColumns.GetRequestedColumns(dataSource))
+						foreach (RequestColumnModel requestColumn in Manager.Request.GetHashCode.GetRequestedColumns(dataSource))
 							if (requestColumn.FiltersWhere.Count > 0)
 								sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserDataSource.Table, requestColumn.Column.Id, 
 																									  requestColumn.FiltersWhere), 
 															" AND ");
 			}
+*/
 			// Devuelve la cadena SQL
 			return sql;
 	}
@@ -104,12 +106,11 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 			// Obtiene las comparaciones de los campos
 			foreach (ParserExpressionModel parserExpression in expressions)
 			{
-				RequestExpressionModel? column = Manager.Request.Expressions.GetRequested(parserExpression.Expression);
+				RequestColumnModel? column = Manager.Request.Expressions.GetRequested(parserExpression.Expression);
 
 					// Añade las condiciones del HAVING
 					if (column is not null)
-						sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserExpression.Table, column.ExpressionId, 
-																							  parserExpression.Aggregation), 
+						sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserExpression.Table, column.Id, parserExpression.Aggregation), 
 												   " AND ");
 			}
 			// Devuelve la cadena SQL

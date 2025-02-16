@@ -7,9 +7,9 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// </summary>
 internal class RequestDimensionColumnModel : RequestColumnBaseModel
 {
-	internal RequestDimensionColumnModel(DataSourceColumnModel column, bool requestedByUser) : base(column) 
+	internal RequestDimensionColumnModel(DataSourceColumnModel column) : base(column) 
 	{
-		RequestedByUser = requestedByUser;
+		//RequestedByUser = requestedByUser;
 	}
 
 	/// <summary>

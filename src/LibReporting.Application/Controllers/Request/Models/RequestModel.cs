@@ -13,7 +13,7 @@ internal class RequestModel
 		Manager = manager;
 		Report = report;
 		// Inicializa las colecciones
-		DataSourceColumns = new RequestDataSourceColumnCollectionModel(this);
+		DataSources = new RequestDataSourceCollectionModel(this);
 		Dimensions = new RequestDimensionCollectionModel(this);
 		Parameters = new RequestParameterCollectionModel(this);
 	}
@@ -46,7 +46,7 @@ internal class RequestModel
 	/// <summary>
 	///		Solicitudes de orígenes de datos
 	/// </summary>
-	public RequestDataSourceColumnCollectionModel DataSourceColumns { get; }
+	public RequestDataSourceCollectionModel DataSources { get; }
 
 	/// <summary>
 	///		Paginación

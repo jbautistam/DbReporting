@@ -1,6 +1,4 @@
-﻿using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
-using Bau.Libraries.LibReporting.Models.Base;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
+﻿using Bau.Libraries.LibReporting.Models.DataWarehouses.DataSets;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Relations;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
@@ -24,13 +22,8 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 	internal void AddRange(List<DimensionRequestModel> requestDimensions)
 	{
 		foreach (DimensionRequestModel requestDimension in requestDimensions)
-			foreach (DimensionColumnRequestModel requestColumn in requestDimension.Columns)
-			{
-				RequestDimensionColumnModel dimensionColumn = Add(requestDimension.DimensionId, requestColumn.ColumnId, true);
-
-					// Asigna los datos de la columna solicitada
-					dimensionColumn.AssignColumnRequestData(requestColumn);
-			}
+			foreach (ColumnRequestModel requestColumn in requestDimension.Columns)
+				Add(requestDimension.DimensionId, new RequestColumnModel(requestColumn));
 	}
 
 	/// <summary>
@@ -42,7 +35,8 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 		foreach (ReportRequestDimension fixedRequest in Request.Report.RequestDimensions)
 			if (fixedRequest.Required || CheckIsRequestedAnyField(Request, fixedRequest))
 				foreach (ReportRequestDimensionField field in fixedRequest.Fields)
-					Request.Dimensions.Add(fixedRequest.DimensionKey, field.Field, false);
+					Request.Dimensions.Add(fixedRequest.DimensionKey,
+										   new RequestColumnModel(new ColumnRequestModel(field.Field)));
 
 		// Comprueba si se ha solicitado alguno de los campos considerados como obligatorios
 		bool CheckIsRequestedAnyField(RequestModel reportRequest, ReportRequestDimension fixedRequest)
@@ -62,7 +56,7 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 	/// <summary>
 	///		Añade una dimensión y columna a la lista
 	/// </summary>
-	private RequestDimensionColumnModel Add(string dimensionId, string columnId, bool requestByUser)
+	private RequestColumnModel Add(string dimensionId, RequestColumnModel requestColumn)
 	{
 		BaseDimensionModel? dimension = Request.Report.DataWarehouse.Dimensions[dimensionId];
 
@@ -70,14 +64,13 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 				throw new Exceptions.ReportingParserException($"Can't find the dimension {dimensionId}");
 			else
 			{
-				DataSourceColumnModel? column = dimension.GetColumn(columnId, false);
+				DataSourceColumnModel? column = dimension.GetColumn(requestColumn.Id, false);
 
 					if (column is null)
-						throw new Exceptions.ReportingParserException($"Can't find the column {columnId} at dimension {dimension.Id}");
+						throw new Exceptions.ReportingParserException($"Can't find the column {requestColumn.Id} at dimension {dimension.Id}");
 					else
 					{
 						RequestDimensionModel? convertedDimension = Search(dimension.Id);
-						RequestDimensionColumnModel requestColumn = new(column, requestByUser);
 
 							// Añade la dimensión si no estaba ya en la lista
 							if (convertedDimension is null)
@@ -163,65 +156,6 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 						isRelated = IsRelatedDimensionRequested(relation.Dimension.Id);
 			// Devuelve el valor que indica si alguna de las dimensiones relacionadas se ha solicitado
 			return isRelated;
-	}
-
-/*
-	/// <summary>
-	///		Obtiene los campos solicitados para una dimensión
-	/// </summary>
-	internal QueryTableModel? GetRequestedTable(string table, string alias, string dimensionKey, bool includePrimaryKeys, bool includeRequestFields)
-	{
-		List<DataSourceColumnModel>? columns = GetRequestedFields(dimensionKey, includePrimaryKeys, includeRequestFields);
-
-			if (columns is null)
-				return null;
-			else
-			{
-				QueryTableModel queryTable = new(table, alias);
-
-					// Añade las columnas
-					foreach (DataSourceColumnModel column in columns)
-						queryTable.AddColumn(column.IsPrimaryKey, column.Id, column.Alias, column.Type);
-					// Devuelve la tabla generada
-					return queryTable;
-			}
-	}
-*/
-
-	/// <summary>
-	///		Obtiene los campos solicitados para una dimensión
-	/// </summary>
-	private List<DataSourceColumnModel>? GetRequestedFields(string dimensionKey, bool includePrimaryKeys, bool includeRequestFields)
-	{
-		RequestDimensionModel? dimensionRequest = GetRequested(dimensionKey);
-
-			if (dimensionRequest is not null)
-				return GetRequestedFields(dimensionRequest, includePrimaryKeys, includeRequestFields);
-			else
-				return null;
-	}
-
-	/// <summary>
-	///		Obtiene los campos solicitados para una dimensión
-	/// </summary>
-	private List<DataSourceColumnModel> GetRequestedFields(RequestDimensionModel dimensionRequest, bool includePrimaryKeys, bool includeRequestFields)
-	{
-		BaseDimensionModel dimension = dimensionRequest.Dimension;
-		BaseReportingDictionaryModel<DataSourceColumnModel> dimensionColumns = dimension.GetColumns();
-		List<DataSourceColumnModel> columns = [];
-
-			// Añade los campos clave
-			if (includePrimaryKeys)
-				foreach (DataSourceColumnModel column in dimensionColumns.EnumerateValues())
-					if (column.IsPrimaryKey)
-						columns.Add(column);
-			// Asigna los campos
-			if (includeRequestFields)
-				foreach (RequestDimensionColumnModel columnRequest in dimensionRequest.Columns)
-					if (!columnRequest.Column.IsPrimaryKey)
-						columns.Add(columnRequest.Column);
-			// Devuelve las columnas
-			return columns;
 	}
 
 	/// <summary>

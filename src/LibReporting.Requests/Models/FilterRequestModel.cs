@@ -31,26 +31,14 @@ public class FilterRequestModel
 	}
 
 	/// <summary>
-	///		Clona un filtro
-	/// </summary>
-	public FilterRequestModel Clone()
-	{
-		FilterRequestModel cloned =	new()
-										{
-											Condition = Condition
-										};
-
-			// Copia los valores
-			foreach (object? value in Values)
-				cloned.Values.Add(value);
-			// Devuelve el objeto clonado
-			return cloned;
-	}
-
-	/// <summary>
 	///		Condición que se debe utilizar
 	/// </summary>
 	public ConditionType Condition { get; set; }
+
+	/// <summary>
+	///		Modo de agregación (para los HAVING)
+	/// </summary>
+	public ColumnRequestModel.AggregationType AggregatedBy { get; set; }
 
 	/// <summary>
 	///		Valores del filtro

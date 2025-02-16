@@ -23,19 +23,6 @@ public class ParameterRequestModel
 	}
 
 	/// <summary>
-	///		Clona los datos de un parámetro
-	/// </summary>
-	public ParameterRequestModel Clone()
-	{
-		return new ParameterRequestModel
-						{
-							Key = Key,
-							Type = Type,
-							Value = Value
-						};
-	}
-
-	/// <summary>
 	///		Clave del parámetro
 	/// </summary>
 	public string Key { get; set; } = default!;

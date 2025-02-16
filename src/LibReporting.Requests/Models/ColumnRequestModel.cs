@@ -1,9 +1,9 @@
 ﻿namespace Bau.Libraries.LibReporting.Requests.Models;
 
 /// <summary>
-///		Clase base para las columnas
+///		Datos de solicitud de una columna
 /// </summary>
-public abstract class BaseColumnRequestModel
+public class ColumnRequestModel
 {
 	/// <summary>
 	///		Modo de ordenación
@@ -19,26 +19,43 @@ public abstract class BaseColumnRequestModel
 	}
 
 	/// <summary>
-	///		Copia los datos base en un objeto clonado
+	///		Modo de agregación por esta columna
 	/// </summary>
-	protected void CopyBase(BaseColumnRequestModel cloned)
+	public enum AggregationType
 	{
-		// Copoia los datos básicos
-		cloned.Visible = Visible;
-		cloned.OrderIndex = OrderIndex;
-		cloned.OrderBy = OrderBy;
-		// Copia los filtros del WHERE
-		foreach (FilterRequestModel filter in FiltersWhere)
-			cloned.FiltersWhere.Add(filter.Clone());
-		// Copia los filtros del HAVING
-		foreach (FilterRequestModel filter in FiltersHaving)
-			cloned.FiltersHaving.Add(filter.Clone());
+		/// <summary>Sin agregación</summary>
+		NoAggregated,
+		/// <summary>Suma</summary>
+		Sum,
+		/// <summary>Valor máximo</summary>
+		Max,
+		/// <summary>Valor mínimo</summary>
+		Min,
+		/// <summary>Media</summary>
+		Average,
+		/// <summary>Desviación estándar</summary>
+		StandardDeviation
 	}
+
+	public ColumnRequestModel(string id)
+	{
+		Id = id;
+	}
+
+	/// <summary>
+	///		Código de columna
+	/// </summary>
+	public string Id { get; }
 
 	/// <summary>
 	///		Indica si esta columna es visible en la consulta final o sólo para los filtros
 	/// </summary>
 	public bool Visible { get; set; } = true;
+
+	/// <summary>
+	///		Modo de agregación
+	/// </summary>
+	public AggregationType AggregatedBy { get; set; }
 
 	/// <summary>
 	///		Indice para la ordenación del campo

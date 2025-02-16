@@ -36,7 +36,7 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la SQL de una lista de expresiones
 	/// </summary>
-	private string GetSql(List<ParserIfRequestExpressionSectionModel> expressions, RequestModel request)
+	private string GetSql(List<ParserIfRequestSectionExpressionModel> expressions, RequestModel request)
 	{
 		string sql = string.Empty;
 
@@ -44,7 +44,7 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 			if (expressions.Count == 0 && !request.Pagination.IsRequestedTotals())
 				throw new Exceptions.ReportingParserException("IfRequest hasn't expression keys");
 			else
-				foreach (ParserIfRequestExpressionSectionModel sectionExpression in expressions)
+				foreach (ParserIfRequestSectionExpressionModel sectionExpression in expressions)
 					if (Manager.Request.Expressions.IsRequested(sectionExpression.Expressions))
 						if (!string.IsNullOrWhiteSpace(sectionExpression.Sql))
 							sql = sql.AddWithSeparator(sectionExpression.Sql.TrimIgnoreNull(), "," + Environment.NewLine);

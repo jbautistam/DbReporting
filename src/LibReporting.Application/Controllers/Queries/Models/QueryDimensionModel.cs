@@ -40,9 +40,7 @@ internal class QueryDimensionModel
 
 						// Añade el campo adicional si no estaba ya en la consulta
 						if (!ExistsField(table, field.Alias))
-							Fields.Add(new QueryFieldModel(this, true, Dimension.GetTableAlias(), field.Field, field.Alias, 
-														   RequestColumnBaseModel.SortOrder.Undefined, 0,
-														   RequestDataSourceColumnModel.AggregationType.NoAggregated, true));
+							Fields.Add(new QueryFieldModel(this, true, Dimension.GetTableAlias(), field.Field, field.Alias, true));
 				}
 	}
 
@@ -64,12 +62,14 @@ internal class QueryDimensionModel
 		// Busca las solicitudes de esta dimensión
 		foreach (RequestDimensionModel requestDimension in request.Dimensions)
 			if (requestDimension.Dimension.Id.Equals(dimension.Id, StringComparison.CurrentCultureIgnoreCase))
-				foreach (RequestDimensionColumnModel columnRequest in requestDimension.Columns)
+				foreach (RequestColumnModel columnRequest in requestDimension.Columns)
 				{
-					DataSourceColumnModel? column = columnRequest.Column;
+					DataSourceColumnModel? column = dimension.GetColumn(columnRequest.Id, false);
 
-						if (column.IsPrimaryKey)
-							AddPrimaryKey(columnRequest, columnRequest.Column.Id, columnRequest.Column.Alias, columnRequest.Column.Visible);
+						if (column is null)
+							throw new Exceptions.ReportingParserException($"Can't find the column {columnRequest.Id} at dimension {requestDimension.Dimension.Id}");
+						else if (column.IsPrimaryKey)
+							AddPrimaryKey(columnRequest, column.Id, column.Alias, column.Visible);
 						else
 							AddColumn(column.Id, column.Alias, columnRequest);
 				}
@@ -88,11 +88,11 @@ internal class QueryDimensionModel
 					// Añade la consulta hija si tiene alguna subconsulta o si alguno de sus campos solicitados no es una clave primaria
 					if (childQuery.Joins.Count > 0 || childQuery.HasFieldsNoPrimaryKey())
 					{
-						QueryJoinModel join = new(QueryJoinModel.JoinType.Inner, childQuery, $"child_{childQuery.Alias}");
+						QueryDimensionJoinModel join = new(QueryDimensionJoinModel.JoinType.Inner, childQuery, $"child_{childQuery.Alias}");
 
 							// Asigna las relaciones
 							foreach (RelationForeignKey foreignKey in relation.ForeignKeys)
-								join.Relations.Add(new QueryRelationModel(foreignKey.ColumnId, childQuery.FromAlias, foreignKey.TargetColumnId));
+								join.Relations.Add(new QueryDimensionRelationModel(foreignKey.ColumnId, childQuery.FromAlias, foreignKey.TargetColumnId));
 							// Añade la unión
 							Joins.Add(join);
 					}
@@ -102,10 +102,9 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Añade un campo de clave primaria a la consulta
 	/// </summary>
-	internal void AddPrimaryKey(RequestColumnBaseModel? requestColumn, string columnId, string columnAlias, bool visible)
+	internal void AddPrimaryKey(RequestColumnModel? requestColumn, string columnId, string columnAlias, bool visible)
 	{
-		QueryFieldModel field = new(this, true, FromAlias, columnId, columnAlias, RequestColumnBaseModel.SortOrder.Undefined, 0,
-									RequestDataSourceColumnModel.AggregationType.NoAggregated, visible);
+		QueryFieldModel field = new(this, true, FromAlias, columnId, columnAlias, visible);
 
 			// Añade los filtros
 			if (requestColumn is not null)
@@ -117,18 +116,9 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Añade un campo a la consulta
 	/// </summary>
-	internal void AddColumn(string columnId, string columnAlias, RequestColumnBaseModel requestColumn)
+	internal void AddColumn(string columnId, string columnAlias, RequestColumnModel requestColumn)
 	{
-		AddColumn(columnId, columnAlias, RequestDataSourceColumnModel.AggregationType.NoAggregated, requestColumn);
-	}
-
-	/// <summary>
-	///		Añade un campo a la consulta
-	/// </summary>
-	internal void AddColumn(string columnId, string columnAlias, RequestDataSourceColumnModel.AggregationType aggregatedBy, 
-							RequestColumnBaseModel requestColumn)
-	{
-		QueryFieldModel field = GetQueryField(columnId, columnAlias, aggregatedBy, requestColumn);
+		QueryFieldModel field = GetQueryField(columnId, columnAlias, requestColumn);
 
 			// Añade los filtros
 			field.FiltersWhere.AddRange(GetFilters(requestColumn.FiltersWhere));
@@ -140,15 +130,13 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Obtiene el campo de la consulta
 	/// </summary>
-	private QueryFieldModel GetQueryField(string columnId, string columnAlias, RequestDataSourceColumnModel.AggregationType aggregatedBy, 
-										  RequestColumnBaseModel requestColumn)
+	private QueryFieldModel GetQueryField(string columnId, string columnAlias, RequestColumnModel requestColumn)
 	{
 		QueryFieldModel? field = Fields.FirstOrDefault(item => item.Field.Equals(columnId, StringComparison.CurrentCultureIgnoreCase));
 
 			// Si no existía, lo añade
 			if (field is null)
-				field = new QueryFieldModel(this, false, FromAlias, columnId, columnAlias, requestColumn.OrderBy, 
-											requestColumn.OrderIndex, aggregatedBy, requestColumn.Visible);
+				field = new QueryFieldModel(this, false, FromAlias, columnId, columnAlias, requestColumn.Visible);
 			// Devuelve el campo
 			return field;
 	}
@@ -198,7 +186,7 @@ internal class QueryDimensionModel
 			if (Joins.Count > 0)
 			{
 				prettifier.NewLine();
-				prettifier.Append(GetSqlJoins());
+				prettifier.Append(GetSqlJoins(FromAlias, Joins));
 			}
 			prettifier.Unindent();
 			prettifier.NewLine();
@@ -207,16 +195,16 @@ internal class QueryDimensionModel
 			prettifier.Append(GetSqlWhere());
 			prettifier.Unindent();
 			prettifier.NewLine();
-			// Añade los GROUP BY
-			prettifier.Indent();
-			prettifier.Append(GetSqlGroupBy(), 100, ",");
-			prettifier.Unindent();
-			prettifier.NewLine();
-			// Añade los HAVING
-			prettifier.Indent();
-			prettifier.Append(GetSqlHaving());
-			prettifier.Unindent();
-			prettifier.NewLine();
+			//// Añade los GROUP BY
+			//prettifier.Indent();
+			//prettifier.Append(GetSqlGroupBy(), 100, ",");
+			//prettifier.Unindent();
+			//prettifier.NewLine();
+			//// Añade los HAVING
+			//prettifier.Indent();
+			//prettifier.Append(GetSqlHaving());
+			//prettifier.Unindent();
+			//prettifier.NewLine();
 			// Devuelve la consulta SQL
 			return prettifier.ToString();
 	}
@@ -235,14 +223,10 @@ internal class QueryDimensionModel
 					sql = sql.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos
 			foreach (QueryFieldModel field in Fields)
-				if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
+				if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestColumnModel.AggregationType.NoAggregated)
 					sql = sql.AddWithSeparator(GetSqlField(field), ",");
 			// Añade los campos (no clave) de los JOIN hijo (dimensiones hija) que no estén agregados
 			sql = sql.AddWithSeparator(GetSqlFields(Joins), ",");
-			// Añade los campos agrupados
-			foreach (QueryFieldModel field in Fields)
-				if (field.Aggregation != RequestDataSourceColumnModel.AggregationType.NoAggregated)
-					sql = sql.AddWithSeparator($"{field.GetAggregation(FromAlias)} AS {Generator.SqlTools.GetFieldName(field.Alias)}", ",");
 			// Devuelve los campos
 			return sql;
 	}
@@ -250,16 +234,16 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Obtiene la cadena SQL de los campos de tablas relacionadas
 	/// </summary>
-	private string GetSqlFields(List<QueryJoinModel> joins)
+	private string GetSqlFields(List<QueryDimensionJoinModel> joins)
 	{
 		string sql = string.Empty;
 
 			// Añade los campos
-			foreach (QueryJoinModel join in joins)
+			foreach (QueryDimensionJoinModel join in joins)
 			{
 				// Añade los campos de la consulta relacionada
 				foreach (QueryFieldModel field in join.Query.Fields)
-					if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated)
+					if (!field.IsPrimaryKey && field.Visible && field.Aggregation == RequestColumnModel.AggregationType.NoAggregated)
 						sql = sql.AddWithSeparator(GetSqlField(field), ",");
 				// Añade los campos de las relaciones hija
 				sql = sql.AddWithSeparator(GetSqlFields(join.Query.Joins), ",");
@@ -312,20 +296,6 @@ internal class QueryDimensionModel
 	}
 
 	/// <summary>
-	///		Obtiene la cadena SQL de la condición WHERE
-	/// </summary>
-	private string GetSqlHaving()
-	{
-		string sql = GetSqlFilters(false);
-
-			// Añade la cláusula HAVING si es necesario
-			if (!string.IsNullOrWhiteSpace(sql))
-				sql = $" HAVING {sql}";
-			// Devuelve el filtro
-			return sql;
-	}
-
-	/// <summary>
 	///		Obtiene la cadena SQL de los filtros y de sus hijos
 	/// </summary>
 	private string GetSqlFilters(bool where)
@@ -337,10 +307,10 @@ internal class QueryDimensionModel
 				foreach (QueryFilterModel filter in where ? field.FiltersWhere : field.FilterHaving)
 					if (where)
 						sql = sql.AddWithSeparator(filter.GetSql(FromAlias, field.Field), Environment.NewLine + "AND");
-					else // ... si estamos en un having, la condición es por el agregado
-						sql = sql.AddWithSeparator(filter.GetSql(field.GetAggregation(FromAlias)), Environment.NewLine + "AND");
+					//else // ... si estamos en un having, la condición es por el agregado
+					//	sql = sql.AddWithSeparator(filter.GetSql(field.GetAggregation(FromAlias)), Environment.NewLine + "AND");
 			// Añade los filtros de las consulta con JOIN
-			foreach (QueryJoinModel join in Joins)
+			foreach (QueryDimensionJoinModel join in Joins)
 			{
 				string sqlFilter = join.Query.GetSqlFilters(where);
 
@@ -354,12 +324,12 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Obtiene la SQL de consulta de los JOIN
 	/// </summary>
-	private string GetSqlJoins()
+	private string GetSqlJoins(string parentTable, List<QueryDimensionJoinModel> joins)
 	{
 		string sql = string.Empty;
 
 			// Añade las consultas para los JOIN
-			foreach (QueryJoinModel join in Joins)
+			foreach (QueryDimensionJoinModel join in joins)
 			{
 				bool needAnd = false;
 
@@ -369,7 +339,7 @@ internal class QueryDimensionModel
 					sql += $" {join.Query.FromTable} AS {Generator.SqlTools.GetFieldName(join.Query.FromAlias)}" + Environment.NewLine;
 					// Añade las relaciones
 					sql += " ON ";
-					foreach (QueryRelationModel relation in join.Relations)
+					foreach (QueryDimensionRelationModel relation in join.Relations)
 					{
 						// Añade el operador AND si es necesario
 						if (needAnd)
@@ -377,8 +347,11 @@ internal class QueryDimensionModel
 						else
 							needAnd = true;
 						// Añade la condición entre campos
-						sql += Generator.SqlTools.GetFieldName(FromAlias, relation.Column) + " = " + Generator.SqlTools.GetFieldName(relation.RelatedTable, relation.RelatedColumn) + Environment.NewLine;
+						sql += Generator.SqlTools.GetFieldName(parentTable, relation.Column) + " = " + 
+									Generator.SqlTools.GetFieldName(relation.RelatedTable, relation.RelatedColumn) + Environment.NewLine;
 					}
+					// Añade las consultas para los join hijos
+					sql = sql.AddWithSeparator(GetSqlJoins(join.Query.FromAlias, join.Query.Joins), Environment.NewLine);
 			}
 			// Devuelve la consulta
 			return sql;
@@ -387,84 +360,52 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Obtiene la cláusula adecuada para el JOIN
 	/// </summary>
-	private string GetJoin(QueryJoinModel.JoinType type)
+	private string GetJoin(QueryDimensionJoinModel.JoinType type)
 	{
 		return type switch
 				{
-					QueryJoinModel.JoinType.Left => "LEFT JOIN",
-					QueryJoinModel.JoinType.Right => "RIGHT JOIN",
-					QueryJoinModel.JoinType.Full => "FULL OUTER JOIN",
-					QueryJoinModel.JoinType.Cross => "CROSS JOIN",
+					QueryDimensionJoinModel.JoinType.Left => "LEFT JOIN",
+					QueryDimensionJoinModel.JoinType.Right => "RIGHT JOIN",
+					QueryDimensionJoinModel.JoinType.Full => "FULL OUTER JOIN",
+					QueryDimensionJoinModel.JoinType.Cross => "CROSS JOIN",
 					_ => "INNER JOIN"
 				};
 	}
 
-	/// <summary>
-	///		Obtiene la cadena de agrupación
-	/// </summary>
-	private string GetSqlGroupBy()
-	{
-		string sqlFields = string.Empty;
+	///// <summary>
+	/////		Obtiene la cadena de agrupación
+	///// </summary>
+	//private string GetSqlGroupBy()
+	//{
+	//	string sqlFields = string.Empty;
 
-			// Sólo tiene GROUP BY cuando hay algún campo agregado
-			if (NeedGroupBy())
-			{
-				// Añade los campos de agrupación
-				foreach (QueryFieldModel field in Fields)
-					if (field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated && field.Visible)
-						sqlFields = sqlFields.AddWithSeparator(Generator.SqlTools.GetFieldName(field.Table, field.Field), ",");
-				// Si hay algún campo de agrupación, le añade la cláusula
-				if (!string.IsNullOrWhiteSpace(sqlFields))
-					sqlFields = $"GROUP BY {sqlFields}" + Environment.NewLine;
-			}
-			// Devuelve la cadena de agrupación
-			return sqlFields;
-	}
+	//		// Sólo tiene GROUP BY cuando hay algún campo agregado
+	//		if (NeedGroupBy())
+	//		{
+	//			// Añade los campos de agrupación
+	//			foreach (QueryFieldModel field in Fields)
+	//				if (field.Aggregation == RequestDataSourceColumnModel.AggregationType.NoAggregated && field.Visible)
+	//					sqlFields = sqlFields.AddWithSeparator(Generator.SqlTools.GetFieldName(field.Table, field.Field), ",");
+	//			// Si hay algún campo de agrupación, le añade la cláusula
+	//			if (!string.IsNullOrWhiteSpace(sqlFields))
+	//				sqlFields = $"GROUP BY {sqlFields}" + Environment.NewLine;
+	//		}
+	//		// Devuelve la cadena de agrupación
+	//		return sqlFields;
+	//}
 
-	/// <summary>
-	///		Comprueba si necesita una cláusula GROUP BY: si hay algún agregado
-	/// </summary>
-	private bool NeedGroupBy()
-	{
-		// Recorre los campos buscando si hay algún agregado
-		foreach (QueryFieldModel field in Fields)
-			if (field.Aggregation != RequestDataSourceColumnModel.AggregationType.NoAggregated)
-				return true;
-		// Si ha llegado hasta aquí es porque no hay ningún campo agregado
-		return false;
-	}
-
-	/// <summary>
-	///		Obtiene la cadena de ordenación
-	/// </summary>
-	internal string GetOrderByFields(string? tableAliasAtWith = null)
-	{
-		string sql = string.Empty;
-
-			// Normaliza el nombre del alias de la tabla que
-			if (string.IsNullOrWhiteSpace(tableAliasAtWith))
-				tableAliasAtWith = Alias;
-			// Añade los campos a ordenar
-			foreach (QueryFieldModel field in Fields)
-				if (field.Visible && field.OrderBy != RequestColumnBaseModel.SortOrder.Undefined)
-					sql = sql.AddWithSeparator(Generator.SqlTools.GetFieldName(tableAliasAtWith, field.Alias) + " " + GetSortClause(field.OrderBy), ",");
-			// Añade los campos a ordenar de las consultas hijo
-			foreach (QueryJoinModel join in Joins)
-				sql = sql.AddWithSeparator(join.Query.GetOrderByFields(tableAliasAtWith), ",");
-			// Devuelve la cadena
-			return sql;
-	}
-
-	/// <summary>
-	///		Obtiene la cláusula de ordenación
-	/// </summary>
-	private string GetSortClause(RequestColumnBaseModel.SortOrder orderBy)
-	{
-		if (orderBy == RequestColumnBaseModel.SortOrder.Ascending)
-			return "ASC";
-		else
-			return "DESC";
-	}
+	///// <summary>
+	/////		Comprueba si necesita una cláusula GROUP BY: si hay algún agregado
+	///// </summary>
+	//private bool NeedGroupBy()
+	//{
+	//	// Recorre los campos buscando si hay algún agregado
+	//	foreach (QueryFieldModel field in Fields)
+	//		if (field.Aggregation != RequestDataSourceColumnModel.AggregationType.NoAggregated)
+	//			return true;
+	//	// Si ha llegado hasta aquí es porque no hay ningún campo agregado
+	//	return false;
+	//}
 
 	/// <summary>
 	///		Comprueba si hay algún campo que no sea clave primaria
@@ -517,10 +458,5 @@ internal class QueryDimensionModel
 	/// <summary>
 	///		Subconsultas combinadas
 	/// </summary>
-	internal QueryJoinsCollection Joins { get; } = [];
-
-	/// <summary>
-	///		Claves foráneas de esta consulta
-	/// </summary>
-	internal QueryForeignKeyCollection ForeignKeys { get; } = [];
+	internal QueryDimensionJoinCollectionModel Joins { get; } = [];
 }

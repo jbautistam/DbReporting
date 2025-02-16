@@ -16,7 +16,7 @@ internal class ParserIfRequestSectionModel : ParserBaseSectionModel
 	/// <summary>
 	///     Expresiones solicitadas
 	/// </summary>
-	internal List<ParserIfRequestExpressionSectionModel> Expressions { get; } = [];
+	internal List<ParserIfRequestSectionExpressionModel> Expressions { get; } = [];
 
     /// <summary>
     ///     Indica si se debe añadir esta sección cuando se consultan totales

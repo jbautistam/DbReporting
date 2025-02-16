@@ -4,7 +4,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 /// <summary>
 ///		Modelo de interpretación de una expresión
 /// </summary>
-internal class ParserIfRequestExpressionSectionModel : ParserBaseSectionModel
+internal class ParserIfRequestSectionExpressionModel : ParserBaseSectionModel
 {
     /// <summary>
     ///     Añade las expresiones

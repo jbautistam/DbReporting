@@ -3,17 +3,18 @@
 namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 
 /// <summary>
-///		Clase con una colección de <see cref="RequestExpressionModel"/>
+///		Clase con una colección de <see cref="RequestColumnModel"/> para las solicitudes de expresiones
 /// </summary>
-internal class RequestExpressionCollectionModel : List<RequestExpressionModel>
+internal class RequestExpressionCollectionModel : List<RequestColumnModel>
 {
 	/// <summary>
 	///		Añade una serie de expresiones solicitadas
 	/// </summary>
-	internal void AddRange(List<ExpressionColumnRequestModel> expressions)
+	internal void AddRange(List<ColumnRequestModel> expressions)
 	{
-		foreach (ExpressionColumnRequestModel requestExpression in expressions)
-			Add(new RequestExpressionModel(requestExpression.ColumnId));
+		foreach (ColumnRequestModel requestExpression in expressions)
+			if (!string.IsNullOrWhiteSpace(requestExpression.Id))
+				Add(new RequestColumnModel(requestExpression));
 	}
 
 	/// <summary>
@@ -38,5 +39,5 @@ internal class RequestExpressionCollectionModel : List<RequestExpressionModel>
 	/// <summary>
 	///		Obtiene la expresión solicitada
 	/// </summary>
-	internal RequestExpressionModel? GetRequested(string id) => this.FirstOrDefault(item => item.ExpressionId.Equals(id, StringComparison.CurrentCultureIgnoreCase));
+	internal RequestColumnModel? GetRequested(string id) => this.FirstOrDefault(item => item.Id.Equals(id, StringComparison.CurrentCultureIgnoreCase));
 }

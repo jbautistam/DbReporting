@@ -165,9 +165,6 @@ internal class ReportQueryGenerator
 					case ParserSubquerySectionModel item:
 							parser.Replace(marker, new Generators.QuerySubqueryGenerator(this, item, queriesBlock).GetSql());
 						break;
-					case ParserPaginationSectionModel item:
-							parser.Replace(marker, new Generators.QueryPaginationGenerator(this, item).GetSql());
-						break;
 					default:
 						throw new ReportingParserException($"Unknown section: {section.GetType().ToString()}");
 				}

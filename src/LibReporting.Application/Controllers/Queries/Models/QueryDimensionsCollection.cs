@@ -31,7 +31,7 @@ internal class QueryDimensionsCollection : List<QueryDimensionModel>
 			foreach (QueryFieldModel field in query.Fields)
 				fields.Add(field);
 			// Añade los campos hijo
-			foreach (QueryJoinModel child in query.Joins)
+			foreach (QueryDimensionJoinModel child in query.Joins)
 				fields.AddRange(GetFieldsRequest(child.Query));
 			// Devuelve los campos
 			return fields;

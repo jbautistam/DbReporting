@@ -5,10 +5,11 @@
 /// </summary>
 /// <example>
 /// -OrderBy 
-///     -Dimension:Users
-///     -Additional
-///         Field2
-///     -Required
+///     -Dimension: Users
+///     -Expression: Expression
+///         --Table: nombre de la tabla
+///         --Field: alias del campo
+///     -Sql
 /// </example>
 internal class ParserOrderBySectionModel : ParserBaseSectionModel
 {
@@ -18,9 +19,9 @@ internal class ParserOrderBySectionModel : ParserBaseSectionModel
     internal List<ParserDimensionModel> Dimensions { get; } = [];
 
     /// <summary>
-    ///     Indica si el ORDER BY es obligatorio (por ejemplo porque tiene paginación)
+    ///     Expresiones asociadas al ORDER BY
     /// </summary>
-    internal bool Required { get; set; }
+    internal List<ParserExpressionModel> Expressions { get; } = [];
 
     /// <summary>
     ///		Sql adicional

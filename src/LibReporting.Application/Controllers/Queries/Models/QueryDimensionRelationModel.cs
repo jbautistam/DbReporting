@@ -3,9 +3,9 @@
 /// <summary>
 ///		Relación de una consulta
 /// </summary>
-internal class QueryRelationModel
+internal class QueryDimensionRelationModel
 {
-	internal QueryRelationModel(string column, string relatedTable, string relatedColumn)
+	internal QueryDimensionRelationModel(string column, string relatedTable, string relatedColumn)
 	{
 		Column = column;
 		RelatedTable = relatedTable;

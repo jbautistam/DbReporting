@@ -7,25 +7,6 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// </summary>
 internal class RequestDataSourceColumnModel : RequestColumnBaseModel
 {
-	/// <summary>
-	///		Modo de agregación por esta columna
-	/// </summary>
-	internal enum AggregationType
-	{
-		/// <summary>Sin agregación</summary>
-		NoAggregated,
-		/// <summary>Suma</summary>
-		Sum,
-		/// <summary>Valor máximo</summary>
-		Max,
-		/// <summary>Valor mínimo</summary>
-		Min,
-		/// <summary>Media</summary>
-		Average,
-		/// <summary>Desviación estándar</summary>
-		StandardDeviation
-	}
-	
 	internal RequestDataSourceColumnModel(DataSourceColumnModel column, AggregationType aggregatedBy) : base(column) 
 	{
 		AggregatedBy = aggregatedBy;

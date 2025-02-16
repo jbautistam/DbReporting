@@ -72,7 +72,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 										request.DataSources.Add(LoadDataSource(nodeML));
 									break;
 								case TagExpression:
-										request.Expressions.AddRange(LoadExpressions(nodeML));
+										request.Expressions.Add(LoadColumn(nodeML));
 									break;
 							}
 					}
@@ -90,33 +90,42 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 			// Añade los atributos de la dimensión
 			dimension.DimensionId = rootML.Attributes[TagId].Value.TrimIgnoreNull();
 			// Carga las columnas hija
-			dimension.Columns.AddRange(LoadDimensionColumns(rootML));
+			dimension.Columns.AddRange(LoadColumns(rootML));
 			// Devuelve los datos
 			return dimension;
 	}
 
 	/// <summary>
-	///		Carga una lista de <see cref="DimensionColumnRequestModel"/>
+	///		Carga una lista de <see cref="ColumnRequestModel"/>
 	/// </summary>
-	private List<DimensionColumnRequestModel> LoadDimensionColumns(MLNode rootML)
+	private List<ColumnRequestModel> LoadColumns(MLNode rootML)
 	{
-		List<DimensionColumnRequestModel> columns = [];
+		List<ColumnRequestModel> columns = [];
 
 			// Carga las columnas
 			foreach (MLNode nodeML in rootML.Nodes)
 				if (nodeML.Name == TagColumn)
-				{
-					DimensionColumnRequestModel column = new();
-
-						// Asigna las propiedades
-						column.ColumnId = nodeML.Attributes[TagId].Value.TrimIgnoreNull();
-						// Asigna las propiedades básicas
-						LoadBaseColumnData(column, nodeML);
-						// Añade la columna
-						columns.Add(column);
-				}
+					columns.Add(LoadColumn(nodeML));
 			// Devuelve la lista
 			return columns;
+	}
+
+	/// <summary>
+	///		Carga los datos de la columna
+	/// </summary>
+	private ColumnRequestModel LoadColumn(MLNode rootML)
+	{
+		ColumnRequestModel column = new(rootML.Attributes[TagId].Value.TrimIgnoreNull());
+
+			// Carga los datos de la columna
+			column.Visible = rootML.Attributes[TagVisible].Value.GetBool();
+			column.OrderIndex = rootML.Attributes[TagOrderIndex].Value.GetInt(0);
+			column.OrderBy = rootML.Attributes[TagOrderBy].Value.GetEnum(ColumnRequestModel.SortOrder.Undefined);
+			// Carga los filtros
+			column.FiltersWhere.AddRange(LoadFilters(TagWhere, rootML));
+			column.FiltersHaving.AddRange(LoadFilters(TagHaving, rootML));
+			// Devuelve la columna
+			return column;
 	}
 
 	/// <summary>
@@ -129,69 +138,9 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 			// Asigna los datos de la expresión
 			dataSource.ReportDataSourceId = rootML.Attributes[TagId].Value.TrimIgnoreNull();
 			// Añade las columnas
-			dataSource.Columns.AddRange(LoadDataSourceColumns(rootML));
+			dataSource.Columns.AddRange(LoadColumns(rootML));
 			// Devuelve los datos
 			return dataSource;
-	}
-
-	/// <summary>
-	///		Carga las columnas de un origen de datos
-	/// </summary>
-	private List<DataSourceColumnRequestModel> LoadDataSourceColumns(MLNode rootML)
-	{
-		List<DataSourceColumnRequestModel> columns = [];
-
-			// Carga las columnas
-			foreach (MLNode nodeML in rootML.Nodes)
-				if (nodeML.Name == TagColumn)
-				{
-					DataSourceColumnRequestModel column = new();
-
-						// Carga las propiedades
-						column.ColumnId = nodeML.Attributes[TagId].Value.TrimIgnoreNull();
-						// Carga los datos básicos
-						LoadBaseColumnData(column, nodeML);
-						// Añade la columna a la colección
-						columns.Add(column);
-				}
-			// Devuelve las columnas
-			return columns;
-	}
-
-	/// <summary>
-	///		Carga las columnas de una expresión
-	/// </summary>
-	private List<ExpressionColumnRequestModel> LoadExpressions(MLNode rootML)
-	{
-		List<ExpressionColumnRequestModel> columns = [];
-
-			// Carga las columnas
-			foreach (MLNode nodeML in rootML.Nodes)
-				if (nodeML.Name == TagColumn)
-				{
-					ExpressionColumnRequestModel column = new();
-
-						// Carga las propiedades
-						column.ColumnId = nodeML.Attributes[TagId].Value.TrimIgnoreNull();
-						// Añade la columna a la colección
-						columns.Add(column);
-				}
-			// Devuelve las columnas
-			return columns;
-	}
-
-	/// <summary>
-	///		Carga los datos base de una columna
-	/// </summary>
-	private void LoadBaseColumnData(BaseColumnRequestModel column, MLNode rootML)
-	{
-		// Carga los datos de la columna
-		column.Visible = rootML.Attributes[TagVisible].Value.GetBool();
-		column.OrderIndex = rootML.Attributes[TagOrderIndex].Value.GetInt(0);
-		column.OrderBy = rootML.Attributes[TagOrderBy].Value.GetEnum(BaseColumnRequestModel.SortOrder.Undefined);
-		// Carga los filtros
-		column.FiltersWhere.AddRange(LoadFilters(TagWhere, rootML));
-		column.FiltersHaving.AddRange(LoadFilters(TagHaving, rootML));
 	}
 
 	/// <summary>
@@ -346,34 +295,11 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 					// Añade los atributos de la dimensión
 					nodeML.Attributes.Add(TagId, dimension.DimensionId);
 					// Añade las columnas
-					nodeML.Nodes.AddRange(GetNodesDimensionColumns(dimension.Columns));
+					nodeML.Nodes.AddRange(GetNodesColumns(dimension.Columns));
 					// Añade el nodo a la colección
 					nodesML.Add(nodeML);
 			}
 			// Devuelve los nodos
-			return nodesML;
-	}
-
-	/// <summary>
-	///		Añade los nodos de las columnas de dimensión
-	/// </summary>
-	private MLNodesCollection GetNodesDimensionColumns(List<DimensionColumnRequestModel> columns)
-	{
-		MLNodesCollection nodesML = [];
-
-			// Añade los nodos de columnas
-			foreach (DimensionColumnRequestModel column in columns)
-			{
-				MLNode nodeML = new(TagColumn);
-
-					// Añade los atributos
-					nodeML.Attributes.Add(TagId, column.ColumnId);
-					// Añade los atributos básicos de la columna
-					GetBaseColumnAttributes(column, nodeML);
-					// Añade el nodo a la colección
-					nodesML.Add(nodeML);
-			}
-			// Devuelve la colección de nodos
 			return nodesML;
 	}
 	
@@ -392,15 +318,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 					// Añade los atributos
 					nodeML.Attributes.Add(TagId, dataSource.ReportDataSourceId);
 					// Añade las columnas
-					foreach (DataSourceColumnRequestModel column in dataSource.Columns)
-					{
-						MLNode columnML = nodeML.Nodes.Add(TagColumn);
-
-							// Añade los valores
-							columnML.Attributes.Add(TagId, column.ColumnId);
-							// Añade los atributos base de la columna
-							GetBaseColumnAttributes(column, columnML);
-					}
+					nodesML.AddRange(GetNodesColumns(dataSource.Columns));
 					// Añade los datos del nodo a la colección
 					nodesML.Add(nodeML);
 			}
@@ -411,17 +329,17 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// <summary>
 	///		Obtiene los nodos de las expresiones
 	/// </summary>
-	private MLNodesCollection GetNodesExpressions(List<ExpressionColumnRequestModel> expressions)
+	private MLNodesCollection GetNodesExpressions(List<ColumnRequestModel> expressions)
 	{
 		MLNodesCollection nodesML = [];
 
 			// Añade las columnas
-			foreach (ExpressionColumnRequestModel column in expressions)
+			foreach (ColumnRequestModel column in expressions)
 			{
-				MLNode columnML = nodesML.Add(TagColumn);
+				MLNode rootML = nodesML.Add(TagExpression);
 
-					// Añade los valores
-					columnML.Attributes.Add(TagId, column.ColumnId);
+					// Añade los valores de la columna
+					rootML.Nodes.Add(GetNodeColumn(column));
 			}
 			// Devuelve los nodos
 			return nodesML;
@@ -430,15 +348,33 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// <summary>
 	///		Añade a un nodo los datos básicos de una columna
 	/// </summary>
-	private void GetBaseColumnAttributes(BaseColumnRequestModel column, MLNode columnML)
+	private MLNodesCollection GetNodesColumns(List<ColumnRequestModel> columns)
 	{
-		// Añade los atributos de la columna
-		columnML.Attributes.Add(TagVisible, column.Visible);
-		columnML.Attributes.Add(TagOrderIndex, column.OrderIndex);
-		columnML.Attributes.Add(TagOrderBy, column.OrderBy.ToString());
-		// Añade los filtros
-		columnML.Nodes.AddRange(GetNodesFilter(TagWhere, column.FiltersWhere));
-		columnML.Nodes.AddRange(GetNodesFilter(TagHaving, column.FiltersHaving));
+		MLNodesCollection nodesML = [];
+
+			// Añade los atributos de la columna
+			foreach (ColumnRequestModel column in columns)
+				nodesML.Add(GetNodeColumn(column));
+			// Devuelve los nodos
+			return nodesML;
+	}
+
+	/// <summary>
+	///		Añade a un nodo los datos básicos de una columna
+	/// </summary>
+	private MLNode GetNodeColumn(ColumnRequestModel column)
+	{
+		MLNode nodeML = new(TagColumn);
+
+			// Añade los atributos de la columna
+			nodeML.Attributes.Add(TagVisible, column.Visible);
+			nodeML.Attributes.Add(TagOrderIndex, column.OrderIndex);
+			nodeML.Attributes.Add(TagOrderBy, column.OrderBy.ToString());
+			// Añade los filtros
+			nodeML.Nodes.AddRange(GetNodesFilter(TagWhere, column.FiltersWhere));
+			nodeML.Nodes.AddRange(GetNodesFilter(TagHaving, column.FiltersHaving));
+			// Devuelve el nodo
+			return nodeML;
 	}
 
 	/// <summary>

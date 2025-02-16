@@ -6,11 +6,11 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 /// <summary>
 ///		Lista de <see cref="RequestDataSourceColumnModel"/>
 /// </summary>
-internal class RequestDataSourceColumnCollectionModel : List<RequestDataSourceColumnModel>
+internal class RequestDataSourceColumnCollectionModel : List<RequestColumnModel>
 {
-	internal RequestDataSourceColumnCollectionModel(RequestModel request)
+	internal RequestDataSourceColumnCollectionModel(RequestDataSourceModel parent)
 	{
-		Request = request;
+		Parent = parent;
 	}
 
 	/// <summary>
@@ -18,59 +18,37 @@ internal class RequestDataSourceColumnCollectionModel : List<RequestDataSourceCo
 	/// </summary>
 	internal void AddRange(List<DataSourceRequestModel> requestDataSources)
 	{
-		List<RequestDataSourceColumnModel> converted = [];
+		List<RequestColumnModel> converted = [];
 
 			foreach (DataSourceRequestModel requestDataSource in requestDataSources)
 			{
-				BaseDataSourceModel? dataSource = Request.Report.DataWarehouse.DataSources[requestDataSource.ReportDataSourceId];
-				// BaseDataSourceModel? dataSource = manager.Schema.DataWarehouses.GetDataSource(requestDataSource.ReportDataSourceId);
+				BaseDataSourceModel? dataSource = Parent.Parent.Request.Report.DataWarehouse.DataSources[requestDataSource.ReportDataSourceId];
 
 					if (dataSource is null)
 						throw new Exceptions.ReportingParserException($"Can't find the data source {requestDataSource.ReportDataSourceId}");
 					else
-						foreach (DataSourceColumnRequestModel requestColumn in requestDataSource.Columns)
+						foreach (ColumnRequestModel requestColumn in requestDataSource.Columns)
 						{
-							DataSourceColumnModel? column = dataSource.Columns[requestColumn.ColumnId];
+							DataSourceColumnModel? column = dataSource.Columns[requestColumn.Id];
 
 								if (column is null)
-									throw new Exceptions.ReportingParserException($"Can't find the column {requestColumn.ColumnId} at data source {dataSource.GetTableAlias()}");
+									throw new Exceptions.ReportingParserException($"Can't find the column {requestColumn.Id} at data source {dataSource.GetTableAlias()}");
 								else
-								{
-									RequestDataSourceColumnModel requestDataSourceColumn = new(column, Convert(requestColumn.AggregatedBy));
-
-										// Asigna los datos de la solicitud de la columna
-										requestDataSourceColumn.AssignColumnRequestData(requestColumn);
-										// Convierte los datos
-										converted.Add(requestDataSourceColumn);
-								}
+									converted.Add(new RequestColumnModel(requestColumn));
 						}	
 			}
-
-		// Convierte el tipo de agregación
-		RequestDataSourceColumnModel.AggregationType Convert(DataSourceColumnRequestModel.AggregationType type)
-		{
-			return type switch
-					{
-						DataSourceColumnRequestModel.AggregationType.Sum => RequestDataSourceColumnModel.AggregationType.Sum,
-						DataSourceColumnRequestModel.AggregationType.Max => RequestDataSourceColumnModel.AggregationType.Max,
-						DataSourceColumnRequestModel.AggregationType.Min => RequestDataSourceColumnModel.AggregationType.Min,
-						DataSourceColumnRequestModel.AggregationType.Average => RequestDataSourceColumnModel.AggregationType.Average,
-						DataSourceColumnRequestModel.AggregationType.StandardDeviation => RequestDataSourceColumnModel.AggregationType.StandardDeviation,
-						_ => RequestDataSourceColumnModel.AggregationType.NoAggregated
-					};
-		}
 	}
 
 	/// <summary>
 	///		Obtiene las columnas solicitadas para un origen de datos
 	/// </summary>
-	internal List<RequestDataSourceColumnModel> GetRequestedColumns(BaseDataSourceModel dataSource)
+	internal List<RequestColumnModel> GetRequestedColumns(BaseDataSourceModel dataSource)
 	{
-		List<RequestDataSourceColumnModel> columns = [];
+		List<RequestColumnModel> columns = [];
 
 			// Obtiene las columnas solicitadas
-			foreach (RequestDataSourceColumnModel column in this)
-				if (column.Column.DataSource.Id.Equals(dataSource.Id, StringComparison.CurrentCultureIgnoreCase))
+			foreach (RequestColumnModel column in this)
+				if (column.Id.Equals(dataSource.Id, StringComparison.CurrentCultureIgnoreCase))
 					columns.Add(column);
 			// Devuelve las columnas solicitadas
 			return columns;
@@ -79,5 +57,5 @@ internal class RequestDataSourceColumnCollectionModel : List<RequestDataSourceCo
 	/// <summary>
 	///		Solicitud a la que se asocia la colección
 	/// </summary>
-	internal RequestModel Request { get; }
+	internal RequestDataSourceModel Parent { get; }
 }

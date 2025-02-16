@@ -6,23 +6,6 @@
 public class DataSourceRequestModel
 {
 	/// <summary>
-	///		Clona los datos de un <see cref="DataSourceRequestModel"/>
-	/// </summary>
-	public DataSourceRequestModel Clone()
-	{
-		DataSourceRequestModel cloned = new()
-											{
-												ReportDataSourceId = ReportDataSourceId
-											};
-
-			// Clona las columnas
-			foreach (DataSourceColumnRequestModel column in Columns)
-				cloned.Columns.Add(column.Clone());
-			// Devuelve el objeto clonado
-			return cloned;
-	}
-
-	/// <summary>
 	///		Clave del informe de origen de datos
 	/// </summary>
 	public string ReportDataSourceId { get; set; } = default!;
@@ -30,5 +13,5 @@ public class DataSourceRequestModel
 	/// <summary>
 	///		Columnas solicitadas
 	/// </summary>
-	public List<DataSourceColumnRequestModel> Columns { get; } = [];
+	public List<ColumnRequestModel> Columns { get; } = [];
 }
