@@ -19,11 +19,11 @@ internal class RequestDimensionCollectionModel : List<RequestDimensionModel>
 	/// <summary>
 	///		Añade las dimensiones solicitadas
 	/// </summary>
-	internal void AddRange(List<DimensionRequestModel> requestDimensions)
+	internal void AddRange(List<DataRequestModel> dataRequests)
 	{
-		foreach (DimensionRequestModel requestDimension in requestDimensions)
+		foreach (DataRequestModel requestDimension in dataRequests)
 			foreach (ColumnRequestModel requestColumn in requestDimension.Columns)
-				Add(requestDimension.DimensionId, new RequestColumnModel(requestColumn));
+				Add(requestDimension.Id, new RequestColumnModel(requestColumn));
 	}
 
 	/// <summary>

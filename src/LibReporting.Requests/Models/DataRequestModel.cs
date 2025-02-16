@@ -1,14 +1,19 @@
 ﻿namespace Bau.Libraries.LibReporting.Requests.Models;
 
 /// <summary>
-///		Clase con los datos de un origen de datos solicitado para un listado
+///		Clase con los datos solicitados para un listado
 /// </summary>
-public class DataSourceRequestModel
+public class DataRequestModel
 {
+	public DataRequestModel(string id)
+	{
+		Id = id;
+	}
+
 	/// <summary>
-	///		Clave del informe de origen de datos
+	///		Clave del tipo solicititado
 	/// </summary>
-	public string ReportDataSourceId { get; set; } = default!;
+	public string Id { get; }
 
 	/// <summary>
 	///		Columnas solicitadas

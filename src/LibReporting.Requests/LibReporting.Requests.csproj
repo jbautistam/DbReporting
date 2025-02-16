@@ -13,4 +13,9 @@
     <None Remove="Builders\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Models\DataSourceRequestModel.cs" />
+    <Compile Remove="Models\DimensionRequestModel.cs" />
+  </ItemGroup>
+
 </Project>

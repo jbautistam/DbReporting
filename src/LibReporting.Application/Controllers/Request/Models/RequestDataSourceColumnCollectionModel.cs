@@ -4,7 +4,7 @@ using Bau.Libraries.LibReporting.Requests.Models;
 namespace Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 
 /// <summary>
-///		Lista de <see cref="RequestDataSourceColumnModel"/>
+///		Lista de <see cref="DataRequestModel"/>
 /// </summary>
 internal class RequestDataSourceColumnCollectionModel : List<RequestColumnModel>
 {
@@ -14,20 +14,20 @@ internal class RequestDataSourceColumnCollectionModel : List<RequestColumnModel>
 	}
 
 	/// <summary>
-	///		Convierte las solicitudes de <see cref="RequestDataSourceColumnModel"/>
+	///		Convierte las solicitudes de <see cref="DataRequestModel"/>
 	/// </summary>
-	internal void AddRange(List<DataSourceRequestModel> requestDataSources)
+	internal void AddRange(List<DataRequestModel> dataRequests)
 	{
 		List<RequestColumnModel> converted = [];
 
-			foreach (DataSourceRequestModel requestDataSource in requestDataSources)
+			foreach (DataRequestModel dataRequest in dataRequests)
 			{
-				BaseDataSourceModel? dataSource = Parent.Parent.Request.Report.DataWarehouse.DataSources[requestDataSource.ReportDataSourceId];
+				BaseDataSourceModel? dataSource = Parent.Parent.Request.Report.DataWarehouse.DataSources[dataRequest.Id];
 
 					if (dataSource is null)
-						throw new Exceptions.ReportingParserException($"Can't find the data source {requestDataSource.ReportDataSourceId}");
+						throw new Exceptions.ReportingParserException($"Can't find the data source {dataRequest.Id}");
 					else
-						foreach (ColumnRequestModel requestColumn in requestDataSource.Columns)
+						foreach (ColumnRequestModel requestColumn in dataRequest.Columns)
 						{
 							DataSourceColumnModel? column = dataSource.Columns[requestColumn.Id];
 

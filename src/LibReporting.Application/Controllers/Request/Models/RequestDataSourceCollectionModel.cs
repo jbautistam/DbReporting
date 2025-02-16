@@ -13,13 +13,13 @@ internal class RequestDataSourceCollectionModel : List<RequestDataSourceModel>
 	}
 
 	/// <summary>
-	///		Añade las dimensiones solicitadas
+	///		Añade los datos solicitados
 	/// </summary>
-	internal void AddRange(List<DataSourceRequestModel> requestDataSources)
+	internal void AddRange(List<DataRequestModel> requestDataSources)
 	{
-		foreach (DataSourceRequestModel requestDataSource in requestDataSources)
+		foreach (DataRequestModel requestDataSource in requestDataSources)
 		{
-			RequestDataSourceModel dataSource = new(this, requestDataSource.ReportDataSourceId);
+			RequestDataSourceModel dataSource = new(this, requestDataSource.Id);
 
 				// Añade las columnas
 				foreach (ColumnRequestModel column in requestDataSource.Columns)
