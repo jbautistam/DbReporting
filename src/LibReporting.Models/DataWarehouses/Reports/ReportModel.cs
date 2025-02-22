@@ -63,7 +63,7 @@ public class ReportModel : Base.BaseReportingModel
 	/// <summary>
 	///		Expresiones del informe
 	/// </summary>
-	public List<string> Expressions { get; } = [];
+	public List<ReportExpressionModel> Expressions { get; } = [];
 
 	/// <summary>
 	///		Bloques del informe

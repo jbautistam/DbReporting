@@ -97,7 +97,7 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 									report.RequestDimensions.AddRange(LoadRequests(nodeML));
 								break;
 							case TagExpression:
-									report.Expressions.AddRange(LoadExpressions(nodeML));
+									report.Expressions.AddRange(LoadExpressions(report, nodeML));
 								break;
 						}
 			// Devuelve el informe
@@ -402,16 +402,17 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 	/// <summary>
 	///		Carga la lista de expresiones
 	/// </summary>
-	private List<string> LoadExpressions(MLNode nodeML)
+	private List<ReportExpressionModel> LoadExpressions(ReportModel report, MLNode rootML)
 	{
-		List<string> expressions = [];
-		string fields = nodeML.Attributes[TagName].Value.TrimIgnoreNull();
+		List<ReportExpressionModel> expressions = [];
+		string fields = rootML.Attributes[TagName].Value.TrimIgnoreNull();
 
 			// Carga los campos en la lista
 			if (!string.IsNullOrWhiteSpace(fields))
 				foreach (string field in fields.Split(';'))
 					if (!string.IsNullOrWhiteSpace(field))
-						expressions.Add(field.TrimIgnoreNull());
+						expressions.Add(new ReportExpressionModel(report, field.TrimIgnoreNull(), 
+																  rootML.Attributes[TagType].Value.GetEnum(DataSourceColumnModel.FieldType.Decimal)));
 			// Devuelve la lista de expresiones
 			return expressions;
 	}

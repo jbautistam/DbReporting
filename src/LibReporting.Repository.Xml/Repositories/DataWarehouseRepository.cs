@@ -87,7 +87,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 									break;
 							}
 						// Carga los informes avanzados
-						AddAdvancedReports(dataWarehouse, Path.GetDirectoryName(id));
+						AddAdvancedReports(dataWarehouse, Path.Combine(Path.GetDirectoryName(id)!, "Reports"));
 					}
 			// Devuelve los datos del almacén de datos
 			return dataWarehouse;
