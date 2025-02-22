@@ -16,7 +16,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries;
 internal class ReportQueryGenerator
 {
 	// Variables privadas
-	private QueryDimensionsCollection _queryDimensions = [];
+	private QueryDimensionCollectionModel _queryDimensions = [];
 
 	internal ReportQueryGenerator(RequestModel request) 
 	{
@@ -159,7 +159,7 @@ internal class ReportQueryGenerator
 					case ParserIfRequestSectionModel item:
 							parser.Replace(marker, new Generators.QueryIfRequestGenerator(this, item).GetSql());
 						break;
-					case ParserConditionSectionModel item:
+					case ParserFilterSectionModel item:
 							parser.Replace(marker, new Generators.QueryConditionsGenerator(this, item).GetSql());
 						break;
 					case ParserSubquerySectionModel item:

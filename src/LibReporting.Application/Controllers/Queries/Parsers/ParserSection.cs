@@ -14,6 +14,8 @@ internal class ParserSection
 	private const string HeaderOrderBy = "OrderBy";
 	private const string HeaderExpression = "Expression";
 	private const string HeaderSql = "Sql";
+	private const string HeaderSqlTotals = "SqlTotals";
+	private const string HeaderSqlNoRequest = "SqlNoRequest";
 	private const string HeaderFields = "Fields";
 	private const string HeaderInnerJoin = "InnerJoin";
 	private const string HeaderLeftJoin = "LeftJoin";
@@ -27,6 +29,7 @@ internal class ParserSection
 	private const string HeaderIfRequest = "IfRequest";
 	private const string HeaderPartitionBy = "PartitionBy";
 	private const string HeaderWithComma = "WithComma";
+	private const string HeaderWithPreviousComma = "WithPreviousComma";
 	private const string HeaderTable = "Table";
 	private const string HeaderField = "Field";
 	private const string HeaderAlias = "Alias";
@@ -35,9 +38,7 @@ internal class ParserSection
 	private const string HeaderOn = "On";
 	private const string HeaderAdditionalTable = "AdditionalTable";
 	private const string HeaderWithPrimaryKeys = "WithPrimaryKeys";
-	private const string HeaderRequired = "Required";
 	private const string HeaderCheckIfNull = "CheckIfNull";
-	private const string HeaderWhenRequestTotals = "WhenRequestTotals";
 	private const string HeaderDataSource = "DataSource";
 	private const string HeaderOperator = "Operator";
 	private const string HeaderAggregation = "Aggregation";
@@ -103,14 +104,14 @@ internal class ParserSection
 						sections.Add(ParseJoin(block, ParserJoinSectionModel.JoinType.FullJoin));
 					else if (block.HasHeader(HeaderCrossJoin))
 						sections.Add(ParseJoin(block, ParserJoinSectionModel.JoinType.CrossJoin));
-					else if (block.HasHeader(HeaderWhere))
-						sections.Add(ParseWhere(block));
 					else if (block.HasHeader(HeaderSubquery))
 						sections.Add(ParseSubquery(block));
 					else if (block.HasHeader(HeaderGroupBy))
 						sections.Add(ParseGroupBy(block));
+					else if (block.HasHeader(HeaderWhere))
+						sections.Add(ParseFilter(ParserFilterSectionModel.FilterType.Where, block));
 					else if (block.HasHeader(HeaderHaving))
-						sections.Add(ParseHaving(block));
+						sections.Add(ParseFilter(ParserFilterSectionModel.FilterType.Having, block));
 					else if (block.HasHeader(HeaderOrderBy))
 						sections.Add(ParseOrderBy(block));
 					else if (block.HasHeader(HeaderIfRequest))
@@ -134,8 +135,14 @@ internal class ParserSection
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderDimension))
 					fields.ParserDimensions.Add(ParseDimension(child));
+				else if (child.HasHeader(HeaderExpression))
+					fields.ParserExpressions.Add(ParseRequestExpression(child));
 				else if (child.HasHeader(HeaderWithComma))
 					fields.WithComma = child.GetBooleanValue();
+				else if (child.HasHeader(HeaderWithPreviousComma))
+					fields.WithPreviousComma = child.GetBooleanValue();
+				else if (child.HasHeader(HeaderSqlTotals))
+					fields.SqlTotals = child.GetChildsContent();
 			// Devuelve los datos del campo
 			return fields;
 	}
@@ -220,10 +227,6 @@ internal class ParserSection
 					dimension.WithPrimaryKeys = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderWithRequestedFields) || child.HasHeader(HeaderOnRequestFields))
 					dimension.WithRequestedFields = child.GetBooleanValue();
-				else if (child.HasHeader(HeaderRequired))
-					dimension.Required = child.GetBooleanValue();
-				else if (child.HasHeader(HeaderIfRequest))
-					dimension.AddRelatedDimensions(child.Content);
 				else if (child.HasHeader(HeaderCheckIfNull))
 					dimension.CheckIfNull = child.GetBooleanValue();
 			// Se solicitan los campos se no se ha solicitado nada
@@ -247,35 +250,20 @@ internal class ParserSection
 	}
 
 	/// <summary>
-	///		Interpreta una cláusula WHERE
+	///		Interpreta una sección del filtro (WHERE / HAVING)
 	/// </summary>
-	private ParserWhereSectionModel ParseWhere(BlockInfo block)
+	private ParserFilterSectionModel ParseFilter(ParserFilterSectionModel.FilterType type, BlockInfo block)
 	{ 
-		ParserWhereSectionModel section = new();
+		ParserFilterSectionModel section = new(type);
 
 			// Asigna las propiedades
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderDataSource))
 					section.DataSources.Add(ParseDataSource(child));
-				else if (child.HasHeader(HeaderOperator))
-					section.Operator = child.Content.TrimIgnoreNull();
-				else if (child.HasHeader(HeaderSql))
-					section.Sql = child.GetChildsContent();
-			// Devuelve la cláusula
-			return section;
-	}
-
-	/// <summary>
-	///		Interpreta una cláusula HAVING
-	/// </summary>
-	private ParserHavingSectionModel ParseHaving(BlockInfo block)
-	{ 
-		ParserHavingSectionModel section = new();
-
-			// Asigna las propiedades
-			foreach (BlockInfo child in block.Blocks)
-				if (child.HasHeader(HeaderExpression))
+				else if (child.HasHeader(HeaderExpression))
 					section.Expressions.Add(ParseExpression(child));
+				else if (child.HasHeader(HeaderAggregation))
+					section.Aggregation = child.Content.TrimIgnoreNull();
 				else if (child.HasHeader(HeaderOperator))
 					section.Operator = child.Content.TrimIgnoreNull();
 				else if (child.HasHeader(HeaderSql))
@@ -297,8 +285,6 @@ internal class ParserSection
 					expression.Table = child.Content.TrimIgnoreNull();
 				else if (child.HasHeader(HeaderField))
 					expression.Field = child.Content.TrimIgnoreNull();
-				else if (child.HasHeader(HeaderAggregation))
-					expression.Aggregation = child.Content.TrimIgnoreNull();
 			// Devuelve los datos de la expresión
 			return expression;
 	}
@@ -368,8 +354,6 @@ internal class ParserSection
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderExpression))
 					section.Expressions.Add(ParseRequestExpression(child));
-				else if (child.HasHeader(HeaderWhenRequestTotals))
-					section.WhenRequestTotals = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderWithComma))
 					section.WithComma = child.GetBooleanValue();
 				else if (child.HasHeader(HeaderSql))
@@ -391,6 +375,10 @@ internal class ParserSection
 			foreach (BlockInfo child in block.Blocks)
 				if (child.HasHeader(HeaderSql))
 					section.Sql = child.GetChildsContent();
+				else if (child.HasHeader(HeaderSqlTotals))
+					section.SqlTotals = child.GetChildsContent();
+				else if (child.HasHeader(HeaderSqlNoRequest))
+					section.SqlWhenNotRequest = child.GetChildsContent();
 			// Devuelve la sección interpretada
 			return section;
 	}

@@ -8,12 +8,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="Controllers\Queries\Models\QueryFieldCollectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryForeignKeyCollection.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryForeignKeyModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableColumnModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableModel.cs" />
 		<Compile Remove="Controllers\Queries\Models\QueryTableNameModel.cs" />
+		<Compile Remove="Controllers\Queries\Parsers\Models\ParserConditionSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\Models\ParserFieldsDimensionSectionModel.cs" />
+		<Compile Remove="Controllers\Queries\Parsers\Models\ParserHavingSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\Models\ParserJoinRelationSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\Models\ParserWhereConditionSectionModel.cs" />
 		<Compile Remove="Controllers\Queries\Parsers\ParserParametersSection.cs" />

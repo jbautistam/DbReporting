@@ -14,11 +14,6 @@ internal class SqlFilterGenerator
 	}
 
 	/// <summary>
-	///		Obtiene la SQL de los filtros
-	/// </summary>
-	internal string GetSql(string table, string column, string aggregation) => GetSqlWithFilter(table, column, aggregation, null);
-
-	/// <summary>
 	///		Obtiene la SQL de los filtros para un <see cref="List{RequestFilterModel}"/>
 	/// </summary>
 	internal string GetSql(string table, string column, List<RequestFilterModel> filters) => GetSql(table, column, string.Empty, filters);
@@ -32,7 +27,7 @@ internal class SqlFilterGenerator
 
 			// Genera la SQL de los filtros
 			foreach (RequestFilterModel filter in filters)
-				sql = sql.AddWithSeparator(GetSqlWithFilter(table, column, aggregation, filter), "AND");
+				sql = sql.AddWithSeparator(GetSqlWithFilter(table, column, aggregation, filter), Environment.NewLine + "AND");
 			// Devuelve la cadena SQL
 			return sql;
 	}

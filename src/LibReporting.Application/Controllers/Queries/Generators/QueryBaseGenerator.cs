@@ -22,17 +22,17 @@ internal abstract class QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la cadena SQL para los campos solicitados de las dimensiones
 	/// </summary>
-	protected string GetSqlFieldsForDimensions(QueryDimensionsCollection queryDimensions, List<ParserDimensionModel> dimensions, bool onlyVisibleFields)
+	protected string GetSqlFieldsForDimensions(QueryDimensionCollectionModel queryDimensions, List<ParserDimensionModel> dimensions, bool onlyVisibleFields)
 	{
 		string sql = string.Empty;
 
 			// Obtiene los campos
 			foreach (ParserDimensionModel dimension in dimensions)
 			{
-				List<QueryFieldModel> fields = queryDimensions.GetFieldsRequest(dimension.DimensionKey);
+				List<QueryDimensionFieldModel> fields = queryDimensions.GetFieldsRequest(dimension.DimensionKey);
 
 					// Añade los campos solicitados a la SQL
-					foreach (QueryFieldModel field in fields)
+					foreach (QueryDimensionFieldModel field in fields)
 						if (MustIncludeField(field, dimension.WithPrimaryKeys, dimension.WithRequestedFields, onlyVisibleFields))
 						{
 							string sqlField = string.Empty;
@@ -53,7 +53,7 @@ internal abstract class QueryBaseGenerator
 	/// <summary>
 	///		Comprueba si se debe incluir el campo en la salida de la cadena SQL
 	/// </summary>
-	protected bool MustIncludeField(QueryFieldModel field, bool withPrimaryKeys, bool withRequestedFields, bool onlyVisibleFields)
+	protected bool MustIncludeField(QueryDimensionFieldModel field, bool withPrimaryKeys, bool withRequestedFields, bool onlyVisibleFields)
 	{
 		if (field.IsPrimaryKey && withPrimaryKeys)
 			return true;

@@ -5,11 +5,11 @@ using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 
 /// <summary>
-///		Clase con los datos para generar la SQL de <see cref="ParserConditionSectionModel"/>
+///		Clase con los datos para generar la SQL de <see cref="ParserFilterSectionModel"/>
 /// </summary>
 internal class QueryConditionsGenerator : QueryBaseGenerator
 {
-	internal QueryConditionsGenerator(ReportQueryGenerator manager, ParserConditionSectionModel section) : base(manager)
+	internal QueryConditionsGenerator(ReportQueryGenerator manager, ParserFilterSectionModel section) : base(manager)
 	{
 		Section = section;
 	}
@@ -22,15 +22,8 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 		string sql = string.Empty;
 
 			// Añade los filtros de los orígenes de datos y expresiones
-			switch (Section)
-			{
-				case ParserWhereSectionModel section:
-						sql = GetSql(section.DataSources);
-					break;
-				case ParserHavingSectionModel section:
-						sql = GetSql(section.Expressions);
-					break;
-			}
+			sql = GetSql(Section, Section.DataSources);
+			sql = sql.AddWithSeparator(GetSql(Section, Section.Expressions), Environment.NewLine + "AND");
 			// Añade la SQL adicional si existe
 			if (!string.IsNullOrWhiteSpace(Section.Sql))
 			{
@@ -38,42 +31,31 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 				if (string.IsNullOrWhiteSpace(Section.Operator))
 					Section.Operator = "AND";
 				// Añade la cadena adicional a la SQL
-				sql = sql.AddWithSeparator(Section.Sql, $" {Section.Operator} ");
+				sql = sql.AddWithSeparator(Section.Sql, $"{Environment.NewLine} {Section.Operator} ");
 			}
 			// Añade la cláusula WHERE / HAVING si es necesario
-			sql = GetClause(Section, sql);
+			if (!string.IsNullOrWhiteSpace(sql))
+				sql = $"{GetClause(Section)} {sql}";
 			// Devuelve la cadena SQL
 			return sql;
+
+		// Obtiene la cláusula de la sección
+		string GetClause(ParserFilterSectionModel section)
+		{
+			return section.Type switch
+						{
+							ParserFilterSectionModel.FilterType.Where => "WHERE",
+							ParserFilterSectionModel.FilterType.Having => "HAVING",
+							_ => throw new Exceptions.ReportingParserException($"Condition type unknown {section.Type.ToString()}"),
+						};
+		}
 	}
 
-	/// <summary>
-	///		Añade la cláusula WHERE o HAVING dependiendo del tipo de condición
-	/// </summary>
-	private string GetClause(ParserConditionSectionModel section, string sql)
-	{
-		if (!string.IsNullOrWhiteSpace(sql))
-			return $" {GetClause(section)} {sql}";
-		else
-			return string.Empty;
-	}
 
 	/// <summary>
-	///		Obtiene la cláusula de la sección
+	///		Obtiene la cadena SQL para las condiciones sobre <see cref="ParserDataSourceModel"/>
 	/// </summary>
-	private string GetClause(ParserConditionSectionModel section)
-	{
-		return section switch
-					{
-						ParserWhereSectionModel => "WHERE",
-						ParserHavingSectionModel => "HAVING",
-						_ => throw new Exceptions.ReportingParserException($"Condition type unknown {section.GetType().ToString()}"),
-					};
-	}
-
-	/// <summary>
-	///		Obtiene la cadena SQL de los orígenes de datos
-	/// </summary>
-	private string GetSql(List<ParserDataSourceModel> dataSources)
+	private string GetSql(ParserFilterSectionModel section, List<ParserDataSourceModel> dataSources)
 	{
 		string sql = string.Empty;
 
@@ -96,9 +78,9 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 	}
 
 	/// <summary>
-	///		Obtiene la cadena SQL para una condición HAVING
+	///		Obtiene la cadena SQL para las condiciones sobre <see cref="ParserExpressionModel"/>
 	/// </summary>
-	private string GetSql(List<ParserExpressionModel> expressions)
+	private string GetSql(ParserFilterSectionModel section, List<ParserExpressionModel> expressions)
 	{
 		string sql = string.Empty;
 
@@ -107,17 +89,42 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 			{
 				RequestColumnModel? column = Manager.Request.Expressions.Get(parserExpression.Expression);
 
-					// Añade las condiciones del HAVING
+					// Añade las condiciones del filtro
 					if (column is not null)
-						sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserExpression.Table, column.Id, parserExpression.Aggregation), 
-												   " AND ");
+						sql = sql.AddWithSeparator(Manager.SqlTools.SqlFilterGenerator.GetSql(parserExpression.Table, parserExpression.Field, 
+																							  GetAggregation(section.Type, section.Aggregation),
+																							  GetFilters(section.Type, column)), 
+												   Environment.NewLine + "AND");
 			}
 			// Devuelve la cadena SQL
 			return sql;
+
+		// Obtiene la cláusula de agregación
+		string GetAggregation(ParserFilterSectionModel.FilterType type, string? aggregation)
+		{
+			if (type == ParserFilterSectionModel.FilterType.Where)
+				return string.Empty;
+			else
+			{
+				if (string.IsNullOrWhiteSpace(aggregation))
+					return "SUM";
+				else
+					return aggregation;
+			}
+		}
+
+		// Obtiene la cláusula de agregación
+		List<RequestFilterModel> GetFilters(ParserFilterSectionModel.FilterType type, RequestColumnModel column)
+		{
+			if (type == ParserFilterSectionModel.FilterType.Where)
+				return column.FiltersWhere;
+			else
+				return column.FiltersHaving;
+		}
 	}
 	
 	/// <summary>
 	///		Sección que se está generando
 	/// </summary>
-	internal ParserConditionSectionModel Section { get; }
+	internal ParserFilterSectionModel Section { get; }
 }

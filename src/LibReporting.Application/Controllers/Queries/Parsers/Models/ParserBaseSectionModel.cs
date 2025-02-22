@@ -19,7 +19,7 @@ internal abstract class ParserBaseSectionModel
 				if (string.IsNullOrWhiteSpace(separator))
 					separator = "-";
 				// Separa el contenido
-				foreach (string part in content.Split(separator))
+				foreach (string part in content.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
 					if (!string.IsNullOrWhiteSpace(part))
 						parts.Add(part.Trim());
 			}

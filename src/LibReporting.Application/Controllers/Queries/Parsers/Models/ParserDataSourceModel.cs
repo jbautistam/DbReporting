@@ -11,7 +11,7 @@ internal class ParserDataSourceModel : ParserBaseSectionModel
 	internal string DataSourceKey { get; set; } = string.Empty;
 
     /// <summary>
-    ///		Tabla de la que se obtiene el origen de datos
+    ///		Campo de la que se obtiene el origen de datos
     /// </summary>
     internal string Table { get; set; } = string.Empty;
 }

@@ -1,7 +1,7 @@
 ﻿namespace Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 
 /// <summary>
-///		Sección de paginación
+///		Sección de subconsulta
 /// </summary>
 internal class ParserSubquerySectionModel : ParserBaseSectionModel
 {

@@ -9,7 +9,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 /// </summary>
 internal class QueryPartitionByGenerator : QueryBaseGenerator
 {
-	internal QueryPartitionByGenerator(ReportQueryGenerator manager, ParserPartitionBySectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
+	internal QueryPartitionByGenerator(ReportQueryGenerator manager, ParserPartitionBySectionModel section, QueryDimensionCollectionModel queryDimensions) : base(manager)
 	{
 		Section = section;
 		QueryDimensions = queryDimensions;
@@ -43,5 +43,5 @@ internal class QueryPartitionByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Consultas de dimensiones
 	/// </summary>
-	internal QueryDimensionsCollection QueryDimensions { get; }
+	internal QueryDimensionCollectionModel QueryDimensions { get; }
 }

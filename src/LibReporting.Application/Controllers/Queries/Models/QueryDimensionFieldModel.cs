@@ -3,20 +3,23 @@
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 
 /// <summary>
-///		Campo de una consulta
+///		Campo de una <see cref="QueryDimensionModel"/>
 /// </summary>
-internal class QueryFieldModel
+internal class QueryDimensionFieldModel
 {
 	// Variables privadas
 	private string _alias = string.Empty;
 
-	internal QueryFieldModel(QueryDimensionModel query, bool primaryKey, string table, string field, string alias, bool visible)
+	internal QueryDimensionFieldModel(QueryDimensionModel query, bool primaryKey, string table, string field, string? alias, bool visible)
 	{
 		Query = query;
 		IsPrimaryKey = primaryKey;
 		Table = table;
 		Field = field;
-		Alias = alias;
+		if (string.IsNullOrWhiteSpace(alias))
+			Alias = field;
+		else
+			Alias = alias;
 		Visible = visible;
 	}
 
@@ -49,12 +52,9 @@ internal class QueryFieldModel
 		{
 			string alias = _alias;
 
-				// Si no se ha definido el alias, se calcula
-				if (string.IsNullOrWhiteSpace(_alias))
-				{
-					// Genera el alias inicial
-					alias = $"{Table}_{Field}";
-				}
+				// Si no es una clave primaria y estamos en una dimensión derivada, añadimos el prefijo al alias
+				if (!IsPrimaryKey && Query.Dimension is LibReporting.Models.DataWarehouses.Dimensions.DimensionChildModel dimension)
+					alias = $"{dimension.ColumnsPrefix}{alias}";
 				// Devuelve el alias
 				return alias;
 		}

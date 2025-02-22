@@ -8,14 +8,6 @@ internal class ParserDimensionModel : ParserBaseSectionModel
     // Variables privadas
     private string _tableDimensionAlias = string.Empty;
 
-    /// <summary>
-    ///     Añade los dimensiones relacionadas
-    /// </summary>
-    internal void AddRelatedDimensions(string content)
-    {
-        RelatedDimensions.AddRange(SplitContent(content));
-    }
-
 	/// <summary>
 	///		Clave de la dimensión
 	/// </summary>
@@ -65,19 +57,4 @@ internal class ParserDimensionModel : ParserBaseSectionModel
     ///     Indica si se deben incluir los campos solicitados (sean o no claves primarias)
     /// </summary>
     internal bool WithRequestedFields { get; set; }
-
-    /// <summary>
-    ///		Indica si es obligatorio aunque no se haya solicitado
-    /// </summary>
-    internal bool Required { get; set; }
-
-    /// <summary>
-    ///		Dimensiones relacionadas (obliga a hacer un join por esta dimensión aunque no se haya solicitado directamente)
-    /// </summary>
-    internal List<string> RelatedDimensions { get; } = [];
-
-    /// <summary>
-    ///		Dimensiones que se deben comprobar que no se han solicitado
-    /// </summary>
-    internal List<string> IfNotRequestDimensions { get; } = [];
 }

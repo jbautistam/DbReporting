@@ -2,12 +2,12 @@
 
 using Bau.Libraries.LibHelper.Extensors;
 
-namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Prettifier;
+namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Tools;
 
 /// <summary>
-///		Generador de cadenas
+///		Generador para SQL
 /// </summary>
-internal class StringPrettifier
+internal class SqlStringBuilder
 {
 	// Variables privadas
 	private int _indent;

@@ -3,14 +3,14 @@
 /// <summary>
 ///		Lista de <see cref="QueryDimensionModel"/>
 /// </summary>
-internal class QueryDimensionsCollection : List<QueryDimensionModel>
+internal class QueryDimensionCollectionModel : List<QueryDimensionModel>
 {
 	/// <summary>
 	///		Obtiene los campos asociados a una dimensión y sus hijas
 	/// </summary>
-	internal List<QueryFieldModel> GetFieldsRequest(string dimensionId)
+	internal List<QueryDimensionFieldModel> GetFieldsRequest(string dimensionId)
 	{
-		List<QueryFieldModel> fields = [];
+		List<QueryDimensionFieldModel> fields = [];
 		QueryDimensionModel? queryDimension = Get(dimensionId);
 
 			// Se obtienen los datos
@@ -23,12 +23,12 @@ internal class QueryDimensionsCollection : List<QueryDimensionModel>
 	/// <summary>
 	///		Obtiene los campos asociados a una consulta y sus hijas
 	/// </summary>
-	private List<QueryFieldModel> GetFieldsRequest(QueryDimensionModel query)
+	private List<QueryDimensionFieldModel> GetFieldsRequest(QueryDimensionModel query)
 	{
-		List<QueryFieldModel> fields = [];
+		List<QueryDimensionFieldModel> fields = [];
 
 			// Añade los campos de la consulta
-			foreach (QueryFieldModel field in query.Fields)
+			foreach (QueryDimensionFieldModel field in query.Fields)
 				fields.Add(field);
 			// Añade los campos hijo
 			foreach (QueryDimensionJoinModel child in query.Joins)

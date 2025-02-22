@@ -19,7 +19,6 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	private const string TagValue = "Value";
 	private const string TagExpression = "Expression";
 	private const string TagColumn = "Column";
-	private const string TagAggregatedBy = "AggregatedBy";
 	private const string TagVisible = "Visible";
 	private const string TagOrderIndex = "OrderIndex";
 	private const string TagOrderBy = "OrderBy";
@@ -72,6 +71,12 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 										request.DataSources.Add(LoadDataRequest(nodeML));
 									break;
 								case TagExpression:
+										ColumnRequestModel? column = LoadExpression(nodeML);
+
+											if (column is not null)
+												request.Expressions.Add(column);
+									break;
+								case TagColumn:
 										request.Expressions.Add(LoadColumn(nodeML));
 									break;
 							}
@@ -93,6 +98,20 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 					columns.Add(LoadColumn(nodeML));
 			// Devuelve la lista
 			return columns;
+	}
+
+	/// <summary>
+	///		Carga los datos de la expresión: esto es sólo para compatibilidad con las solicitudes antiguas
+	/// </summary>
+	//TODO Quitar esto
+	private ColumnRequestModel? LoadExpression(MLNode rootML)
+	{
+		// Busca la primera columna
+		foreach (MLNode nodeML in rootML.Nodes)
+			if (nodeML.Name == TagColumn)
+				return LoadColumn(nodeML);
+		// Si ha llegado hasta aquí es porque no ha encontrado nada
+		return null;
 	}
 
 	/// <summary>
@@ -294,13 +313,8 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 		MLNodesCollection nodesML = [];
 
 			// Añade las columnas
-			foreach (ColumnRequestModel column in expressions)
-			{
-				MLNode rootML = nodesML.Add(TagExpression);
-
-					// Añade los valores de la columna
-					rootML.Nodes.Add(GetNodeColumn(column));
-			}
+			foreach (ColumnRequestModel expression in expressions)
+				nodesML.Add(GetNodeColumn(expression));
 			// Devuelve los nodos
 			return nodesML;
 	}

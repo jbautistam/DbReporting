@@ -23,9 +23,6 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 
 			// Añade la SQL para las expresiones normales
 			sql = GetSql(Section.Expressions, Manager.Request);
-			// Se añade la SQL para las expresiones de totales
-			if (MustAddWhenTotals(Manager.Request) && !string.IsNullOrWhiteSpace(Section.Sql))
-				sql = sql.AddWithSeparator(Section.Sql, "," + Environment.NewLine);
 			// Añade una coma si es necesario
 			if (Section.WithComma && !string.IsNullOrWhiteSpace(sql))
 				sql += ", ";
@@ -46,18 +43,17 @@ internal class QueryIfRequestGenerator : QueryBaseGenerator
 			else
 				foreach (ParserIfRequestSectionExpressionModel sectionExpression in expressions)
 					if (Manager.Request.Expressions.IsRequested(sectionExpression.Expressions))
+					{
 						if (!string.IsNullOrWhiteSpace(sectionExpression.Sql))
 							sql = sql.AddWithSeparator(sectionExpression.Sql.TrimIgnoreNull(), "," + Environment.NewLine);
-						else
-							throw new Exceptions.ReportingParserException($"Can't find the SQL for section 'IfRequest expressions' for expressions '{sectionExpression.Expressions[0]}'");
+						else if (Manager.Request.Pagination.IsRequestedTotals() && !string.IsNullOrWhiteSpace(sectionExpression.SqlTotals))
+							sql = sql.AddWithSeparator(sectionExpression.SqlTotals, "," + Environment.NewLine);
+					}
+					else if (!string.IsNullOrWhiteSpace(sectionExpression.SqlWhenNotRequest))
+						sql = sql.AddWithSeparator(sectionExpression.SqlWhenNotRequest, "," + Environment.NewLine);
 			// Devuelve la cadena solicitada
 			return sql;
 	}
-	
-	/// <summary>
-	///		Comprueba si se debe añadir una consulta al consultar totales
-	/// </summary>
-	private bool MustAddWhenTotals(RequestModel request) => request.Pagination.IsRequestedTotals() && Section.WhenRequestTotals;
 
 	/// <summary>
 	///		Sección que se está generando

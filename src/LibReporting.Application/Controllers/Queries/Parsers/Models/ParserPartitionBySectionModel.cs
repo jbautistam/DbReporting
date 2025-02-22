@@ -6,10 +6,8 @@
 /// <example>
 /// -PartitionBy 
 ///     -Dimension:Users
-///     -Sql
-///         YearMonth
-///     -OrderBy
-///         Date
+///     -Sql: YearMonth
+///     -OrderBy: Date
 /// </example>
 internal class ParserPartitionBySectionModel : ParserBaseSectionModel
 {

@@ -11,10 +11,7 @@ internal class ParserIfRequestSectionExpressionModel : ParserBaseSectionModel
     /// </summary>
 	internal void AddExpressions(string content)
 	{
-        if (!string.IsNullOrWhiteSpace(content))
-            foreach (string part in content.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-                if (!Expressions.Any(item => item.Equals(part, StringComparison.CurrentCultureIgnoreCase)))
-                    Expressions.Add(part);
+        Expressions.AddRange(SplitContent(content, ","));
 	}
 
 	/// <summary>
@@ -25,5 +22,15 @@ internal class ParserIfRequestSectionExpressionModel : ParserBaseSectionModel
     /// <summary>
     ///		Consulta SQL a añadir cuando se solicita la expresión
     /// </summary>
-    internal string Sql { get; set; } = default!;
+    internal string? Sql { get; set; }
+
+    /// <summary>
+    ///		Consulta SQL a añadir cuando se solicita la expresión en una consulta con totales
+    /// </summary>
+    internal string? SqlTotals { get; set; }
+
+    /// <summary>
+    ///		Consulta SQL a añadir cuando no se solicita la expresión
+    /// </summary>
+    internal string? SqlWhenNotRequest { get; set; }
 }

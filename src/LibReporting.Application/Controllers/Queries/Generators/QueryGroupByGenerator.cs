@@ -9,7 +9,7 @@ namespace Bau.Libraries.LibReporting.Application.Controllers.Queries.Generators;
 /// </summary>
 internal class QueryGroupByGenerator : QueryBaseGenerator
 {
-	internal QueryGroupByGenerator(ReportQueryGenerator manager, ParserGroupBySectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
+	internal QueryGroupByGenerator(ReportQueryGenerator manager, ParserGroupBySectionModel section, QueryDimensionCollectionModel queryDimensions) : base(manager)
 	{
 		Section = section;
 		QueryDimensions = queryDimensions;
@@ -40,5 +40,5 @@ internal class QueryGroupByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Colección de consultas de dimensiones 
 	/// </summary>
-	internal QueryDimensionsCollection QueryDimensions { get; }
+	internal QueryDimensionCollectionModel QueryDimensions { get; }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Bau.Libraries.LibReporting.Application.Controllers.Parsers.Models;
 
 /// <summary>
-///		Modelo de interpretación de una dimensión
+///		Modelo de interpretación de una expresión
 /// </summary>
 internal class ParserExpressionModel : ParserBaseSectionModel
 {
@@ -16,17 +16,12 @@ internal class ParserExpressionModel : ParserBaseSectionModel
 	internal string Expression { get; }
 
     /// <summary>
-    ///		Tabla de la que se obtiene el origen de datos
+    ///		Tabla de la que se obtiene la expresión
     /// </summary>
-    internal string Table { get; set; } = default!;
+    internal string? Table { get; set; }
 
     /// <summary>
     ///		Campo / alias en la tabla
     /// </summary>
-    internal string Field { get; set; } = default!;
-
-	/// <summary>
-	///		Agregación (SUM, MAX...) en caso que estemos en una cláusula HAVING
-	/// </summary>
-	internal string Aggregation { get; set; } = "SUM";
+    internal string? Field { get; set; }
 }

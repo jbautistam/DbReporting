@@ -12,7 +12,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	// Registros privadas
 	private record JoinField(string FieldSource, string FieldTarget);
 
-	internal QueryRelationGenerator(ReportQueryGenerator manager, ParserJoinSectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
+	internal QueryRelationGenerator(ReportQueryGenerator manager, ParserJoinSectionModel section, QueryDimensionCollectionModel queryDimensions) : base(manager)
 	{
 		Section = section;
 		QueryDimensions = queryDimensions;
@@ -139,7 +139,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 		List<JoinField> fields = [];
 
 			// Obtiene los campos solicitados
-			foreach (QueryFieldModel field in queryDimension.Fields)
+			foreach (QueryDimensionFieldModel field in queryDimension.Fields)
 				if (!field.IsPrimaryKey)
 					fields.Add(new JoinField(field.Alias, field.Alias));
 			// Devuelve la lista de campos
@@ -154,7 +154,7 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 		List<JoinField> fields = [];
 
 			// Obtiene los campos solicitados
-			foreach (QueryFieldModel field in queryDimension.Fields)
+			foreach (QueryDimensionFieldModel field in queryDimension.Fields)
 				if (field.IsPrimaryKey)
 					fields.Add(new JoinField(field.Alias, field.Alias));
 			// Devuelve la lista de campos
@@ -184,5 +184,5 @@ internal class QueryRelationGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Dimensiones definidas en la consulta
 	/// </summary>
-	internal QueryDimensionsCollection QueryDimensions { get; }
+	internal QueryDimensionCollectionModel QueryDimensions { get; }
 }

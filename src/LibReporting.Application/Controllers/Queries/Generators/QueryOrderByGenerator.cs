@@ -13,7 +13,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 	// Datos de ordenación
 	private record SortField(string Table, string Field, int SortIndex, RequestColumnModel.SortOrder Type);
 
-	internal QueryOrderByGenerator(ReportQueryGenerator manager, ParserOrderBySectionModel section, QueryDimensionsCollection queryDimensions) : base(manager)
+	internal QueryOrderByGenerator(ReportQueryGenerator manager, ParserOrderBySectionModel section, QueryDimensionCollectionModel queryDimensions) : base(manager)
 	{
 		Section = section;
 		QueryDimensions = queryDimensions;
@@ -30,10 +30,10 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 			// Obtiene los campos para ORDER BY asociados a las dimensiones solicitadas
 			foreach (ParserDimensionModel parserDimension in Section.Dimensions)
 			{
-				List<QueryFieldModel> fields = QueryDimensions.GetFieldsRequest(parserDimension.DimensionKey);
+				List<QueryDimensionFieldModel> fields = QueryDimensions.GetFieldsRequest(parserDimension.DimensionKey);
 
 					// Añade los datos de ordenación
-					foreach (QueryFieldModel field in fields)
+					foreach (QueryDimensionFieldModel field in fields)
 						if (MustIncludeField(field, parserDimension.WithPrimaryKeys, parserDimension.WithRequestedFields, true))
 						{
 							SortField? sortField = GetSortDimensionRequest(parserDimension, field);
@@ -75,7 +75,7 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Obtiene la ordenación solicitada para un campo de dimensión
 	/// </summary>
-	private SortField? GetSortDimensionRequest(ParserDimensionModel dimension, QueryFieldModel field)
+	private SortField? GetSortDimensionRequest(ParserDimensionModel dimension, QueryDimensionFieldModel field)
 	{
 		RequestDimensionModel? requestDimension = Manager.Request.Dimensions.GetRequested(dimension.DimensionKey);
 
@@ -157,5 +157,5 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 	/// <summary>
 	///		Consultas de dimensiones
 	/// </summary>
-	internal QueryDimensionsCollection QueryDimensions { get; }
+	internal QueryDimensionCollectionModel QueryDimensions { get; }
 }
