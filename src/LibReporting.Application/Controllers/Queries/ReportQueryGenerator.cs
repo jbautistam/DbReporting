@@ -5,7 +5,6 @@ using Bau.Libraries.LibReporting.Application.Controllers.Queries.Models;
 using Bau.Libraries.LibReporting.Application.Controllers.Request.Models;
 using Bau.Libraries.LibReporting.Application.Exceptions;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
-using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports.Blocks;
 
 namespace Bau.Libraries.LibReporting.Application.Controllers.Queries;
