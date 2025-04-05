@@ -51,7 +51,6 @@ internal class QueryConditionsGenerator : QueryBaseGenerator
 		}
 	}
 
-
 	/// <summary>
 	///		Obtiene la cadena SQL para las condiciones sobre <see cref="ParserDataSourceModel"/>
 	/// </summary>

@@ -69,7 +69,6 @@ internal class QueryOrderByGenerator : QueryBaseGenerator
 			sql = sql.AddWithSeparator(GetPaginationSql(NeedPaginate()), Environment.NewLine);
 			// Devuelve la cadena SQL
 			return sql;
-
 	}
 
 	/// <summary>
