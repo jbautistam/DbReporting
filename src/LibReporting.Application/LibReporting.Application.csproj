@@ -40,10 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Bau.Libraries.LibHelper" Version="1.1.38" />
-	</ItemGroup>
-
-	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\..\Common\LibHelper\src\LibHelper.csproj" />
 	  <ProjectReference Include="..\LibReporting.Models\LibReporting.Models.csproj" />
 	  <ProjectReference Include="..\LibReporting.Requests\LibReporting.Requests.csproj" />
 	</ItemGroup>
