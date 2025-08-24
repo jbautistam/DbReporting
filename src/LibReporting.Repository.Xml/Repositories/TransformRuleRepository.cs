@@ -34,14 +34,33 @@ public class TransformRuleRepository
 					if (rootML.Name == TagRoot)
 						foreach (MLNode childML in rootML.Nodes)
 							if (childML.Name == TagRule)
-								rules.Add(new TransformRuleModel
-													{
-														Source = childML.Nodes[TagSource].Value.TrimIgnoreNull(),
-														Target = childML.Nodes[TagTarget].Value.TrimIgnoreNull()
-													}
-										 );
+							{
+								TransformRuleModel rule = new()
+															{
+																Source = GetNodeOrAttribute(childML, TagSource),
+																Target = GetNodeOrAttribute(childML, TagTarget)
+															};
+
+									// Comprueba antes de añadir
+									if (!string.IsNullOrWhiteSpace(rule.Source) && !string.IsNullOrWhiteSpace(rule.Target))
+										rules.Add(rule);
+							}
 			// Devuelve los datos leidos
 			return rules;
+	}
+
+	/// <summary>
+	///		Obtiene el valor de un nodo o un atributo
+	/// </summary>
+	private string GetNodeOrAttribute(MLNode nodeML, string tag)
+	{
+		string result = nodeML.Attributes[tag].Value.TrimIgnoreNull();
+
+			// Obtiene el valor del nodo si el atributo está vacío
+			if (string.IsNullOrWhiteSpace(result))
+				result = nodeML.Nodes[tag].Value.TrimIgnoreNull();
+			// Devuelve el resultado
+			return result;
 	}
 
 	/// <summary>
