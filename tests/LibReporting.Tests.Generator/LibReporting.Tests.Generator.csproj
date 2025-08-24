@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LibReporting.Application\LibReporting.Application.csproj" />
+    <ProjectReference Include="..\..\src\LibReporting.Models\LibReporting.Models.csproj" />
+    <ProjectReference Include="..\..\src\LibReporting.Repository.Xml\LibReporting.Repository.Xml.csproj" />
+    <ProjectReference Include="..\..\src\LibReporting.Requests\LibReporting.Requests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+</Project>

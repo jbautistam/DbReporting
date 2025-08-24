@@ -12,6 +12,7 @@ public class ReportingRepositoryXml : IReportingRepository
 		DataWarehouseRepository = new Repositories.DataWarehouseRepository(this);
 		ReportRepository = new Repositories.ReportRepository(this);
 		RequestRepository = new Repositories.RequestRepository(this);
+		TransformRuleRepository = new Repositories.TransformRuleRepository();
 	}
 
 	/// <summary>
@@ -23,6 +24,11 @@ public class ReportingRepositoryXml : IReportingRepository
 	///		Repositorio de <see cref="Models.DataWarehouses.Reports.ReportModel"/>
 	/// </summary>
 	public IReportRepository ReportRepository { get; }
+
+	/// <summary>
+	///		Repositorio de <see cref="Models.DataWarehouses.Reports.Transformers.TransformRuleModel"/>
+	/// </summary>
+	public Repositories.TransformRuleRepository TransformRuleRepository { get; }
 
 	/// <summary>
 	///		Repositorio de <see cref="Requests.Models.ReportRequestModel"/>

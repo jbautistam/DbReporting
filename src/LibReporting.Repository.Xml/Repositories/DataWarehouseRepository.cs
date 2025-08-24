@@ -88,6 +88,8 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 							}
 						// Carga los informes avanzados
 						AddAdvancedReports(dataWarehouse, Path.Combine(Path.GetDirectoryName(id)!, "Reports"));
+						// Carga las reglas de transformación
+						AddTransformRules(dataWarehouse, Path.Combine(Path.GetDirectoryName(id)!, "Rules"));
 					}
 			// Devuelve los datos del almacén de datos
 			return dataWarehouse;
@@ -106,6 +108,16 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 					if (report is not null)
 						dataWarehouse.Reports.Add(report);
 			}
+	}
+
+	/// <summary>
+	///		Añade las reglas de transformación
+	/// </summary>
+	private void AddTransformRules(DataWarehouseModel dataWarehouse, string? path)
+	{
+		if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
+			foreach (string fileName in Directory.GetFiles(path, "*.rules.xml"))
+				dataWarehouse.Rules.AddRange(Manager.TransformRuleRepository.Load(fileName));
 	}
 
 	/// <summary>

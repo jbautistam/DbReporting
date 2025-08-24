@@ -29,8 +29,8 @@ internal class ReportQueryGenerator
 	{
 		// Normaliza la solicitud de las dimensiones
 		Request.Dimensions.Normalize();
-		// Devuelve la SQL generada
-		return GetSql(GetQueries(Request.Report.Blocks));
+		// Genera la SQL y aplica las reglas de transformación
+		return new Tools.TransformRuleSevice(Request.Report.DataWarehouse.Rules).Apply(GetSql(GetQueries(Request.Report.Blocks)));
 	}
 
 	/// <summary>

@@ -63,4 +63,9 @@ public class DataWarehouseModel : Base.BaseReportingModel
 	///		Informes
 	/// </summary>
 	public Base.BaseReportingDictionaryModel<Reports.ReportModel> Reports { get; } = new();
+
+	/// <summary>
+	///		Reglas de transformación
+	/// </summary>
+	public List<Reports.Transformers.TransformRuleModel> Rules { get; } = [];
 }
