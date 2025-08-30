@@ -12,7 +12,7 @@ namespace Bau.Libraries.LibReporting.Repository.Xml.Repositories;
 /// <summary>
 ///		Repositorio de <see cref="ReportingSchemaModel"/> con archivos XML
 /// </summary>
-public class DataWarehouseRepository : BaseRepository, Application.Interfaces.ISchemaRepository
+public class DataWarehouseRepository
 {
 	// Constantes privadas
 	private const string TagRoot = "Dashboard";
@@ -42,26 +42,28 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 	private const string TagValue = "Value";
 	private const string TagFormula = "Formula";
 
-	public DataWarehouseRepository(ReportingRepositoryXml manager) : base(manager) {}
-
 	/// <summary>
 	///		Carga los datos de esquema
 	/// </summary>
-	public async Task<DataWarehouseModel> GetAsync(string id, ReportingSchemaModel schema, CancellationToken cancellationToken)
+	public DataWarehouseModel Load(string fileName, ReportingSchemaModel schema)
 	{
-		// Evita las advertencias
-		await Task.Delay(1, cancellationToken);
-		// Carga los datos
-		return Get(id, schema);
+		DataWarehouseModel dataWarehouse = LoadFromXml(Path.GetFileNameWithoutExtension(fileName), File.ReadAllText(fileName), schema);
+
+			// Carga los informes avanzados
+			AddAdvancedReports(dataWarehouse, Path.Combine(Path.GetDirectoryName(fileName)!, "Reports"));
+			// Carga las reglas de transformación
+			AddTransformRules(dataWarehouse, Path.Combine(Path.GetDirectoryName(fileName)!, "Rules"));
+			// Devuelve los datos del almacén de datos
+			return dataWarehouse;
 	}
 
 	/// <summary>
 	///		Carga los datos de esquema
 	/// </summary>
-	public DataWarehouseModel Get(string id, ReportingSchemaModel schema)
+	public DataWarehouseModel LoadFromXml(string dataWarehouseId, string xml, ReportingSchemaModel schema)
 	{
 		DataWarehouseModel dataWarehouse = new(schema);
-		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().Load(id);
+		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().ParseText(xml);
 
 			// Carga los datos
 			if (fileML is not null)
@@ -69,7 +71,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 					if (rootML.Name == TagRoot)
 					{
 						// Asigna las propiedades
-						dataWarehouse.Id = Path.GetFileNameWithoutExtension(id);
+						dataWarehouse.Id = dataWarehouseId;
 						dataWarehouse.Name = rootML.Nodes[TagName].Value.TrimIgnoreNull();
 						dataWarehouse.Description = rootML.Nodes[TagDescription].Value.TrimIgnoreNull();
 						// Carga las dimensiones y orígenes de datos
@@ -86,10 +88,6 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 										dataWarehouse.Dimensions.Add(LoadBaseDimension(nodeML, dataWarehouse));
 									break;
 							}
-						// Carga los informes avanzados
-						AddAdvancedReports(dataWarehouse, Path.Combine(Path.GetDirectoryName(id)!, "Reports"));
-						// Carga las reglas de transformación
-						AddTransformRules(dataWarehouse, Path.Combine(Path.GetDirectoryName(id)!, "Rules"));
 					}
 			// Devuelve los datos del almacén de datos
 			return dataWarehouse;
@@ -103,7 +101,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 		if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
 			foreach (string fileName in Directory.GetFiles(path, "*.report.xml"))
 			{
-				ReportModel report = Manager.ReportRepository.Get(fileName, dataWarehouse);
+				ReportModel report = new ReportRepository().Load(fileName, dataWarehouse);
 
 					if (report is not null)
 						dataWarehouse.Reports.Add(report);
@@ -117,7 +115,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 	{
 		if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
 			foreach (string fileName in Directory.GetFiles(path, "*.rules.xml"))
-				dataWarehouse.Rules.AddRange(Manager.TransformRuleRepository.Load(fileName));
+				dataWarehouse.Rules.AddRange(new TransformRuleRepository().Load(fileName));
 	}
 
 	/// <summary>
@@ -273,24 +271,13 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 	/// <summary>
 	///		Modifica los datos de esquema
 	/// </summary>
-	public async Task UpdateAsync(string id, DataWarehouseModel dataWarehouse, CancellationToken cancellationToken)
-	{
-		// Evita las advertencias
-		await Task.Delay(1, cancellationToken);
-		// Graba los datos
-		Update(id, dataWarehouse);
-	}
-
-	/// <summary>
-	///		Modifica los datos de esquema
-	/// </summary>
-	public void Update(string id, DataWarehouseModel dataWarehouse)
+	public void Save(string fileName, DataWarehouseModel dataWarehouse)
 	{
 		MLFile fileML = new();
 		MLNode rootML = fileML.Nodes.Add(TagRoot);
 
 			// Añade las propiedades básicas
-			rootML.Nodes.Add(TagId, Path.GetFileNameWithoutExtension(id));
+			rootML.Nodes.Add(TagId, Path.GetFileNameWithoutExtension(fileName));
 			rootML.Nodes.Add(TagName, dataWarehouse.Name);
 			rootML.Nodes.Add(TagDescription, dataWarehouse.Description);
 			// Añade los nodos de orígenes de datos
@@ -316,7 +303,7 @@ public class DataWarehouseRepository : BaseRepository, Application.Interfaces.IS
 						break;
 				}
 			// Graba el archivo
-			new LibMarkupLanguage.Services.XML.XMLWriter().Save(id, fileML);
+			new LibMarkupLanguage.Services.XML.XMLWriter().Save(fileName, fileML);
 	}
 
 	/// <summary>

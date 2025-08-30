@@ -1,4 +1,5 @@
-﻿using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports.Blocks;
+﻿using Bau.Libraries.LibReporting.Models.DataWarehouses.Dimensions;
+using Bau.Libraries.LibReporting.Models.DataWarehouses.Reports.Blocks;
 
 namespace Bau.Libraries.LibReporting.Models.DataWarehouses.Reports;
 
@@ -22,6 +23,37 @@ public class ReportModel : Base.BaseReportingModel
 			return Id.CompareTo(report.Id);
 		else
 			return -1;
+	}
+
+	/// <summary>
+	///		Obtiene las dimensiones definidas en un informe (tanto las dimensiones seleccionadas en el informe como sus hijas)
+	/// </summary>
+	public List<BaseDimensionModel> GetAllDimensions()
+	{
+		List<BaseDimensionModel> dimensions = [];
+
+			// Añade las dimensiones (intenta que no haya duplicados)
+			foreach (BaseDimensionModel dimension in Dimensions)
+				foreach (BaseDimensionModel reportDimension in GetReportDimensions(dimension))
+					if (!dimensions.Any(item => item.Id.Equals(reportDimension.Id, StringComparison.CurrentCultureIgnoreCase)))
+						dimensions.Add(reportDimension);
+			// Devuelve la lista de dimensiones
+			return dimensions;
+
+		// Obtiene las dimensiones de informe y sus hijos
+		List<BaseDimensionModel> GetReportDimensions(BaseDimensionModel dimension)
+		{
+			List<BaseDimensionModel> result = [];
+
+				// Añade la dimensión
+				result.Add(dimension);
+				// Añade las dimensiones
+				foreach (Relations.DimensionRelationModel relation in dimension.GetRelations())
+					if (relation.Dimension is not null)
+						result.AddRange(GetReportDimensions(relation.Dimension));
+				// Devuelve las dimensiones
+				return result;
+		}
 	}
 
 	/// <summary>

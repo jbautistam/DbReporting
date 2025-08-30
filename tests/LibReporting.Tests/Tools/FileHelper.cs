@@ -11,9 +11,18 @@ internal static class FileHelper
 	internal static string GetFullFileName(string fileName) => Path.Combine(GetDataPath(), fileName);
 
 	/// <summary>
-	///		Obtiene el directorio de archivos de datos del proyecto
+	///		Busca el directorio "Data" a partir del directorio ejecutable
 	/// </summary>
-	internal static string GetDataPath() => Path.Combine(GetExecutionPath(), "Data");
+	internal static string GetDataPath()
+	{
+		string path = Path.GetDirectoryName(GetExecutionPath())!;
+
+			// Busca el directorio Data
+			while (!Directory.Exists(Path.Combine(path!, "Data")))
+				path = Path.GetDirectoryName(path)!;
+			// Devuelve el directorio Data
+			return Path.Combine(path, "Data");
+	}
 
 	/// <summary>
 	///		Obtiene el directorio de ejecución del proyecto
@@ -38,6 +47,31 @@ internal static class FileHelper
 	}
 
 	/// <summary>
+	///		Obtiene la lista de archivos de esquemas del directorio Data
+	/// </summary>
+	public static List<string> GetSchemasFiles()
+	{
+		List<string> files = [];
+
+			// Busca los directorios del directorio Data
+			foreach (string path in Directory.GetDirectories(GetDataPath()))
+			{
+				string schema = string.Empty;
+
+					// Obtiene el archivo de esquema
+					if (Directory.Exists(Path.Combine(path, "Reports")))
+						foreach (string file in Directory.GetFiles(path))
+							if (file.EndsWith(".reporting.xml", StringComparison.CurrentCultureIgnoreCase))
+								schema = file;
+					// Añade el directorio de esquema
+					if (!string.IsNullOrWhiteSpace(schema))
+						files.Add(schema);
+			}
+			// Devuelve los informes
+			return files;
+	}
+
+	/// <summary>
 	///		Obtiene la lista de esquemas e informes del directorio Data
 	/// </summary>
 	public static Dictionary<string, List<string>> GetReports()
@@ -48,16 +82,19 @@ internal static class FileHelper
 			foreach (string path in Directory.GetDirectories(GetDataPath()))
 			{
 				string schema = string.Empty;
-				List<string> reportFiles = new();
+				List<string> reportFiles = [];
 
-					// Obtiene el esquema y los informes
+					// Obtiene el archivo de esquema
 					foreach (string file in Directory.GetFiles(path))
 						if (file.EndsWith(".reporting.xml", StringComparison.CurrentCultureIgnoreCase))
 							schema = file;
-						else if (file.EndsWith(".report.xml", StringComparison.CurrentCultureIgnoreCase))
-							reportFiles.Add(file);
+					// Obtiene los informes
+					if (Directory.Exists(Path.Combine(path, "Reports")))
+						foreach (string file in Directory.GetFiles(Path.Combine(path, "Reports")))
+							if (file.EndsWith(".report.xml", StringComparison.CurrentCultureIgnoreCase))
+								reportFiles.Add(file);
 					// Crea el diccionario
-					if (!string.IsNullOrWhiteSpace(schema))
+					if (!string.IsNullOrWhiteSpace(schema) && reportFiles.Count > 0)
 						reports.Add(schema, reportFiles);
 			}
 			// Devuelve los informes

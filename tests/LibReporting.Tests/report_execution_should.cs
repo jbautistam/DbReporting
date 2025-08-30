@@ -1,7 +1,7 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
+using Microsoft.Data.SqlClient;
 using LibReporting.Tests.Tools;
 using Bau.Libraries.LibReporting.Requests.Models;
-using System.Data.SqlClient;
 
 namespace LibReporting.Tests;
 
@@ -38,7 +38,7 @@ public class report_execution_should
 							}
 				}
 			// Comprueba los errores
-			error.Should().BeNullOrWhiteSpace();
+			error.ShouldBeNullOrWhiteSpace();
 	}
 
 	/// <summary>
@@ -50,7 +50,7 @@ public class report_execution_should
 				"Sales/ManualRequests/Sales/Sales.request.xml")]
 	public void execute_to_sql(string fileName, string fileRequest)
 	{
-		ExecuteSql(FileHelper.GetFullFileName(fileName), FileHelper.GetFullFileName(fileRequest)).Should().BeNullOrWhiteSpace();
+		ExecuteSql(FileHelper.GetFullFileName(fileName), FileHelper.GetFullFileName(fileRequest)).ShouldBeNullOrWhiteSpace();
 	}
 
 	/// <summary>
@@ -64,8 +64,10 @@ public class report_execution_should
 			try
 			{
 				ReportingSolutionManager manager = new();
-				ReportRequestModel request = manager.LoadRequest(requestFile);
+				ReportRequestModel? request = manager.LoadRequest(requestFile);
 
+					// Se debería haber cargado la solicitud
+					request.ShouldNotBeNull();
 					// Cambia la paginación
 					request.Pagination.MustPaginate = true;
 					request.Pagination.Page = 1;
@@ -73,7 +75,7 @@ public class report_execution_should
 					// Agrega el dataWarehouse
 					manager.AddDataWarehouse(schemaFile);
 					// Comprueba que realmente se haya cargado una solicitud
-					request.Should().NotBeNull();
+					request.ShouldNotBeNull();
 					// Obtiene la SQL del informe
 					using (SqlConnection connection = new(Tools.ConnectionsHelper.GetConnectionStringForSchema(schemaFile)))
 					{

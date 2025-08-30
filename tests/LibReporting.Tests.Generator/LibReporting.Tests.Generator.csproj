@@ -9,10 +9,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Accept.png" />
+    <None Remove="Resources\Delete.png" />
+    <None Remove="Resources\Search.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\LibReporting.Application\LibReporting.Application.csproj" />
     <ProjectReference Include="..\..\src\LibReporting.Models\LibReporting.Models.csproj" />
     <ProjectReference Include="..\..\src\LibReporting.Repository.Xml\LibReporting.Repository.Xml.csproj" />
     <ProjectReference Include="..\..\src\LibReporting.Requests\LibReporting.Requests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Accept.png" />
+    <Resource Include="Resources\Delete.png" />
+    <Resource Include="Resources\Search.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\BaseRepository.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Bau.Libraries.LibMarkup" Version="1.3.6" />
   </ItemGroup>
 

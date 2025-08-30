@@ -18,12 +18,12 @@ public class TransformRuleRepository
 	/// <summary>
 	///		Carga la lista de <see cref="TransformRuleModel"/> de un archivo
 	/// </summary>
-	public List<TransformRuleModel> Load(string fileName) => GetFromXml(LibHelper.Files.HelperFiles.LoadTextFile(fileName));
+	public List<TransformRuleModel> Load(string fileName) => LoadFromXml(LibHelper.Files.HelperFiles.LoadTextFile(fileName));
 
 	/// <summary>
 	///		Carga la lista de <see cref="TransformRuleModel"/> de una cadena XML
 	/// </summary>
-	public List<TransformRuleModel> GetFromXml(string xml)
+	public List<TransformRuleModel> LoadFromXml(string xml)
 	{
 		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().ParseText(xml);
 		List<TransformRuleModel> rules = [];
@@ -64,9 +64,9 @@ public class TransformRuleRepository
 	}
 
 	/// <summary>
-	///		Modifica los datos de esquema
+	///		Graba la lista de reglas en un archivo XML
 	/// </summary>
-	public void Update(string id, List<TransformRuleModel> rules)
+	public void Save(string fileName, List<TransformRuleModel> rules)
 	{
 		MLFile fileML = new();
 		MLNode rootML = fileML.Nodes.Add(TagRoot);
@@ -80,6 +80,6 @@ public class TransformRuleRepository
 					rootML.Nodes.Add(nodeML);
 			}
 			// Graba el archivo
-			new LibMarkupLanguage.Services.XML.XMLWriter().Save(id, fileML);
+			new LibMarkupLanguage.Services.XML.XMLWriter().Save(fileName, fileML);
 	}
 }

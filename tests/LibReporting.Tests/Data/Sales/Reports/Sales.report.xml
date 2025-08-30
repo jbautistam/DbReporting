@@ -92,9 +92,9 @@
 		            			-Dimension: Products
 									--Table: ProductsCte
 								-Dimension: Calendar
-									--Table: CalendarCte									
+									--Table: CalendarCte
+								-Paginate									
 		            	}}
-						{{Pagination}}
 				]]>
 			</Query>
 		</With>

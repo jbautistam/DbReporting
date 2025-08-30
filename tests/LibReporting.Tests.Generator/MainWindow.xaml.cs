@@ -18,7 +18,17 @@ public partial class MainWindow : Window
 	private void GenerateFiles()
 	{
 		if (ValidateData())
-			new Managers.FilesTestGenerator().Generate(txtFile.Text, txtOutput.Text);
+			try
+			{
+				// Genera los archivos
+				new Managers.FilesTestGenerator().Generate(txtFile.FileName, txtOutput.PathName);
+				// Mensaje al usuario
+				MessageBox.Show("End files generation");
+			}
+			catch (Exception exception)
+			{
+				MessageBox.Show($"Error when generate requests. {exception.Message}");
+			}
 	}
 
 	/// <summary>
@@ -29,10 +39,10 @@ public partial class MainWindow : Window
 		bool validated = false;
 
 			// Comprueba los datos
-			if (string.IsNullOrWhiteSpace(txtFile.Text) || string.IsNullOrWhiteSpace(txtOutput.Text))
-				MessageBox.Show("Introduzca el nombre de archivo y el directorio de salida");
-			else if (!System.IO.File.Exists(txtFile.Text))
-				MessageBox.Show("Seleccione el archivo de reporting");
+			if (string.IsNullOrWhiteSpace(txtFile.FileName) || string.IsNullOrWhiteSpace(txtOutput.PathName))
+				MessageBox.Show("Enter the schema file name and the output folder");
+			else if (!File.Exists(txtFile.FileName))
+				MessageBox.Show("Can't find the schema file name");
 			else
 				validated = true;
 			// Devuelve el valor que indica si los datos son correctos

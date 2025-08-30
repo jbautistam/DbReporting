@@ -7,7 +7,7 @@ namespace Bau.Libraries.LibReporting.Repository.Xml.Repositories;
 /// <summary>
 ///		Repositorio para <see cref="ReportRequestModel"/>
 /// </summary>
-public class RequestRepository : BaseRepository, Application.Interfaces.IRequestRepository
+public class RequestRepository
 {
 	// Constantes privadas
 	private const string TagRoot = "ReportRequest";
@@ -27,27 +27,17 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	private const string TagCondition = "Condition";
 	private const string TagDimension = "Dimension";
 	private const string TagDataSource = "DataSource";
-
-	public RequestRepository(ReportingRepositoryXml manager) : base(manager) {}
-
-	/// <summary>
-	///		Carga los datos de un <see cref="ReportRequestModel"/>
-	/// </summary>
-	public async Task<ReportRequestModel?> GetAsync(string id, CancellationToken cancellationToken)
-	{
-		// Evita las advertencias
-		await Task.Delay(1, cancellationToken);
-		// Carga los datos
-		return Get(id);
-	}
+	private const string TagPagination = "Pagination";
+	private const string TagPage = "Page";
+	private const string TagRecordsPerPage = "RecordsPerPage";
 
 	/// <summary>
 	///		Carga los datos de un <see cref="ReportRequestModel"/>
 	/// </summary>
-	public ReportRequestModel? Get(string id)
+	public ReportRequestModel? Load(string fileName)
 	{
 		ReportRequestModel? request = null;
-		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().Load(id);
+		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().Load(fileName);
 
 			// Carga los datos del archivo
 			if (fileML is not null)
@@ -79,10 +69,23 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 								case TagColumn:
 										request.Expressions.Add(LoadColumn(nodeML));
 									break;
+								case TagPagination:
+										LoadPagination(request.Pagination, nodeML);
+									break;
 							}
 					}
 			// Devuelve los datos de la solicitud
 			return request;
+	}
+
+	/// <summary>
+	///		Carga los datos de paginación
+	/// </summary>
+	private void LoadPagination(PaginationRequestModel pagination, MLNode nodeML)
+	{
+		pagination.Page = nodeML.Attributes[TagPage].Value.GetInt(0);
+		pagination.RecordsPerPage = nodeML.Attributes[TagRecordsPerPage].Value.GetInt(0);
+		pagination.MustPaginate = pagination.Page > 0;
 	}
 
 	/// <summary>
@@ -179,10 +182,10 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	private void LoadParameter(MLNode rootML, List<ParameterRequestModel> parameters)
 	{
 		ParameterRequestModel parameter = new()
-												{
-													Key = rootML.Attributes[TagKey].Value.TrimIgnoreNull(), 
-													Type = rootML.Attributes[TagType].Value.GetEnum(ParameterRequestModel.ParameterType.String)
-												};
+											{
+												Key = rootML.Attributes[TagKey].Value.TrimIgnoreNull(), 
+												Type = rootML.Attributes[TagType].Value.GetEnum(ParameterRequestModel.ParameterType.String)
+											};
 
 			// Obtiene el valor
 			parameter.Value = ConvertParameter(parameter.Type, rootML.Attributes[TagValue].Value.TrimIgnoreNull());
@@ -207,18 +210,7 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 	/// <summary>
 	///		Graba los datos de un <see cref="ReportRequestModel"/>
 	/// </summary>
-	public async Task UpdateAsync(string id, ReportRequestModel request, CancellationToken cancellationToken)
-	{
-		// Evita las advertencias
-		await Task.Delay(1, cancellationToken);
-		// Graba los datos
-		Update(id, request);
-	}
-
-	/// <summary>
-	///		Graba los datos de un <see cref="ReportRequestModel"/>
-	/// </summary>
-	public void Update(string id, ReportRequestModel request)
+	public void Save(string fileName, ReportRequestModel request)
 	{
 		MLFile fileML = new();
 		MLNode rootML = fileML.Nodes.Add(TagRoot);
@@ -227,12 +219,30 @@ public class RequestRepository : BaseRepository, Application.Interfaces.IRequest
 			rootML.Attributes.Add(TagDataWarehouseId, request.DataWarehouseId);
 			rootML.Attributes.Add(TagId, request.ReportId);
 			// Añade los datos de la solicitud
+			rootML.Nodes.Add(GetNodePagination(request.Pagination));
 			rootML.Nodes.AddRange(GetNodesParameters(request.Parameters));
 			rootML.Nodes.AddRange(GetNodesDataRequest(TagDimension, request.Dimensions));
 			rootML.Nodes.AddRange(GetNodesDataRequest(TagDataSource, request.DataSources));
 			rootML.Nodes.AddRange(GetNodesExpressions(request.Expressions));
 			// Graba el archivo
-			new LibMarkupLanguage.Services.XML.XMLWriter().Save(id, fileML);
+			new LibMarkupLanguage.Services.XML.XMLWriter().Save(fileName, fileML);
+	}
+
+	/// <summary>
+	///		Obtiene el nodo de paginación
+	/// </summary>
+	private MLNode GetNodePagination(PaginationRequestModel pagination)
+	{
+		MLNode nodeML = new(TagPagination);
+
+			// Normaliza la página
+			if (!pagination.MustPaginate)
+				pagination.Page = 0;
+			// Añade los atributos al nodo
+			nodeML.Attributes.Add(TagPagination, pagination.Page);
+			nodeML.Attributes.Add(TagRecordsPerPage, pagination.RecordsPerPage);
+			// Devuelve el nodo
+			return nodeML;
 	}
 
 	/// <summary>

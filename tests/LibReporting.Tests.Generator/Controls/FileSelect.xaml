@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="LibReporting.Tests.Generator.Controls.FileSelect"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+						 mc:Ignorable="d" d:DesignHeight="50" d:DesignWidth="300" >
+	<Grid x:Name="grdFileSelect">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<TextBox Grid.Column="0" Text="{Binding FileName, Mode=TwoWay}" Margin="0" />
+		<Button Grid.Column="1" x:Name="cmdSelect" Click="cmdSelect_Click" Margin="0">
+			<Button.Content>
+				<Image Width="16" Height="16" Source="/Resources/Search.png"/>
+			</Button.Content>
+		</Button>
+	</Grid>
+</UserControl>

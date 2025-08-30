@@ -1,21 +1,20 @@
-﻿<Window x:Class="LibReporting.Tests.Generator.MainWindow"
+﻿<Window xmlns:Controls="clr-namespace:LibReporting.Tests.Generator.Controls"  
+		x:Class="LibReporting.Tests.Generator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LibReporting.Tests.Generator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Test files generator" Height="250" Width="800">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
-		<GroupBox Header="Parámetros">
+		<GroupBox Header="Parámetros" Margin="5" Foreground="Maroon" FontWeight="Bold">
 			<Grid>
 				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
@@ -23,14 +22,21 @@
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
-				<Label Grid.Row="0" Grid.Column="0" Content="Xml reporting file:" />
-				<TextBox x:Name="txtFile" Grid.Row="0" Grid.Column="1" Text="C:\Projects\Repos\Poc\Roivolution.Admon\Roivolution\BauLibraries\Libraries\DbReporting\tests\LibReporting.Tests\Data\Sales\Reporting-Sql Server - SalesSamples.Schema.xml"/>
-				<Label Grid.Row="1" Grid.Column="0" Content="Output folder:" />
-				<TextBox x:Name="txtOutput" Grid.Row="1" Grid.Column="1" Text="C:\Projects\Repos\Poc\Roivolution.Admon\Roivolution\BauLibraries\Libraries\DbReporting\tests\LibReporting.Tests\Data\Sales\Requests"/>
+				<Label Grid.Row="0" Grid.Column="0" Content="Xml reporting file:" Margin="5" Foreground="Navy" FontWeight="Bold" />
+				<Controls:FileSelect Grid.Row="0" Grid.Column="1" x:Name="txtFile" Margin="5" VerticalContentAlignment="Center" FontWeight="Normal"
+					FileName="C:\Users\jose.bautista\Downloads\SourceCode\DbReporting-main\tests\LibReporting.Tests\Data\Sales\Reporting-Sql Server - SalesSamples.Schema.xml"
+					Mask="Xml files (*.xml)|*.xml|All files (*.*)|*.*"
+				/>
+				<Label Grid.Row="1" Grid.Column="0" Content="Output folder:" Margin="5" Foreground="Navy" FontWeight="Bold" />
+				<Controls:PathSelect Grid.Row="1" Grid.Column="1" x:Name="txtOutput" Margin="5" VerticalContentAlignment="Center" FontWeight="Normal"
+					PathName="C:\Users\jose.bautista\Downloads\SourceCode\DbReporting-main\tests\LibReporting.Tests\Data\Sales\Requests"/>
 			</Grid>
         </GroupBox>
-		<StackPanel Grid.Row="1">
-			<Button Content="Generar archivos" Click="cmdGenerate_Click"/>
-		</StackPanel>
+			<Button Click="cmdGenerate_Click" Grid.Row="2" Margin="5">
+				<StackPanel Orientation="Horizontal">
+					<Image Source="/Resources/Accept.png"/>
+					<TextBlock Text="Generate"/>
+				</StackPanel>
+			</Button>
     </Grid>
 </Window>

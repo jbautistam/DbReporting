@@ -12,7 +12,7 @@ namespace Bau.Libraries.LibReporting.Repository.Xml.Repositories;
 /// <summary>
 ///		Repositorio de <see cref="ReportModel"/> con archivos XML
 /// </summary>
-public class ReportRepository : BaseRepository, Application.Interfaces.IReportRepository
+public class ReportRepository
 {
 	// Constantes privadas
 	private const string TagRoot = "Report";
@@ -48,26 +48,18 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 	private const string TagColumn = "Column";
 	private const string TagDimensionColumn = "DimensionColumn";
 
-	public ReportRepository(ReportingRepositoryXml manager) : base(manager) {}
-
 	/// <summary>
 	///		Carga el informe de un archivo sobre un <see cref="DataWarehouseModel"/>
 	/// </summary>
-	public async Task<ReportModel> GetAsync(string id, DataWarehouseModel dataWarehouse, CancellationToken cancellationToken)
-	{
-		// Evita las advertencias
-		await Task.Delay(1, cancellationToken);
-		// Carga los datos
-		return Get(id, dataWarehouse);
-	}
+	public ReportModel Load(string fileName, DataWarehouseModel dataWarehouse) => LoadFromXml(fileName, dataWarehouse, File.ReadAllText(fileName));
 
 	/// <summary>
-	///		Carga el informe de un archivo sobre un <see cref="DataWarehouseModel"/>
+	///		Carga el informe de un texto XML sobre un <see cref="DataWarehouseModel"/>
 	/// </summary>
-	public ReportModel Get(string id, DataWarehouseModel dataWarehouse)
+	public ReportModel LoadFromXml(string reportId, DataWarehouseModel dataWarehouse, string xml)
 	{
-		ReportModel report = new(dataWarehouse, id);
-		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().Load(report.FileName);
+		ReportModel report = new(dataWarehouse, reportId);
+		MLFile fileML = new LibMarkupLanguage.Services.XML.XMLParser().ParseText(xml);
 
 			// Carga los datos del informe
 			foreach (MLNode rootML in fileML.Nodes)
@@ -124,7 +116,7 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 		return new ReportParameterModel
 						{
 							Id = rootML.Attributes[TagName].Value.TrimIgnoreNull(),
-							Type = rootML.Attributes[TagType].Value.GetEnum(LibReporting.Models.DataWarehouses.DataSets.DataSourceColumnModel.FieldType.Unknown),
+							Type = rootML.Attributes[TagType].Value.GetEnum(DataSourceColumnModel.FieldType.Unknown),
 							DefaultValue = rootML.Attributes[TagDefault].Value.TrimIgnoreNull()
 						};
 	}
@@ -312,10 +304,10 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 				if (nodeML.Name == TagDimension)
 				{
 					ReportRequestDimension dimension = new()
-																	{
-																		DimensionKey = nodeML.Attributes[TagName].Value.TrimIgnoreNull(),
-																		Required = nodeML.Attributes[TagRequired].Value.TrimIgnoreNull().GetBool()
-																	};
+														{
+															DimensionKey = nodeML.Attributes[TagName].Value.TrimIgnoreNull(),
+															Required = nodeML.Attributes[TagRequired].Value.TrimIgnoreNull().GetBool()
+														};
 
 						// Añade los conjuntos de campos
 						foreach (MLNode childML in nodeML.Nodes)
@@ -415,24 +407,5 @@ public class ReportRepository : BaseRepository, Application.Interfaces.IReportRe
 																  rootML.Attributes[TagType].Value.GetEnum(DataSourceColumnModel.FieldType.Decimal)));
 			// Devuelve la lista de expresiones
 			return expressions;
-	}
-
-	/// <summary>
-	///		Graba los datos: aún no hace nada (BauDbStudio lo graba como un archivo XML simple)
-	/// </summary>
-	public void Update(string id, ReportModel request)
-	{
-		throw new NotImplementedException();
-	}
-
-	/// <summary>
-	///		Graba los datos: aún no hace nada (BauDbStudio lo graba como un archivo XML simple)
-	/// </summary>
-	public async Task UpdateAsync(string id, ReportModel request, CancellationToken cancellationToken)
-	{
-		// Evita las advertencias
-		await Task.Delay(1, cancellationToken);
-		// Graba los datos
-		Update(id, request);
 	}
 }

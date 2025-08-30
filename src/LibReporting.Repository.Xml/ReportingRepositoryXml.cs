@@ -1,37 +1,27 @@
-﻿using Bau.Libraries.LibReporting.Application.Interfaces;
-
-namespace Bau.Libraries.LibReporting.Repository.Xml;
+﻿namespace Bau.Libraries.LibReporting.Repository.Xml;
 
 /// <summary>
 ///		Controlador del repositorio de informes utilizando XML
 /// </summary>
-public class ReportingRepositoryXml : IReportingRepository
+public class ReportingRepositoryXml
 {
-	public ReportingRepositoryXml()
-	{
-		DataWarehouseRepository = new Repositories.DataWarehouseRepository(this);
-		ReportRepository = new Repositories.ReportRepository(this);
-		RequestRepository = new Repositories.RequestRepository(this);
-		TransformRuleRepository = new Repositories.TransformRuleRepository();
-	}
-
 	/// <summary>
 	///		Repositorio de <see cref="Models.DataWarehouses.DataWarehouseModel"/>
 	/// </summary>
-	public ISchemaRepository DataWarehouseRepository { get; }
+	public Repositories.DataWarehouseRepository DataWarehouseRepository { get; } = new();
 
 	/// <summary>
 	///		Repositorio de <see cref="Models.DataWarehouses.Reports.ReportModel"/>
 	/// </summary>
-	public IReportRepository ReportRepository { get; }
+	public Repositories.ReportRepository ReportRepository { get; } = new();
 
 	/// <summary>
 	///		Repositorio de <see cref="Models.DataWarehouses.Reports.Transformers.TransformRuleModel"/>
 	/// </summary>
-	public Repositories.TransformRuleRepository TransformRuleRepository { get; }
+	public Repositories.TransformRuleRepository TransformRuleRepository { get; } = new();
 
 	/// <summary>
 	///		Repositorio de <see cref="Requests.Models.ReportRequestModel"/>
 	/// </summary>
-	public IRequestRepository RequestRepository { get; }
+	public Repositories.RequestRepository RequestRepository { get; } = new();
 }

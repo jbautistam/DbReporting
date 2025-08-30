@@ -20,14 +20,14 @@ internal class SqlTestManager
 	{
 		ReportingManager manager = new();
 		Bau.Libraries.LibReporting.Repository.Xml.ReportingRepositoryXml repository = new();
-		ReportRequestModel? request = repository.RequestRepository.Get(Configuration.GetReportConfiguration(type).RequestFile);
+		ReportRequestModel? request = repository.RequestRepository.Load(Configuration.GetReportConfiguration(type).RequestFile);
 
 			if (request is null)
 				throw new Exception($"Can't load the request for report: {type}");
 			else
 			{
 				// Agrega el dataWarehouse
-				manager.AddDataWarehouse(repository.DataWarehouseRepository.Get(Configuration.SchemaFile, manager.Schema));
+				manager.AddDataWarehouse(repository.DataWarehouseRepository.Load(Configuration.SchemaFile, manager.Schema));
 				// Cambia la paginación de la solicitud
 				request.Pagination.MustPaginate = page > 0;
 				request.Pagination.Page = page;

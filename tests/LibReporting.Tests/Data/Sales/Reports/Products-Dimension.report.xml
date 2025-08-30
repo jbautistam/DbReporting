@@ -12,8 +12,10 @@
 
 			<Query>
 				<![CDATA[
-					SELECT {{
+					SELECT Id
+						   {{
 								Fields
+									-WithComma
 									-Dimension: Products 
 										--Table: ProductsCte
 	                		}}

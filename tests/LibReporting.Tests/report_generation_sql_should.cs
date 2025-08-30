@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 
 namespace LibReporting.Tests;
 
@@ -14,49 +14,44 @@ public class report_generation_sql_should
 	[Theory]
 	[InlineData("Sales/Reporting-Sql Server - SalesSamples.Schema.xml", 
 				"Sales/ManualRequests/Sales/Sales.request.xml")]
-/*
-	[InlineData("Sales/Reporting-Sql Server - SalesSamples.Schema.xml", 
-				"Sales/ManualRequests/Products.request.xml")]
-*/
 	public void convert_to_sql(string schema, string fileRequest)
 	{
 		string schemaFileName = Tools.FileHelper.GetFullFileName(schema);
 		string requestFileName = Tools.FileHelper.GetFullFileName(fileRequest);
 		string error = CheckResponseFile(schemaFileName, requestFileName);
 
-			error.Should().BeNullOrWhiteSpace();
+			error.ShouldBeNullOrWhiteSpace();
 	}
 
 	/// <summary>
 	///		Comprueba todos los archivos de informe: obtiene todos los esquemas e informes del directorio Data, obtiene todos los
 	///	archivos de solicitud y los compara con las respuestas
 	/// </summary>
-	[Fact(Skip = "Todavía no")]
+	[Fact]
 	public void convert_to_sql_files()
 	{
-		Dictionary<string, List<string>> reports = Tools.FileHelper.GetReports();
+		List<string> schemaFiles = Tools.FileHelper.GetSchemasFiles();
 		string error = string.Empty;
 
-			// Recorre los esquemas e informes procesando las solicitudes / respuestas
-			foreach (KeyValuePair<string, List<string>> report in reports)
-				foreach (string reportFile in report.Value)
-				{
-					string pathRequest = Path.Combine(Path.GetDirectoryName(reportFile) ?? string.Empty, 
-													  reportFile[..^".report.xml".Length]);
+			// Recorre los directorios de esquemas procesando las solicitudes / respuestas
+			foreach (string schemaFile in schemaFiles)
+			{
+				string pathRequests = Path.Combine(Path.GetDirectoryName(schemaFile)!, "Requests");
 
-						if (!Directory.Exists(pathRequest))
-							error += $"Can't find request for report '{Path.GetFileName(reportFile)}'";
-						else
-							foreach (string requestFile in Directory.GetFiles(pathRequest, "*.request.xml"))
+					if (!Directory.Exists(pathRequests))
+						error += $"Can't find the path request at folder '{Path.GetFileName(schemaFile)}'";
+					else
+						foreach (string requestFolder in Directory.GetDirectories(pathRequests))
+							foreach (string requestFile in Directory.GetFiles(requestFolder, "*.request.xml"))
 							{
-								string errorCompare = CheckResponseFile(report.Key, requestFile);
+								string errorCompare = CheckResponseFile(schemaFile, requestFile);
 
 									if (!string.IsNullOrWhiteSpace(errorCompare))
 										error += errorCompare + Environment.NewLine;
 							}
-				}
+			}
 			// Comprueba los errores
-			error.Should().BeNullOrWhiteSpace();
+			error.ShouldBeNullOrWhiteSpace();
 	}
 
 	/// <summary>

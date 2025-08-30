@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Bau.Libraries.LibReporting.Models.DataWarehouses;
 
 namespace LibReporting.Tests;
@@ -36,6 +36,6 @@ public class schema_should
 							}
 			}
 			// Comprueba los errores
-			error.Should().BeNullOrEmpty();
+			error.ShouldBeNullOrEmpty();
 	}
 }
